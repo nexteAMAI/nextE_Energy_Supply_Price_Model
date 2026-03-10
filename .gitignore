@@ -5,10 +5,8 @@ config/api_keys.env
 
 # Data files (too large for Git; managed separately)
 data/raw/
-data/processed/
 data/static/*.csv
 data/static/*.parquet
-*.parquet
 
 # Python
 __pycache__/
