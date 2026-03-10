@@ -1,20 +1,19 @@
 """Page 05: Balancing — Imbalance cost rolling 30-day, Long/Short spread, volume."""
+import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
+from components.shared import init_page, load_csv, load_parquet, load_kpis
 import streamlit as st, pandas as pd, plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from pathlib import Path
 
 st.header("⚖️ Balancing & Imbalance Cost Tracker")
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "processed"
-
-imb_monthly = DATA_DIR / "imbalance_monthly_stats.csv"
-imb_rolling = DATA_DIR / "imbalance_rolling_30d.csv"
-imb_pq = DATA_DIR / "streamlit_imbalance.parquet"
+DATA_DIR = init_page()
 
 tab1, tab2, tab3 = st.tabs(["📈 Monthly Cost", "🔄 Rolling 30-Day", "📊 Long/Short Spread"])
 
 with tab1:
-    if imb_monthly.exists():
-        monthly = pd.read_csv(imb_monthly, index_col=0, parse_dates=True)
+    monthly = load_csv("imbalance_monthly_stats.csv")
+    if not monthly.empty:
         n = st.slider("Months to show", 12, 120, 36, key="imb_m")
         last = monthly.tail(n)
 
@@ -28,7 +27,7 @@ with tab1:
                 fig.add_trace(go.Scatter(x=last.index, y=last[col], name=name, mode="lines+markers"))
             fig.update_layout(height=400, yaxis_title="EUR/MWh", font=dict(family="DM Sans"),
                                legend=dict(orientation="h", y=-0.15), margin=dict(t=20))
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
 
         if spread_cols:
             st.subheader("Long/Short Spread to DAM (Monthly Avg)")
@@ -38,13 +37,13 @@ with tab1:
                 fig2.add_trace(go.Bar(x=last.index, y=last[col], name=name))
             fig2.update_layout(height=350, yaxis_title="EUR/MWh", barmode="group",
                                 font=dict(family="DM Sans"), legend=dict(orientation="h", y=-0.15), margin=dict(t=20))
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width='stretch')
     else:
         st.warning("Imbalance monthly stats not found.")
 
 with tab2:
-    if imb_rolling.exists():
-        rolling = pd.read_csv(imb_rolling, index_col=0, parse_dates=True)
+    rolling = load_csv("imbalance_rolling_30d.csv")
+    if not rolling.empty:
         last_365 = rolling.tail(365)
 
         cost_col = [c for c in last_365.columns if "rolling_imbalance_cost" in c]
@@ -57,7 +56,7 @@ with tab2:
             fig3.add_hline(y=2.5, line_dash="dash", line_color="#27ae60",
                             annotation_text="Well-managed target (2.5 EUR/MWh)")
             fig3.update_layout(height=400, yaxis_title="EUR/MWh", font=dict(family="DM Sans"), margin=dict(t=20))
-            st.plotly_chart(fig3, use_container_width=True)
+            st.plotly_chart(fig3, width='stretch')
 
         ls_cols = [c for c in last_365.columns if "spread" in c.lower()]
         if ls_cols:
@@ -67,10 +66,9 @@ with tab2:
         st.info("Rolling imbalance data not available.")
 
 with tab3:
-    if imb_pq.exists():
+    imb = load_parquet("streamlit_imbalance.parquet")
+    if not imb.empty:
         st.subheader("Imbalance Price Distribution (Last 12 Months)")
-        imb = pd.read_parquet(imb_pq)
-        imb.index = pd.to_datetime(imb.index)
         last_12m = imb[imb.index >= imb.index.max() - pd.Timedelta(days=365)]
 
         long_col = [c for c in last_12m.columns if "Long" in c]
@@ -85,6 +83,6 @@ with tab3:
             fig4.update_layout(height=400, font=dict(family="DM Sans"), showlegend=False, margin=dict(t=40))
             fig4.update_xaxes(title_text="EUR/MWh")
             fig4.update_yaxes(title_text="Count")
-            st.plotly_chart(fig4, use_container_width=True)
+            st.plotly_chart(fig4, width='stretch')
     else:
         st.info("Imbalance parquet data not available.")
