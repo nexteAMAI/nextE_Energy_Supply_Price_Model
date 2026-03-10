@@ -1,0 +1,54 @@
+# ==============================================================================
+# Weekly Data Refresh — Sunday 08:00 EET (05:00 UTC)
+# Fetches: commodity futures (TTF, coal, EUA, Brent), RO power forward curve,
+# SRMC recalculation, forward curve export
+# ==============================================================================
+
+name: Weekly Forward Curve Refresh
+
+on:
+  schedule:
+    - cron: '0 5 * * 0'  # 05:00 UTC Sunday = 08:00 EET
+  workflow_dispatch:
+
+env:
+  EQ_API_KEY: ${{ secrets.EQ_API_KEY }}
+  ENTSOE_API_KEY: ${{ secrets.ENTSOE_API_KEY }}
+  BALANCING_SERVICES_API_KEY: ${{ secrets.BALANCING_SERVICES_API_KEY }}
+  JAO_API_KEY: ${{ secrets.JAO_API_KEY }}
+
+jobs:
+  weekly-refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run weekly pipeline
+        run: python pipeline.py --mode weekly
+
+      - name: Run full test suite
+        run: pytest tests/ -v --tb=short --cov=processors --cov-report=html
+
+      - name: Upload processed data
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-data-${{ github.run_number }}
+          path: data/processed/
+          retention-days: 60
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov/
