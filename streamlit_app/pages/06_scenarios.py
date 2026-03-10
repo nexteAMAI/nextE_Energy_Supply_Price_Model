@@ -88,6 +88,7 @@ with tab2:
 
     tornado = load_csv("tornado_inputs.csv")
     if not tornado.empty:
+        tornado = tornado.reset_index()  # load_csv sets index_col=0; restore "variable" as a column
         fig_t = go.Figure()
         fig_t.add_trace(go.Bar(
             y=tornado["variable"], x=tornado["low_impact_eur_mwh"],
