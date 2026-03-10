@@ -1,0 +1,46 @@
+# ==============================================================================
+# Daily Data Refresh — 06:00 EET (03:00 UTC)
+# Fetches D-1: DAM prices, generation, load, imbalance, FX
+# ==============================================================================
+
+name: Daily Data Refresh
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # 03:00 UTC = 06:00 EET
+  workflow_dispatch:       # Manual trigger
+
+env:
+  EQ_API_KEY: ${{ secrets.EQ_API_KEY }}
+  ENTSOE_API_KEY: ${{ secrets.ENTSOE_API_KEY }}
+  BALANCING_SERVICES_API_KEY: ${{ secrets.BALANCING_SERVICES_API_KEY }}
+
+jobs:
+  daily-refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run daily pipeline
+        run: python pipeline.py --mode daily
+
+      - name: Run validation
+        run: pytest tests/ -v --tb=short -k "not integration"
+
+      - name: Upload processed data
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-data-${{ github.run_number }}
+          path: data/processed/
+          retention-days: 30
