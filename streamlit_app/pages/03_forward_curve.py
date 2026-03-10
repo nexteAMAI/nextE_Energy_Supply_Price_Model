@@ -1,15 +1,16 @@
 """Page 03: Forward Curve — RO power forward vs Aurora Central/Low/High."""
+import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
+from components.shared import init_page, load_csv, load_parquet, load_kpis
 import streamlit as st, pandas as pd, plotly.graph_objects as go
-from pathlib import Path
 
 st.header("📉 Forward Curve & Aurora Forecast")
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "processed"
+DATA_DIR = init_page()
 
-aurora_csv = DATA_DIR / "aurora_forecast.csv"
-if not aurora_csv.exists():
+aurora = load_csv("aurora_forecast.csv")
+if aurora.empty:
     st.warning("Aurora forecast not found."); st.stop()
-
-aurora = pd.read_csv(aurora_csv, index_col=0, parse_dates=True)
 
 # --- Scenario selector ---
 tab1, tab2 = st.tabs(["📈 Baseload Forecast", "☀️ Technology Captured Prices"])
@@ -47,7 +48,7 @@ with tab1:
             margin=dict(t=50),
             hovermode="x unified",
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
         # Near-term table
         st.subheader("2026 Monthly Benchmarks (Central)")
@@ -55,7 +56,7 @@ with tab1:
         if not near.empty and central:
             display = near[["Month_Name"] + central + (low or []) + (high or [])].copy() if "Month_Name" in near.columns else near[central + (low or []) + (high or [])].copy()
             st.dataframe(display.style.format("{:.2f}", subset=[c for c in display.columns if "€" in c or "Nominal" in c]),
-                          use_container_width=True)
+                          width='stretch')
 
 with tab2:
     st.subheader("Technology-Specific Captured Prices (Central, Curtailed)")
@@ -81,7 +82,7 @@ with tab2:
     fig2.update_layout(height=450, yaxis_title="EUR/MWh (nominal)",
                         title="Captured Prices by Technology vs Baseload",
                         font=dict(family="DM Sans"), legend=dict(orientation="h", y=-0.12), margin=dict(t=50))
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
 
     # Curtailment rates
     curt_cols = [c for c in aurora.columns if "Curtailment" in c and "Central" in c]
