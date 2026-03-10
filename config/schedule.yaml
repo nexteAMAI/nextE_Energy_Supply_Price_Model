@@ -1,0 +1,39 @@
+# ==============================================================================
+# Layer 1 Refresh Schedule Configuration
+# Reference: Prompt Section 12.3
+# ==============================================================================
+
+daily:
+  cron: "0 6 * * *"  # 06:00 EET daily
+  timezone: "Europe/Bucharest"
+  tasks:
+    - name: "DAM prices (D-1)"
+      extractor: "eq_client"
+      curves: ["dam_spot"]
+    - name: "Generation actuals (D-1)"
+      extractor: "entsoe_client"
+      function: "query_generation"
+    - name: "Load actual + forecast"
+      extractor: "entsoe_client"
+      function: "query_load"
+    - name: "Imbalance prices/volumes (D-1)"
+      extractor: "balancing_client"
+      endpoints: ["imbalance/prices", "imbalance/total-volumes"]
+    - name: "FX rate (EUR/RON, USD/EUR)"
+      extractor: "fx_client"
+
+weekly:
+  cron: "0 8 * * 0"  # Sunday 08:00 EET
+  timezone: "Europe/Bucharest"
+  tasks:
+    - name: "Commodity futures (TTF, coal, EUA, Brent) — full OHLC"
+      extractor: "eq_client"
+      curves: ["ttf_gas_front_month", "ttf_gas_cal_plus_1", "coal_api2_cal_plus_1",
+               "eua_front_december", "brent_front_month"]
+    - name: "RO power forward curve (EEX)"
+      extractor: "eq_client"
+      curves: ["ro_power_base_cal_plus_1", "ro_power_base_quarter", "ro_power_base_month"]
+    - name: "SRMC recalculation"
+      processor: "srmc"
+    - name: "Forward curve export for Excel/Streamlit"
+      output: "forward_curve_latest.csv"

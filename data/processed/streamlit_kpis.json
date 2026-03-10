@@ -1,0 +1,17 @@
+{
+  "dam_base_avg_latest_month": 109.33703465346535,
+  "dam_peak_avg_latest_month": 115.24591991341991,
+  "dam_offpeak_avg_latest_month": 104.35545620437956,
+  "trailing_6m_avg": 119.64134258398002,
+  "trailing_12m_avg": 105.38432321019191,
+  "imbalance_cost_p50": 0.0,
+  "imbalance_cost_p90": 16.856298447145065,
+  "eur_ron_latest": 5.0953,
+  "live_dam_latest_eur_mwh": 152.6,
+  "live_dam_latest_timestamp": "2026-03-09 22:00:00+01:00",
+  "live_load_latest_mw": 6340.0,
+  "data_start": "2015-01-01 01:00:00+02:00",
+  "data_end": "2026-02-25 00:45:00+02:00",
+  "last_updated": "2026-03-10T13:35:50.575008",
+  "refresh_type": "live_api_merge"
+}

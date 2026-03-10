@@ -1,0 +1,37 @@
+# API Keys — NEVER commit
+config/api_keys.env
+*.env
+!*.env.template
+
+# Data files (raw and static are too large; processed is committed for Streamlit Cloud)
+data/raw/
+data/static/*.csv
+data/static/*.parquet
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+!.streamlit/secrets.toml.template

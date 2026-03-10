@@ -1,0 +1,29 @@
+{
+  "total_contracted_volume_mwh": 53000,
+  "portfolio_weighted_price_eur": 90.5,
+  "hedging_ratio_pct": 96.4,
+  "residual_unhedged_volume_mwh": 2000,
+  "contract_count_active": 6,
+  "total_delivery_obligation_mwh": 55000,
+  "breakdown_by_type": {
+    "PPA_Fixed": 47.2,
+    "PPA_DAM_Indexed": 9.4,
+    "PPA_Collar": 5.7,
+    "CMBC_EA": 15.1,
+    "EEX_Forward": 22.6
+  },
+  "breakdown_by_fuel": {
+    "Hydro": 18.9,
+    "Nuclear": 28.3,
+    "Wind": 9.4,
+    "Solar": 5.7,
+    "Mixed": 37.7
+  },
+  "price_range_eur": {
+    "min": 78.0,
+    "max": 102.0,
+    "weighted_avg": 90.5
+  },
+  "last_updated": "2026-03-10T13:35:00",
+  "source": "Layer 2 Excel \u2014 CONTRACT_REGISTER sheet (manual export)"
+}

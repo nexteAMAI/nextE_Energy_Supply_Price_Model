@@ -1,0 +1,47 @@
+name: Daily Data Refresh
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # 03:00 UTC = 06:00 EET
+  workflow_dispatch:
+
+env:
+  EQ_API_KEY: ${{ secrets.EQ_API_KEY }}
+  ENTSOE_API_KEY: ${{ secrets.ENTSOE_API_KEY }}
+  BALANCING_SERVICES_API_KEY: ${{ secrets.BALANCING_SERVICES_API_KEY }}
+
+jobs:
+  daily-refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run live refresh pipeline
+        run: python live_refresh.py --days 14
+
+      - name: Run unit tests
+        run: pytest tests/test_srmc.py tests/test_blended_cost.py tests/test_validation.py -v --tb=short
+        continue-on-error: true
+
+      - name: Commit and push updated data
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/processed/
+          git diff --cached --quiet || git commit -m "Auto-refresh: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
