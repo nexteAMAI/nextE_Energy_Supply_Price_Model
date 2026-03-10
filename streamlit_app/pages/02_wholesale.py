@@ -1,23 +1,19 @@
 """Page 02: Wholesale Analysis — DAM price history, IDM spread, statistics."""
+import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
+from components.shared import init_page, load_csv, load_parquet, load_kpis
 import streamlit as st, pandas as pd, plotly.graph_objects as go, numpy as np
-from pathlib import Path
 
 st.header("📈 Wholesale Energy Market Analysis")
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "processed"
+DATA_DIR = init_page()
 
-# --- Load data ---
-dam_pq = DATA_DIR / "streamlit_dam_timeseries.parquet"
-monthly_csv = DATA_DIR / "dam_monthly_summary.csv"
-idm_csv = DATA_DIR / "idm_monthly_spread.csv"
-
-if not dam_pq.exists():
+dam = load_parquet("streamlit_dam_timeseries.parquet")
+if dam.empty:
     st.warning("DAM data not found."); st.stop()
 
-dam = pd.read_parquet(dam_pq)
-dam.index = pd.to_datetime(dam.index)
 price_col = [c for c in dam.columns if "EUR/MWh" in c or "Value" in c][0]
 
-# --- Date filter ---
 tab1, tab2, tab3 = st.tabs(["📉 Price History", "📊 Monthly Statistics", "🔄 IDM Analysis"])
 
 with tab1:
@@ -54,7 +50,7 @@ with tab1:
 
     fig.update_layout(height=450, yaxis_title="EUR/MWh", font=dict(family="DM Sans"),
                        legend=dict(orientation="h", y=-0.12), margin=dict(t=20))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     # Summary stats
     c1, c2, c3, c4 = st.columns(4)
@@ -64,8 +60,8 @@ with tab1:
     c4.metric("Max", f"€{plot_data.max():.2f}")
 
 with tab2:
-    if monthly_csv.exists():
-        monthly = pd.read_csv(monthly_csv, index_col=0, parse_dates=True)
+    monthly = load_csv("dam_monthly_summary.csv")
+    if not monthly.empty:
         last_24 = monthly.tail(24)
 
         fig2 = go.Figure()
@@ -77,16 +73,16 @@ with tab2:
                                    line=dict(color="#27ae60", dash="dot", width=1.5)))
         fig2.update_layout(height=400, yaxis_title="EUR/MWh", barmode="group",
                             font=dict(family="DM Sans"), legend=dict(orientation="h", y=-0.15), margin=dict(t=20))
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width='stretch')
 
         st.subheader("Monthly Data Table")
         display_cols = ["base_avg", "peak_avg", "offpeak_avg", "p10", "p50", "p90", "min_price", "max_price", "count"]
         available = [c for c in display_cols if c in last_24.columns]
-        st.dataframe(last_24[available].style.format("{:.2f}"), use_container_width=True, height=400)
+        st.dataframe(last_24[available].style.format("{:.2f}"), width='stretch', height=400)
 
 with tab3:
-    if idm_csv.exists():
-        idm = pd.read_csv(idm_csv, index_col=0, parse_dates=True)
+    idm = load_csv("idm_monthly_spread.csv")
+    if not idm.empty:
         st.subheader("IDM-DAM Spread (Monthly)")
 
         spread_cols = [c for c in idm.columns if "spread" in c.lower()]
@@ -100,7 +96,7 @@ with tab3:
                                    marker_color=["#e74c3c" if v > 0 else "#27ae60" for v in (idm[spread_cols[0]] if spread_cols else [])]))
             fig3.update_layout(height=350, yaxis_title="EUR/MWh (premium/discount)",
                                 font=dict(family="DM Sans"), margin=dict(t=20))
-            st.plotly_chart(fig3, use_container_width=True)
+            st.plotly_chart(fig3, width='stretch')
 
         if vol_cols:
             st.subheader("IDM Traded Volume (Monthly)")

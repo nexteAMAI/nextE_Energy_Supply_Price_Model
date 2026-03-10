@@ -1,19 +1,19 @@
 """Page 01: Dashboard — KPI cards, waterfall chart, contract summary."""
-import streamlit as st, json, plotly.graph_objects as go
-from pathlib import Path
+import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
+from components.shared import init_page, load_csv, load_parquet, load_kpis, load_contract_summary
+import streamlit as st, plotly.graph_objects as go
 import pandas as pd
 
 st.header("📊 Dashboard — Key Performance Indicators")
 
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "processed"
-kpi_path = DATA_DIR / "streamlit_kpis.json"
+DATA_DIR = init_page()
 
-if not kpi_path.exists():
+kpis = load_kpis()
+if not kpis:
     st.warning("KPI data not found. Run Layer 1 pipeline first.")
     st.stop()
-
-with open(kpi_path) as f:
-    kpis = json.load(f)
 
 # --- Live Price Banner ---
 live_price = kpis.get("live_dam_latest_eur_mwh")
@@ -38,11 +38,8 @@ c8.metric("Off-Peak Avg", f"€{kpis.get('dam_offpeak_avg_latest_month',0):.2f}/
 st.divider()
 
 # --- Contract Register Summary (Layer 2 Integration) ---
-contract_path = DATA_DIR / "contract_summary.json"
-if contract_path.exists():
-    with open(contract_path) as f:
-        contracts = json.load(f)
-
+contracts = load_contract_summary()
+if contracts:
     st.subheader("📋 Contract Register Summary (Layer 2)")
     st.caption("Source: Excel CONTRACT_REGISTER sheet — summary-level export only")
 
@@ -62,7 +59,7 @@ if contract_path.exists():
                 marker=dict(colors=["#2c3e50", "#3498db", "#e67e22", "#27ae60", "#9b59b6"]),
             ))
             fig_bt.update_layout(height=300, title="By Contract Type", font=dict(family="DM Sans", size=10), margin=dict(t=40, b=10))
-            st.plotly_chart(fig_bt, use_container_width=True)
+            st.plotly_chart(fig_bt, width='stretch')
 
     with col_fuel:
         bf = contracts.get("breakdown_by_fuel", {})
@@ -73,7 +70,7 @@ if contract_path.exists():
                 marker=dict(colors=["#004E98", "#FF6B35", "#06D6A0", "#FFD166", "#95a5a6"]),
             ))
             fig_bf.update_layout(height=300, title="By Fuel Source", font=dict(family="DM Sans", size=10), margin=dict(t=40, b=10))
-            st.plotly_chart(fig_bf, use_container_width=True)
+            st.plotly_chart(fig_bf, width='stretch')
 
     residual = contracts.get("residual_unhedged_volume_mwh", 0)
     total = contracts.get("total_delivery_obligation_mwh", 1)
@@ -139,11 +136,11 @@ fig.update_layout(
              bordercolor="#e74c3c", borderwidth=1, borderpad=8, bgcolor="rgba(255,255,255,0.9)")
     ]
 )
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
 
 # --- Monthly DAM Trend ---
 st.subheader("DAM Monthly Price Trend")
-monthly = pd.read_csv(DATA_DIR / "dam_monthly_summary.csv", index_col=0, parse_dates=True)
+monthly = load_csv("dam_monthly_summary.csv")
 if not monthly.empty:
     last_36 = monthly.tail(36)
     fig2 = go.Figure()
@@ -152,4 +149,4 @@ if not monthly.empty:
     fig2.add_trace(go.Scatter(x=last_36.index, y=last_36["offpeak_avg"], name="Off-Peak", line=dict(color="#3498db", width=1.5, dash="dot")))
     fig2.update_layout(height=350, yaxis_title="EUR/MWh", font=dict(family="DM Sans"),
                         legend=dict(orientation="h", y=-0.15), margin=dict(t=20))
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
