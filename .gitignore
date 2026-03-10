@@ -1,0 +1,38 @@
+# API Keys — NEVER commit
+config/api_keys.env
+*.env
+!*.env.template
+
+# Data files (too large for Git; managed separately)
+data/raw/
+data/processed/
+data/static/*.csv
+data/static/*.parquet
+*.parquet
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
