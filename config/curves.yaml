@@ -1,0 +1,172 @@
+# ==============================================================================
+# Energy Quantified (EQ) Curve Name Registry
+# Maps model variables to EQ curve identifiers for API extraction
+# Reference: EQ Excel Integrator v1.1 + Addendum Section A.1 / I
+# ==============================================================================
+
+# --- Spot Prices & Fundamentals (TIMESERIES) ---
+timeseries:
+  dam_spot:
+    curve: "RO Price Spot EUR/MWh OPCOM H Actual"
+    type: TIMESERIES
+    unit: "EUR/MWh"
+    module: M1
+
+  wind_production:
+    curve: "RO Wind Power Production MWh/h 15min Actual"
+    type: TIMESERIES
+    unit: "MWh/h"
+    module: M3
+
+  solar_production:
+    curve: "RO Solar Power Production MWh/h 15min Actual"
+    type: TIMESERIES
+    unit: "MWh/h"
+    module: M3
+
+  consumption:
+    curve: "RO Consumption MWh/h 15min Actual"
+    type: TIMESERIES
+    unit: "MWh/h"
+    module: M3
+
+  hydro_production:
+    curve: "RO Hydro Power Production MWh/h H Actual"
+    type: TIMESERIES
+    unit: "MWh/h"
+    module: M3
+
+  nuclear_production:
+    curve: "RO Nuclear Power Production MWh/h H Actual"
+    type: TIMESERIES
+    unit: "MWh/h"
+    module: M3
+
+  spot_backcast:
+    curve: "RO Price Spot EUR/MWh Power2Sim H Backcast"
+    type: TIMESERIES
+    unit: "EUR/MWh"
+    module: M1
+
+  residual_load_backcast:
+    curve: "RO Residual Load MWh/h 15min Backcast"
+    type: TIMESERIES
+    unit: "MWh/h"
+    module: M3
+
+  imbalance_volume:
+    curve: "RO Volume Imbalance Net MWh 15min Actual"
+    type: TIMESERIES
+    unit: "MWh"
+    module: M5
+
+  sensitivity_spot:
+    curve: "RO Sensitivity Spot EUR/MWh H Scenario"
+    type: TIMESERIES
+    unit: "EUR/MWh"
+    module: M6
+    note: "20 scenarios from -1400MW to +1400MW"
+
+# --- Forecasts (INSTANCE) ---
+instance:
+  wind_forecast:
+    curve: "RO Wind Power Production MWh/h 15min Forecast"
+    type: INSTANCE
+    tag: "EC"
+    module: M3
+
+  solar_forecast:
+    curve: "RO Solar Power Production MWh/h 15min Forecast"
+    type: INSTANCE
+    tag: "EC"
+    module: M3
+
+  consumption_forecast:
+    curve: "RO Consumption MWh/h 15min Forecast"
+    type: INSTANCE
+    tag: "EC"
+    module: M3
+
+  spot_price_forecast:
+    curve: "RO Price Spot EUR/MWh H Forecast"
+    type: INSTANCE
+    tag: "PREFIX"
+    module: M1
+
+# --- Commodity Futures (OHLC) ---
+ohlc:
+  ttf_gas_front_month:
+    curve: "NL Futures Natural Gas EUR/MWh ICE-TTF OHLC"
+    type: OHLC
+    field: settlement
+    period: month
+    trades: "continues front"
+    front: 1
+    module: M2
+
+  ttf_gas_cal_plus_1:
+    curve: "NL Futures Natural Gas EUR/MWh ICE-TTF OHLC"
+    type: OHLC
+    field: settlement
+    period: year
+    trades: "contract delivery"
+    delivery: "Cal+1"
+    srmc: true
+    efficiency: 0.55
+    module: M2
+
+  coal_api2_cal_plus_1:
+    curve: "Futures Coal API-2 USD/t ICE OHLC"
+    type: OHLC
+    field: settlement
+    period: year
+    trades: "contract delivery"
+    delivery: "Cal+1"
+    srmc: true
+    efficiency: 0.42
+    module: M2
+
+  eua_front_december:
+    curve: "Futures EUA EUR/t ICE OHLC"
+    type: OHLC
+    field: settlement
+    period: mdec
+    trades: "continues front"
+    front: 1
+    module: M2
+
+  brent_front_month:
+    curve: "Futures Crude Oil Brent USD/bbl ICE OHLC"
+    type: OHLC
+    field: settlement
+    period: month
+    trades: "continues front"
+    front: 1
+    module: M2
+
+  ro_power_base_cal_plus_1:
+    curve: "RO Futures Power Base EUR/MWh EEX OHLC"
+    type: OHLC
+    field: settlement
+    period: year
+    trades: "contract delivery"
+    delivery: "Cal+1"
+    module: M1
+
+  ro_power_base_quarter:
+    curve: "RO Futures Power Base EUR/MWh EEX OHLC"
+    type: OHLC
+    field: settlement
+    period: quarter
+    trades: "continues front"
+    front: 1
+    module: M1
+
+  ro_power_base_month:
+    curve: "RO Futures Power Base EUR/MWh EEX OHLC"
+    type: OHLC
+    field: settlement
+    period: month
+    trades: "continues front"
+    front: 1
+    module: M1
