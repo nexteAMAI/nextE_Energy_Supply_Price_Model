@@ -17,7 +17,7 @@ tab1, tab2 = st.tabs(["📈 Baseload Forecast", "☀️ Technology Captured Pric
 
 with tab1:
     horizon = st.slider("Forecast horizon (years)", 2, 35, 10)
-    end_date = pd.Timestamp("2026-01-01") + pd.DateOffset(years=horizon)
+    end_date = pd.Timestamp("2026-01-01", tz="Europe/Bucharest") + pd.DateOffset(years=horizon)
     aurora_f = aurora[aurora.index <= end_date]
 
     central = [c for c in aurora_f.columns if "Baseload_Central" in c and "Nominal" in c]
