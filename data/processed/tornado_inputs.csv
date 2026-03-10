@@ -1,0 +1,7 @@
+variable,unit,low_shock,high_shock,low_impact_eur_mwh,high_impact_eur_mwh,low_total_price,high_total_price,impact_range
+EUR/RON FX Rate,EUR/RON,-0.1,0.1,-0.1,0.1,119.9,120.1,0.2
+EUA Carbon Price,EUR/t,-5.0,5.0,-0.37,0.37,119.63,120.37,0.74
+Procurement Weight Shift,%,-5.0,5.0,-1.5,1.5,118.5,121.5,3.0
+Bilateral PPA Volume,%,-10.0,10.0,-2.0,2.0,118.0,122.0,4.0
+TTF Gas Price,EUR/MWh,-10.0,10.0,-3.6363636363636367,3.6363636363636367,116.36363636363636,123.63636363636364,7.272727272727273
+RES Production,%,-10.0,10.0,-5.0,5.0,115.0,125.0,10.0
