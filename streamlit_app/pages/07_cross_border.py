@@ -1,19 +1,23 @@
 """Page 07: Cross-Border — FBMC flow monitor, capacity utilization, price convergence."""
+import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
+from components.shared import init_page, load_csv, load_parquet, load_kpis
 import streamlit as st, pandas as pd, plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from pathlib import Path
 
 st.header("🌍 Cross-Border Flow Monitor")
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "processed"
+DATA_DIR = init_page()
 
-cb_csv = DATA_DIR / "cross_border_monthly.csv"
-cb_pq = DATA_DIR / "streamlit_cross_border.parquet"
+# load_csv() guarantees a proper DatetimeIndex via pd.to_datetime(utc=True).tz_convert()
+# This fixes the crash at cb.resample("YS") that occurred when parse_dates=True
+# failed to produce a DatetimeIndex on certain CSV date formats.
+cb = load_csv("cross_border_monthly.csv")
 
 tab1, tab2, tab3 = st.tabs(["📊 Monthly Flows", "📈 High-Resolution", "ℹ️ FBMC Context"])
 
 with tab1:
-    if cb_csv.exists():
-        cb = pd.read_csv(cb_csv, index_col=0, parse_dates=True)
+    if not cb.empty:
         n_months = st.slider("Months", 12, 120, 36, key="cb_m")
         last = cb.tail(n_months)
 
@@ -43,23 +47,22 @@ with tab1:
                 hovermode="x unified",
             )
             fig.add_hline(y=0, line_color="grey", line_width=0.5)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
 
-            # Summary table
+            # Annual resample — safe because load_csv() ensures a DatetimeIndex
             st.subheader("Annual Net Imports by Border (GWh)")
             annual = cb.resample("YS").mean()
             annual_display = annual[border_cols + sum_col].tail(5)
             # Convert MW avg to GWh (× hours in year / 1000)
             annual_gwh = annual_display * 8760 / 1000
-            st.dataframe(annual_gwh.style.format("{:.0f}"), use_container_width=True)
+            st.dataframe(annual_gwh.style.format("{:.0f}"), width='stretch')
     else:
         st.warning("Cross-border monthly data not found.")
 
 with tab2:
-    if cb_pq.exists():
+    cb_hr = load_parquet("streamlit_cross_border.parquet")
+    if not cb_hr.empty:
         st.subheader("High-Resolution Cross-Border Flows")
-        cb_hr = pd.read_parquet(cb_pq)
-        cb_hr.index = pd.to_datetime(cb_hr.index)
 
         # Last 30 days
         last_30 = cb_hr[cb_hr.index >= cb_hr.index.max() - pd.Timedelta(days=30)]
@@ -79,7 +82,7 @@ with tab2:
                                 font=dict(family="DM Sans"), legend=dict(orientation="h", y=-0.15),
                                 margin=dict(t=20), hovermode="x unified")
             fig2.add_hline(y=0, line_color="grey", line_width=0.5)
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width='stretch')
 
             # Hourly profile by border
             st.subheader("Average Hourly Import Profile (Last 30 Days)")
@@ -93,7 +96,7 @@ with tab2:
                                            mode="lines+markers", line=dict(color=colors.get(border, "#999"))))
             fig3.update_layout(height=350, xaxis_title="Hour of Day", yaxis_title="Avg MW",
                                 font=dict(family="DM Sans"), legend=dict(orientation="h", y=-0.15), margin=dict(t=20))
-            st.plotly_chart(fig3, use_container_width=True)
+            st.plotly_chart(fig3, width='stretch')
     else:
         st.info("High-resolution cross-border data not available.")
 

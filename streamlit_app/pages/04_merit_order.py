@@ -1,17 +1,16 @@
 """Page 04: Merit Order — Generation stack, capacity factors, residual demand."""
+import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
+from components.shared import init_page, load_csv, load_parquet, load_kpis
 import streamlit as st, pandas as pd, plotly.graph_objects as go
-from pathlib import Path
 
 st.header("🏭 Generation Stack & Merit Order")
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "processed"
+DATA_DIR = init_page()
 
-gen_csv = DATA_DIR / "generation_monthly.csv"
-cf_csv = DATA_DIR / "capacity_factors_monthly.csv"
-
-if not gen_csv.exists():
+gen = load_csv("generation_monthly.csv")
+if gen.empty:
     st.warning("Generation data not found."); st.stop()
-
-gen = pd.read_csv(gen_csv, index_col=0, parse_dates=True)
 
 tab1, tab2, tab3 = st.tabs(["📊 Generation Mix", "⚡ Capacity Factors", "📋 Data Table"])
 
@@ -48,7 +47,7 @@ with tab1:
             legend=dict(orientation="h", y=-0.15, font=dict(size=10)),
             margin=dict(t=20), hovermode="x unified",
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     # Latest month pie chart
     if share_cols:
@@ -64,11 +63,11 @@ with tab1:
         ))
         fig_pie.update_layout(height=380, title=f"Generation Mix — {gen.index[-1].strftime('%b %Y')}",
                                font=dict(family="DM Sans"), margin=dict(t=50))
-        st.plotly_chart(fig_pie, use_container_width=True)
+        st.plotly_chart(fig_pie, width='stretch')
 
 with tab2:
-    if cf_csv.exists():
-        cf = pd.read_csv(cf_csv, index_col=0, parse_dates=True)
+    cf = load_csv("capacity_factors_monthly.csv")
+    if not cf.empty:
         cf_last = cf.tail(24)
         cf_cols = [c for c in cf_last.columns if "cf_pct" in c]
 
@@ -80,7 +79,7 @@ with tab2:
 
             fig_cf.update_layout(height=400, yaxis_title="Capacity Factor (%)",
                                   font=dict(family="DM Sans"), legend=dict(orientation="h", y=-0.15), margin=dict(t=20))
-            st.plotly_chart(fig_cf, use_container_width=True)
+            st.plotly_chart(fig_cf, width='stretch')
     else:
         st.info("Capacity factor data not available.")
 
@@ -88,4 +87,4 @@ with tab3:
     display = gen.tail(24)
     display_cols = [c for c in display.columns if "avg_mw" in c or "share_pct" in c or "total" in c]
     if display_cols:
-        st.dataframe(display[display_cols].style.format("{:.1f}"), use_container_width=True, height=500)
+        st.dataframe(display[display_cols].style.format("{:.1f}"), width='stretch', height=500)

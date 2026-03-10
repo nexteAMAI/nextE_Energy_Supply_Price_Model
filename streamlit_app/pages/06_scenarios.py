@@ -1,17 +1,15 @@
 """Page 06: Scenarios — 3-scenario comparison + sensitivity tornado chart."""
-import streamlit as st, pandas as pd, plotly.graph_objects as go, json
+import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
+from components.shared import init_page, load_csv, load_parquet, load_kpis
+import streamlit as st, pandas as pd, plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from pathlib import Path
 
 st.header("🔀 Scenario Comparison & Sensitivity Analysis")
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "processed"
+DATA_DIR = init_page()
 
-kpi_path = DATA_DIR / "streamlit_kpis.json"
-tornado_csv = DATA_DIR / "tornado_inputs.csv"
-
-kpis = {}
-if kpi_path.exists():
-    with open(kpi_path) as f: kpis = json.load(f)
+kpis = load_kpis()
 
 tab1, tab2 = st.tabs(["📊 3-Scenario Comparison", "🌪️ Sensitivity Tornado"])
 
@@ -63,7 +61,7 @@ with tab1:
 
     fig.update_layout(height=550, font=dict(family="DM Sans"), margin=dict(t=50, b=100))
     fig.update_yaxes(title_text="EUR/MWh", row=1, col=1)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     # Summary table
     st.subheader("Scenario Summary")
@@ -82,15 +80,14 @@ with tab1:
             "Total incl. VAT (€)": f"{sub+vat:.1f}",
             "Total (RON)": f"{(sub+vat)*eur_ron:.0f}",
         })
-    st.dataframe(pd.DataFrame(summary).set_index("Scenario"), use_container_width=True)
+    st.dataframe(pd.DataFrame(summary).set_index("Scenario"), width='stretch')
 
 with tab2:
     st.subheader("Price Sensitivity Tornado Chart")
     st.caption("Impact on final price from ± shocks to key variables (Section 14.2)")
 
-    if tornado_csv.exists():
-        tornado = pd.read_csv(tornado_csv)
-
+    tornado = load_csv("tornado_inputs.csv")
+    if not tornado.empty:
         fig_t = go.Figure()
         fig_t.add_trace(go.Bar(
             y=tornado["variable"], x=tornado["low_impact_eur_mwh"],
@@ -110,19 +107,18 @@ with tab2:
             margin=dict(l=200, t=20),
         )
         fig_t.add_vline(x=0, line_color="black", line_width=1)
-        st.plotly_chart(fig_t, use_container_width=True)
+        st.plotly_chart(fig_t, width='stretch')
 
         st.dataframe(tornado.style.format({
             "low_shock": "{:+.1f}", "high_shock": "{:+.1f}",
             "low_impact_eur_mwh": "{:+.2f}", "high_impact_eur_mwh": "{:+.2f}",
             "impact_range": "{:.2f}",
-        }), use_container_width=True)
+        }), width='stretch')
 
     # Price elasticity
-    elast_csv = DATA_DIR / "price_elasticity.csv"
-    if elast_csv.exists():
+    elast = load_csv("price_elasticity.csv")
+    if not elast.empty:
         st.subheader("Price Elasticity to Load Shifts")
-        elast = pd.read_csv(elast_csv, index_col=0)
 
         fig_e = go.Figure()
         fig_e.add_trace(go.Scatter(
@@ -142,4 +138,4 @@ with tab2:
         fig_e.add_hline(y=0, line_color="grey", line_width=0.5)
         fig_e.update_layout(height=400, xaxis_title="Load Shift (MW)", yaxis_title="Price Change (EUR/MWh)",
                              font=dict(family="DM Sans"), legend=dict(orientation="h", y=-0.15), margin=dict(t=20))
-        st.plotly_chart(fig_e, use_container_width=True)
+        st.plotly_chart(fig_e, width='stretch')
