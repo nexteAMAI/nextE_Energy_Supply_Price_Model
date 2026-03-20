@@ -5,6 +5,10 @@ Nord Pool, and OPCOM APIs.
   --- Supply Extension (v1.0.0, 2026-03-19) ---
   nordpool_client:  BRM/Nord Pool DAM+IDM+Forward data (TEL area)
   opcom_scraper:    OPCOM bilateral + GC market web scraper
+
+  --- DAMAS Extension (v1.0.0, 2026-03-20) ---
+  damas_client:     Transelectrica DAMAS system data (imbalance, generation,
+                    cross-border, load) with ENTSO-E fallback
 """
 
 # --- Supply Extension Exports ---
@@ -19,3 +23,20 @@ except ImportError as e:
         "Existing extractors are unaffected."
     )
     _SUPPLY_EXTRACTORS_AVAILABLE = False
+
+# --- DAMAS Extension Exports ---
+try:
+    from .damas_client import (
+        DAMASClient,
+        DAMASDataBundle,
+        ImbalanceDirection,
+        fetch_system_snapshot,
+    )
+    _DAMAS_AVAILABLE = True
+except ImportError as e:
+    import logging
+    logging.getLogger(__name__).warning(
+        f"DAMAS client not fully loaded: {e}. "
+        "Other extractors are unaffected."
+    )
+    _DAMAS_AVAILABLE = False
