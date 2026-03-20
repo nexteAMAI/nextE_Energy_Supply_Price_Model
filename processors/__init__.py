@@ -14,6 +14,9 @@ Layer 1 Processors — Analytical computation modules.
   supply_pricing:          B2B supply cost waterfall and offer generation
   procurement_optimizer:   Procurement channel allocation optimization (MILP)
   supply_risk:             Shape/volume/price/credit risk + portfolio VaR
+
+  --- Supply P&L Extension (v1.0.0, 2026-03-20) ---
+  supply_pnl:              Per-contract P&L, budget vs actuals, variance decomposition
 """
 
 # --- Supply Extension Exports ---
@@ -58,6 +61,23 @@ try:
         calculate_credit_risk,
         calculate_portfolio_var,
         monitor_position_limits,
+    )
+
+    from .supply_pnl import (
+        PnLPeriod,
+        VarianceType,
+        ContractBudget,
+        ContractActuals,
+        ContractPnL,
+        PortfolioPnL,
+        compute_contract_pnl,
+        compute_portfolio_pnl,
+        decompose_margin_variance,
+        build_variance_bridge,
+        generate_monthly_pnl_series,
+        generate_demo_pnl_data,
+        pnl_to_dataframe,
+        portfolio_summary_table,
     )
 
     _SUPPLY_EXTENSION_AVAILABLE = True
