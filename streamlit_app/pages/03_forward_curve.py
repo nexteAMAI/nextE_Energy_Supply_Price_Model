@@ -105,11 +105,11 @@ with tab1:
             )
         elif resolution == "Quarterly":
             display_df = aurora_f.copy()
-            display_df["_Q"] = display_df["Quarter"]
+            display_df["_Q"] = display_df["Quarter"].astype(str).str.replace("Q", "", regex=False)
             display_df["_Y"] = display_df["Calendar_Year"]
             num_cols = [c for c in display_df.columns if "Nominal" in c and "€" in c]
             display_df = display_df.groupby(["_Y", "_Q"])[num_cols].mean().reset_index()
-            display_df["Period"] = display_df.apply(lambda r: f"Q{int(r['_Q'])}-{int(r['_Y'])}", axis=1)
+            display_df["Period"] = display_df.apply(lambda r: f"Q{r['_Q']}-{int(r['_Y'])}", axis=1)
             display_df.index = range(len(display_df))
         else:  # Yearly
             display_df = aurora_f.copy()
@@ -162,10 +162,10 @@ with tab2:
 
     # Quarterly contracts
     aurora_q = aurora_full.copy()
-    aurora_q["_Q"] = aurora_q["Quarter"]
+    aurora_q["_Q"] = aurora_q["Quarter"].astype(str).str.replace("Q", "", regex=False)
     aurora_q["_Y"] = aurora_q["Calendar_Year"]
     quarterly = aurora_q.groupby(["_Y", "_Q"]).agg({central_col[0]: "mean"}).reset_index()
-    quarterly["Contract"] = quarterly.apply(lambda r: f"Q{int(r['_Q'])}-{int(r['_Y'])}", axis=1)
+    quarterly["Contract"] = quarterly.apply(lambda r: f"Q{r['_Q']}-{int(r['_Y'])}", axis=1)
     quarterly["Type"] = "Quarterly"
     quarterly["Fundamental"] = quarterly[central_col[0]]
 
@@ -352,7 +352,7 @@ with tab3:
         agg_cols = base_col + wind_col + solar_fixed_col + solar_track_col + offshore_col
         agg_cols = [c for c in agg_cols if c in aurora_cp.columns]
         aurora_cp = aurora_cp.groupby(["Calendar_Year", "Quarter"])[agg_cols].mean()
-        aurora_cp["Period"] = [f"Q{int(q)}-{int(y)}" for y, q in aurora_cp.index]
+        aurora_cp["Period"] = [f"{q}-{int(y)}" for y, q in aurora_cp.index]
         aurora_cp = aurora_cp.reset_index(drop=True)
     elif cp_resolution == "Yearly":
         agg_cols = base_col + wind_col + solar_fixed_col + solar_track_col + offshore_col
