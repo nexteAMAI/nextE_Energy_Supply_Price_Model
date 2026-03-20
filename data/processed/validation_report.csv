@@ -1,28 +1,28 @@
 check,status,detail,expected,actual,tolerance,timestamp
-freshness_dam,WARN,"Latest data: 2026-02-25 00:45:00+02:00, age: 13 days",≤7 days,13 days,,2026-03-10T13:35:50.589346
-freshness_generation,WARN,"Latest data: 2026-02-27 23:45:00+02:00, age: 10 days",≤7 days,10 days,,2026-03-10T13:35:50.589404
-freshness_load,WARN,"Latest data: 2026-02-27 23:45:00+02:00, age: 10 days",≤7 days,10 days,,2026-03-10T13:35:50.589430
-freshness_imbalance,WARN,"Latest data: 2026-02-27 23:45:00+02:00, age: 10 days",≤7 days,10 days,,2026-03-10T13:35:50.589449
-nulls_dam_Value [EUR/MWh],PASS,Null rate: 0.1%,,,,2026-03-10T13:35:50.589956
-gaps_dam,WARN,1 gaps > 4× median frequency; largest: 3 days 00:15:00,,,,2026-03-10T13:35:50.592855
-nulls_generation_Biomass [MW],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.595953
-nulls_generation_Fossil Brown coal/Lignite [MW],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.595960
-nulls_generation_Fossil Gas [MW],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.595964
-nulls_generation_Fossil Hard coal [MW],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.595968
-nulls_generation_Hydro Run-of-river and poundage [MW],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.595971
-nulls_generation_Hydro Water Reservoir [MW],PASS,Null rate: 0.1%,,,,2026-03-10T13:35:50.595975
-nulls_generation_Nuclear [MW],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.595978
-nulls_generation_Solar [MW],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.595981
-nulls_generation_Wind Onshore [MW],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.595986
-nulls_generation_Energy storage [MW],FAIL,Null rate: 83.7%,,,,2026-03-10T13:35:50.595990
-gaps_generation,WARN,23 gaps > 4× median frequency; largest: 0 days 06:00:00,,,,2026-03-10T13:35:50.600641
-nulls_load_Actual Load [MW],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.601218
-gaps_load,WARN,55 gaps > 4× median frequency; largest: 0 days 06:00:00,,,,2026-03-10T13:35:50.605517
-nulls_imbalance_Long [EUR/MWh],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.606459
-nulls_imbalance_Short [EUR/MWh],PASS,Null rate: 0.0%,,,,2026-03-10T13:35:50.606464
-gaps_imbalance,PASS,No significant gaps detected (max gap threshold: 4×),,,,2026-03-10T13:35:50.610883
-DAM_2025-01,INFO,"RON benchmark: expected 737.27 RON/MWh, model base avg (EUR): 139.42",737.27,139.4244758064516,,2026-03-10T13:35:50.611712
-DAM_2025-03,PASS,"Expected: 106.36, Actual: 106.49, Deviation: 0.1%",106.36,106.48632570659488,0.03,2026-03-10T13:35:50.612260
-DAM_2025-07,PASS,"Expected: 103.53, Actual: 103.53, Deviation: 0.0%",103.53,103.52708333333332,0.03,2026-03-10T13:35:50.612874
-DAM_2025-10,PASS,"Expected: 121.90, Actual: 121.86, Deviation: 0.0%",121.9,121.85728249916023,0.03,2026-03-10T13:35:50.613416
-DAM_2026-02,INFO,"RON benchmark: expected 519.04 RON/MWh, model base avg (EUR): 109.34",519.04,109.33703465346535,,2026-03-10T13:35:50.613988
+freshness_dam,WARN,"Latest data: 2026-02-25 00:45:00+02:00, age: 23 days",≤7 days,23 days,,2026-03-20T13:52:10.773018
+freshness_generation,WARN,"Latest data: 2026-02-27 23:45:00+02:00, age: 20 days",≤7 days,20 days,,2026-03-20T13:52:10.773170
+freshness_load,WARN,"Latest data: 2026-02-27 23:45:00+02:00, age: 20 days",≤7 days,20 days,,2026-03-20T13:52:10.773242
+freshness_imbalance,WARN,"Latest data: 2026-02-27 23:45:00+02:00, age: 20 days",≤7 days,20 days,,2026-03-20T13:52:10.773298
+nulls_dam_Value [EUR/MWh],PASS,Null rate: 0.1%,,,,2026-03-20T13:52:10.774760
+gaps_dam,WARN,1 gaps > 4× median frequency; largest: 3 days 00:15:00,,,,2026-03-20T13:52:10.782210
+nulls_generation_Biomass [MW],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.786812
+nulls_generation_Fossil Brown coal/Lignite [MW],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.786823
+nulls_generation_Fossil Gas [MW],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.786828
+nulls_generation_Fossil Hard coal [MW],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.786833
+nulls_generation_Hydro Run-of-river and poundage [MW],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.786837
+nulls_generation_Hydro Water Reservoir [MW],PASS,Null rate: 0.1%,,,,2026-03-20T13:52:10.786842
+nulls_generation_Nuclear [MW],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.786847
+nulls_generation_Solar [MW],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.786851
+nulls_generation_Wind Onshore [MW],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.786855
+nulls_generation_Energy storage [MW],FAIL,Null rate: 83.7%,,,,2026-03-20T13:52:10.786860
+gaps_generation,WARN,23 gaps > 4× median frequency; largest: 0 days 06:00:00,,,,2026-03-20T13:52:10.796751
+nulls_load_Actual Load [MW],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.797660
+gaps_load,WARN,55 gaps > 4× median frequency; largest: 0 days 06:00:00,,,,2026-03-20T13:52:10.802161
+nulls_imbalance_Long [EUR/MWh],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.803015
+nulls_imbalance_Short [EUR/MWh],PASS,Null rate: 0.0%,,,,2026-03-20T13:52:10.803022
+gaps_imbalance,PASS,No significant gaps detected (max gap threshold: 4×),,,,2026-03-20T13:52:10.810401
+DAM_2025-01,INFO,"RON benchmark: expected 737.27 RON/MWh, model base avg (EUR): 139.42",737.27,139.4244758064516,,2026-03-20T13:52:10.811254
+DAM_2025-03,PASS,"Expected: 106.36, Actual: 106.49, Deviation: 0.1%",106.36,106.48632570659488,0.03,2026-03-20T13:52:10.812054
+DAM_2025-07,PASS,"Expected: 103.53, Actual: 103.53, Deviation: 0.0%",103.53,103.52708333333332,0.03,2026-03-20T13:52:10.812704
+DAM_2025-10,PASS,"Expected: 121.90, Actual: 121.86, Deviation: 0.0%",121.9,121.85728249916023,0.03,2026-03-20T13:52:10.813199
+DAM_2026-02,INFO,"RON benchmark: expected 519.04 RON/MWh, model base avg (EUR): 109.34",519.04,109.33703465346535,,2026-03-20T13:52:10.813800
