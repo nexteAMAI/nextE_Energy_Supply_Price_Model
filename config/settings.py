@@ -48,6 +48,7 @@ class _Settings:
         self._curves: Dict[str, Any] = {}
         self._datasets: Dict[str, Any] = {}
         self._schedule: Dict[str, Any] = {}
+        self._supply: Dict[str, Any] = {}
 
     def _ensure_loaded(self) -> None:
         if self._loaded:
@@ -61,6 +62,14 @@ class _Settings:
         self._curves = _load_yaml("curves.yaml")
         self._datasets = _load_yaml("datasets.yaml")
         self._schedule = _load_yaml("schedule.yaml")
+
+        # Supply extension config (optional — graceful fallback if not present)
+        supply_path = _CONFIG_DIR / "supply_config.yaml"
+        if supply_path.exists():
+            self._supply = _load_yaml("supply_config.yaml")
+        else:
+            self._supply = {}
+
         self._loaded = True
 
     # ---- Accessors ----
@@ -84,6 +93,23 @@ class _Settings:
     def schedule(self) -> Dict[str, Any]:
         self._ensure_loaded()
         return self._schedule
+
+    @property
+    def supply(self) -> Dict[str, Any]:
+        """Supply extension configuration (supply_config.yaml)."""
+        self._ensure_loaded()
+        return self._supply
+
+    def get_supply_param(self, *keys: str, default: Any = None) -> Any:
+        """Traverse nested supply config dict by keys."""
+        self._ensure_loaded()
+        node = self._supply
+        for k in keys:
+            if isinstance(node, dict) and k in node:
+                node = node[k]
+            else:
+                return default
+        return node
 
     # ---- Convenience getters ----
 
