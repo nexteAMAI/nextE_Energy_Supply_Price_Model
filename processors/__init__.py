@@ -17,6 +17,11 @@ Layer 1 Processors — Analytical computation modules.
 
   --- Supply P&L Extension (v1.0.0, 2026-03-20) ---
   supply_pnl:              Per-contract P&L, budget vs actuals, variance decomposition
+
+  --- Forecasters & Pipeline (v1.0.0, 2026-03-20) ---
+  generation_forecaster:   Multi-probability 15-min PV/Wind generation curves
+  consumption_forecaster:  Multi-probability 15-min B2B load curves
+  supply_pipeline:         End-to-end supply workflow orchestrator
 """
 
 # --- Supply Extension Exports ---
@@ -78,6 +83,38 @@ try:
         generate_demo_pnl_data,
         pnl_to_dataframe,
         portfolio_summary_table,
+    )
+
+    from .generation_forecaster import (
+        Technology,
+        AssetSpec,
+        GenerationForecast,
+        PortfolioForecast,
+        PVForecaster,
+        WindForecaster,
+        forecast_portfolio,
+        generate_demo_portfolio,
+        generate_demo_forecast,
+    )
+
+    from .consumption_forecaster import (
+        CustomerSegment,
+        CustomerProfile,
+        ConsumptionForecast,
+        PortfolioConsumptionForecast,
+        ConsumptionForecaster,
+        forecast_consumption_portfolio,
+        generate_demo_customers,
+        generate_demo_consumption_forecast,
+    )
+
+    from .supply_pipeline import (
+        PipelineMode,
+        PipelineConfig,
+        PipelineResult,
+        StageResult,
+        StageStatus,
+        run_supply_pipeline,
     )
 
     _SUPPLY_EXTENSION_AVAILABLE = True
