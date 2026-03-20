@@ -1,0 +1,387 @@
+# nextE Integrated Energy Supply Pricing Engine Configuration
+# ============================================================
+# Author: nextE AI Workstation
+# Date: 2026-03-19
+# Framework: Extends ro-energy-pricing-engine Layer 1
+# Applicability: B2B energy supply contracts backed by PV + forward procurement
+# Market: OPCOM (PZU, PI, PE), Transelectrica BRP, Nord Pool/EPEX integration
+
+# REGULATORY PARAMETERS (ANRE/EU Framework)
+regulatory:
+  # Green Certificate (GC) regime parameters
+  gc_quota_coefficient: 0.499387  # ANRE Order 81/2025: mandatory GC share (%) of renewable obligation
+  gc_cost_eur_per_mwh: 14.50      # Market price assumption for GC (EUR/MWh), quarterly updated
+
+  # Balancing and imbalance framework
+  balancing_cost_eur_per_mwh: 3.00  # Average BRP imbalance cost (EUR/MWh), P50 estimate
+
+  # VAT framework (Romania)
+  vat_rate: 0.19  # 19% standard VAT rate applicable to electricity supply
+  vat_reverse_charge: false  # B2B supplies: reverse charge applies to VAT-registered customers
+
+  # Prosumer and net-metering framework (RED III transposition)
+  prosumer_net_metering_enabled: true
+  prosumer_grid_fee_pass_through: true
+
+  # REMIT compliance
+  remit_threshold_mwh: 350  # Reporting threshold for bilateral contracts (MWh/year)
+
+# MARGIN AND PRICING PARAMETERS
+margins:
+  # Risk margin (buffer for basis risk, shape risk, credit risk)
+  default_risk_margin_eur_per_mwh: 5.00
+
+  # nextE commercial margin target (EBITDA contribution)
+  default_nexte_margin_eur_per_mwh: 12.00
+
+  # Minimum acceptable margin floor (below which offer is declined)
+  minimum_margin_eur_per_mwh: 8.00
+
+  # Volume discount curve (nonlinear pricing for large customers)
+  volume_discount_curve:
+    0: 0.00         # [0, 1 GWh): 0% discount
+    1: 1.50         # [1, 5 GWh): 1.5% discount
+    5: 3.00         # [5, 20 GWh): 3.0% discount
+    20: 5.00        # [20+ GWh): 5.0% discount
+
+  # Seasonal margin adjustment (reflects volatility/opportunity cost)
+  seasonal_margin_adjustment:
+    winter: 1.15    # Q4, Q1: 15% margin increase (high volatility)
+    summer: 0.85    # Q2, Q3: 15% margin decrease (low volatility)
+    shoulder: 1.00  # Shoulder seasons: no adjustment
+
+# SOLAR PV PRICING MECHANISM PARAMETERS
+pv_pricing:
+  # Default PV pricing mechanism (can be overridden per contract)
+  default_mechanism: HYBRID  # Options: FIXED, DAM_INDEXED, HYBRID
+
+  # FIXED mechanism: fixed EUR/MWh price for all PV generation
+  fixed:
+    default_price_eur_per_mwh: 50.00  # Locked floor price for PV portion
+    contract_duration_months: 12       # Typical fixed PV contract term
+
+  # DAM_INDEXED mechanism: PV priced at day-ahead market (TEL) + transport/admin fee
+  dam_indexed:
+    admin_fee_eur_per_mwh: 2.50        # Administrative and settlement costs
+    transport_margin_eur_per_mwh: 1.00  # Transmission losses and system services
+    locational_discount_eur_per_mwh: 0.50  # TEL zone discount vs. national average
+    dam_price_floor_eur_per_mwh: 30.00  # Price floor to prevent negative economics
+
+  # HYBRID mechanism: fixed floor + indexed upside participation
+  hybrid:
+    fixed_floor_eur_per_mwh: 40.00        # Floor price (minimum PV compensation)
+    indexed_share: 0.70                   # % of DAM price above floor (e.g., 70%)
+    indexed_discount_eur_per_mwh: 10.00   # Discount from DAM price (transport/admin)
+    floor_participation_months: 6         # Months where floor is guaranteed
+    indexation_cap_eur_per_mwh: 120.00    # Maximum indexed price (protects customer)
+
+  # Solar generation assumptions (input validation)
+  solar_hours_by_season:
+    winter: 3.5   # Dec-Feb: ~3.5 peak sun hours/day (latitude-dependent)
+    shoulder: 6.5  # Mar-May, Sep-Nov: ~6.5 peak sun hours/day
+    summer: 8.0   # Jun-Aug: ~8.0 peak sun hours/day
+
+  # Solar capacity factor (empirical for Romania, 35-42N latitude)
+  capacity_factor_assumption: 0.14  # 14% annual average (1,230 full-load hours/year)
+
+  # Solar degradation adjustment
+  year_1_degradation: 0.0250  # 2.5% first-year LID
+  annual_degradation: 0.0070  # 0.7% per year thereafter
+
+  # Solar generation forecast error (standard deviation, historical)
+  day_ahead_forecast_error_pct: 0.12  # 12% RMSE (day-ahead PV forecast)
+  intraday_forecast_error_pct: 0.08   # 8% RMSE (intraday update)
+
+# PROCUREMENT CHANNEL CONFIGURATION
+procurement_channels:
+  # BRM Forward Market (Bilaterals-Romania-Market via Nord Pool)
+  brm_forward:
+    enabled: true
+    channel_name: "BRM Forward"
+    market_operator: "Nord Pool (TEL delivery area)"
+    product_granularity: "weekly, quarterly, seasonal, annual"
+    price_source: "data.nordpoolgroup.com (financial settlement)"
+    typical_liquidity_mwh: 500  # Avg daily liquidity
+    transaction_cost_eur_per_mwh: 0.75
+    collateral_haircut: 0.15  # 15% collateral requirement over MTM
+    credit_assessment_required: true
+    min_contract_volume_mwh: 10  # Minimum trade size
+    max_single_counterparty_mwh: 200
+    typical_spread_vs_dam_eur_per_mwh: 1.50
+    settlement_type: "financial"
+    delivery_area: "TEL"
+
+  # OPCOM Centralized Market for Bilateral Contracts (PCCB-LE, PCCB-NC)
+  opcom_bilateral:
+    enabled: true
+    channel_name: "OPCOM Bilateral Contracts"
+    market_operator: "OPCOM S.A."
+    product_granularity: "monthly, quarterly, annual"
+    auction_frequency: "twice monthly (typically 1st and 15th)"
+    auction_gate_time: "07:00 EET (day-1)"
+    price_source: "opcom.ro market reports"
+    typical_liquidity_mwh: 1000  # Avg auction volume
+    transaction_cost_eur_per_mwh: 0.50
+    collateral_haircut: 0.20
+    credit_assessment_required: true
+    min_contract_volume_mwh: 50
+    max_single_counterparty_mwh: 500
+    typical_spread_vs_dam_eur_per_mwh: 1.00
+    settlement_type: "physical (delivery to Transelectrica)"
+    delivery_area: "Romania (nationwide)"
+    remit_reporting_required: true
+
+  # Direct Bilateral Contracts (physical OTC)
+  direct_bilateral:
+    enabled: true
+    channel_name: "Direct Bilateral OTC"
+    counterparties: "major generators, traders, other suppliers"
+    product_granularity: "customizable (monthly, quarterly, annual, multi-year)"
+    typical_liquidity_mwh: "variable"
+    transaction_cost_eur_per_mwh: 1.25  # Higher due to negotiation/legal overhead
+    collateral_haircut: 0.25
+    credit_assessment_required: true
+    min_contract_volume_mwh: 100
+    negotiation_timeline_days: 7  # Typical negotiation duration
+    typical_spread_vs_dam_eur_per_mwh: 2.00
+    settlement_type: "physical (direct nomination)"
+    remit_reporting_required: true
+    legal_overhead_cost_eur: 500  # Flat legal review cost
+
+  # EEX Financial Products (EBITDA-based settlement)
+  eex_financial:
+    enabled: true
+    channel_name: "EEX Financial Contracts"
+    exchange: "European Energy Exchange (Germany)"
+    product_granularity: "day, week, month, quarter, year (German base/peak)"
+    settlement_basis: "financial (cash-settled vs. EEX reference)"
+    price_source: "www.eex.com (public)"
+    typical_liquidity_mwh: 2000  # High liquidity
+    transaction_cost_eur_per_mwh: 0.25  # Low cost, high liquidity
+    collateral_haircut: 0.10
+    credit_assessment_required: false  # Exchange-cleared, counterparty risk minimal
+    min_contract_volume_mwh: 10
+    delivery_area_proxy: "German border (basis adjustment for Romania)"
+    basis_adjustment_eur_per_mwh: 15.00  # Typical Germany-TEL basis spread
+    remit_reporting_required: true
+    settlement_type: "financial"
+
+  # Spot DAM (Day-Ahead Market - short-term opportunistic procurement)
+  spot_dam:
+    enabled: true
+    channel_name: "OPCOM PZU (Day-Ahead Market)"
+    market_operator: "OPCOM S.A."
+    product_granularity: "hourly"
+    gate_time: "12:00 EET (day-1)"
+    settlement_time: "next business day"
+    price_source: "opcom.ro PZU results"
+    typical_liquidity_mwh: "3000+ (most liquid market)"
+    transaction_cost_eur_per_mwh: 0.10
+    collateral_haircut: 0.05
+    credit_assessment_required: false  # OPCOM member, exchange-based
+    delivery_area: "Romania (national)"
+    settlement_type: "financial (imbalance vs. BRP schedule)"
+    use_case: "residual gap filling, opportunistic arbitrage"
+
+  # Spot IDM (Intraday Market - last-minute corrections)
+  spot_idm:
+    enabled: true
+    channel_name: "OPCOM PI (Intraday Market)"
+    market_operator: "OPCOM S.A."
+    product_granularity: "15-minute, 30-minute, hourly"
+    gate_times:
+      - "07:00 EET"  # First intraday gate
+      - "13:00 EET"  # Second intraday gate (noon update)
+      - "20:00 EET"  # Third intraday gate (evening update)
+    settlement_time: "next business day"
+    price_source: "opcom.ro PI results"
+    typical_liquidity_mwh: "500-1000"
+    transaction_cost_eur_per_mwh: 0.30
+    collateral_haircut: 0.08
+    credit_assessment_required: false
+    delivery_area: "Romania (national)"
+    settlement_type: "financial"
+    use_case: "real-time PV forecast updates, load rebalancing"
+
+# RISK MANAGEMENT PARAMETERS
+risk_limits:
+  # Unhedged exposure (MWh of consumption with no procurement cover)
+  max_unhedged_pct: 0.00  # nextE policy: zero unhedged exposure on customer books
+
+  # Per-customer concentration risk
+  max_customer_exposure_gwh: 50.0  # Maximum 50 GWh single-customer supply
+
+  # Portfolio VaR limits (95% confidence, 30-day holding period)
+  var_95_30d_eur_million: 2.5  # Max acceptable monthly P&L deviation
+
+  # Imbalance risk tolerance (EUR/day)
+  max_daily_imbalance_cost_eur: 50000  # Escalation threshold for risk adjustment
+
+  # Credit risk per counterparty
+  max_single_counterparty_credit_eur_million: 5.0  # Max exposure to any one party
+
+  # Collateral limits
+  max_collateral_requirement_eur_million: 10.0  # Working capital constraint
+
+# FORWARD CURVE DATA CONFIGURATION
+forward_curve:
+  # Primary source: OPCOM bilateral prices (upstream market)
+  source: "OPCOM reports + Nord Pool BRM"
+  update_frequency_hours: 24  # Daily refresh from market data
+  lookback_window_months: 12  # Use 12-month historical curve for baseline
+
+  # Forward curve construction methodology
+  construction:
+    method: "linear interpolation + seasonal adjustment"
+    baseload_segment: "Q1 + Q2 + Q3 + Q4"
+    peak_segment: "peak hours (8-20 CET)"
+    off_peak_segment: "off-peak hours (0-7, 21-23)"
+    weekend_adjustment: -5.00  # EUR/MWh discount for weekend periods
+
+  # Commodity risk assumptions
+  gas_price_elasticity: 0.75  # Forward curve 75% correlated with gas futures (TTF)
+  carbon_price_elasticity: 0.15  # 15% correlation with EU ETS prices
+  hydrology_adjustment: true  # Seasonal hydro inflows adjustment
+  weather_forecast_horizon_days: 14  # Use 14-day weather forecasts for adjustment
+
+# PV GENERATION ASSUMPTIONS (VALIDATION)
+pv_generation:
+  # Typical PV site characteristics (Romania)
+  latitude_range: "35.5-48.0 N"  # Geographic coverage
+  reference_capacity_mw: 10.0  # Normalized reference size
+
+  # Generation profile distribution across day
+  generation_profile:
+    winter: [0.0, 0.0, 0.0, 0.0, 0.05, 0.15, 0.25, 0.30, 0.20, 0.05, 0.0, 0.0,
+             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    summer: [0.0, 0.0, 0.0, 0.0, 0.02, 0.08, 0.15, 0.25, 0.35, 0.40, 0.40, 0.38,
+             0.35, 0.30, 0.22, 0.10, 0.05, 0.02, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+  # Soiling loss (dust, snow, bird droppings)
+  soiling_loss_pct: 0.02  # 2% annual soiling loss
+
+  # Temperature derating
+  temp_coefficient_pct_per_degree: -0.005  # -0.5% per °C above STC (25°C)
+
+  # Inverter efficiency
+  inverter_efficiency_pct: 0.975  # 97.5% AC-DC conversion efficiency
+
+# CONSUMPTION PROFILE ASSUMPTIONS
+consumption:
+  # Typical B2B customer load profiles
+  profiles:
+    commercial: {
+      "winter": [0.85, 0.80, 0.78, 0.80, 0.88, 1.05, 1.15, 1.10, 1.05, 0.98, 0.95, 0.92,
+                  0.90, 0.92, 0.95, 0.98, 1.02, 1.08, 1.05, 1.00, 0.95, 0.90, 0.85, 0.80],
+      "summer": [0.70, 0.65, 0.60, 0.62, 0.75, 0.95, 1.10, 1.15, 1.10, 1.00, 0.95, 0.90,
+                  0.85, 0.88, 0.92, 0.95, 0.98, 1.05, 1.00, 0.95, 0.85, 0.78, 0.70, 0.65]
+    }
+    industrial: {
+      "winter": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+      "summer": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    }
+
+  # Consumption forecast error (standard deviation)
+  day_ahead_forecast_error_pct: 0.05  # 5% RMSE for day-ahead consumption forecast
+  seasonal_forecast_error_pct: 0.08   # 8% RMSE for seasonal/annual forecasts
+
+# SCENARIO PROBABILITY WEIGHTS (Multi-scenario analysis)
+scenarios:
+  # Probability distribution across P10, P25, P50, P75, P90
+  probability_weights:
+    p10: 0.10
+    p25: 0.25
+    p50: 0.30
+    p75: 0.25
+    p90: 0.10
+
+  # Stress scenarios (additional analysis)
+  stress_scenarios:
+    high_price: {
+      name: "High Energy Price Scenario",
+      dam_price_multiplier: 1.50,
+      gc_price_multiplier: 1.40,
+      probability: 0.05
+    }
+    low_pv: {
+      name: "Low PV Generation Scenario",
+      pv_generation_multiplier: 0.70,
+      consumption_multiplier: 1.05,
+      probability: 0.05
+    }
+    high_volatility: {
+      name: "High Price Volatility Scenario",
+      price_volatility_multiplier: 2.00,
+      probability: 0.03
+    }
+
+# EXPORT AND REPORTING PARAMETERS
+reporting:
+  # Offer sheet export format
+  offer_sheet_format: "PDF + Excel"  # Customer-facing document format
+  precision_decimals: 2               # EUR/MWh precision (2 decimal places)
+
+  # Regulatory reporting thresholds
+  remit_reporting_threshold_mwh: 350  # Annual volume threshold for REMIT
+  anre_reporting_frequency: "quarterly"  # ANRE market transparency reports
+
+  # Waterfall reporting levels
+  waterfall_levels:
+    - "Energy Procurement Cost"
+    - "Green Certificate Cost"
+    - "Balancing & Imbalance Cost"
+    - "Transport & Admin"
+    - "Risk Premium"
+    - "nextE Commercial Margin"
+    - "Final Offer Price (ex-VAT)"
+    - "VAT (19%)"
+    - "Final Offer Price (inc-VAT)"
+
+# CALCULATION PARAMETERS
+calculations:
+  # Time granularity for all calculations
+  granularity_minutes: 15  # All values in 15-minute intervals
+
+  # Aggregation for reporting
+  reporting_granularity: "hourly"  # Aggregate to hourly for customer communication
+
+  # Rounding convention
+  rounding_rule: "half_up"  # EUR/MWh values rounded to 0.01
+
+  # Monte Carlo simulation settings (for VaR calculation)
+  monte_carlo_iterations: 10000
+  confidence_level_pct: 95
+
+  # Interpolation method for missing data
+  missing_data_interpolation: "linear"
+
+  # Outlier detection and handling
+  outlier_detection_zscore: 3.0  # Flag values > 3 sigma as outliers
+  outlier_handling: "log_and_exclude"  # Log outlier, use interpolation
+
+# SYSTEM CONFIGURATION
+system:
+  timezone: "EET"  # Eastern European Time (Romania)
+  daylight_saving_start: "last_sunday_march"
+  daylight_saving_end: "last_sunday_october"
+
+  # Logging
+  log_level: "INFO"
+  log_format: "json"
+
+  # Data persistence
+  database_backend: "Supabase/PostgreSQL"
+  cache_ttl_minutes: 60  # Cache expiration for market data
+
+  # API integrations
+  api_timeout_seconds: 30
+  api_retry_attempts: 3
+  api_retry_backoff_seconds: 5
+
+  # Security
+  pii_masking: true  # Mask customer names in logs
+  audit_trail: true  # Log all pricing decisions for compliance
+
+# END OF CONFIGURATION
