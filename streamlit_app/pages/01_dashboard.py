@@ -191,7 +191,7 @@ grid_col3, grid_col4 = st.columns(2)
 with grid_col3:
     if not cross.empty:
         recent_cross = cross[cross.index >= cutoff_12m]
-        net_cols = [c for c in recent_cross.columns if "net" in c.lower() or "import" in c.lower() or "export" in c.lower()]
+        net_cols = [c for c in recent_cross.columns if "net" in c.lower() or "import" in c.lower() or "export" in c.lower() or c == "sum [MW]"]
         if net_cols:
             cross_monthly = recent_cross[net_cols[0]].resample("MS").mean()
             colors = ["#27ae60" if v >= 0 else "#e74c3c" for v in cross_monthly.values]
