@@ -128,7 +128,7 @@ cross = load_parquet("streamlit_cross_border.parquet")
 imb_ts = load_parquet("streamlit_imbalance.parquet")
 
 # Filter last 12 months
-cutoff_12m = pd.Timestamp.now(tz="Europe/Bucharest") - pd.DateOffset(months=12)
+cutoff_12m = (pd.Timestamp.now(tz="Europe/Bucharest") - pd.DateOffset(months=12)).tz_localize(None)
 
 grid_col1, grid_col2 = st.columns(2)
 
