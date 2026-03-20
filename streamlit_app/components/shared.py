@@ -59,7 +59,7 @@ def load_csv(name):
         return pd.DataFrame()
     df = pd.read_csv(p, index_col=0)
     try:
-        df.index = pd.to_datetime(df.index, utc=True).tz_convert("Europe/Bucharest")
+        df.index = pd.to_datetime(df.index, utc=True).tz_convert("Europe/Bucharest").tz_localize(None)
     except Exception:
         try:
             df.index = pd.to_datetime(df.index)

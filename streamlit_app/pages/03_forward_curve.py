@@ -13,9 +13,6 @@ DATA_DIR = init_page()
 aurora = load_csv("aurora_forecast.csv")
 if aurora.empty:
     st.warning("Aurora forecast not found."); st.stop()
-# Ensure tz-naive index for consistent comparisons
-if aurora.index.tz is not None:
-    aurora.index = aurora.index.tz_localize(None)
 
 kpis = load_kpis()
 eur_ron = kpis.get("eur_ron_latest", 4.977)
