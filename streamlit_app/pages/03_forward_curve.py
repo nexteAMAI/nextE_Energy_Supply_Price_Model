@@ -1,5 +1,5 @@
 """Page 03: Forward Curve — Aurora forecast vs market, SRMC analysis, capture prices."""
-import sys
+import json, sys
 from pathlib import Path as _P
 sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
 from components.shared import init_page, load_csv, load_parquet, load_kpis
@@ -177,30 +177,34 @@ with tab2:
     yearly["Type"] = "Yearly"
     yearly["Fundamental"] = yearly[central_col[0]]
 
-    # Market benchmark forward prices (latest available — hardcoded from OPCOM/broker data)
-    # These would ideally come from a live feed; for now, use representative values
-    market_forwards = {
-        "Mar-2026": 109.34,  # from DAM trailing average
-        "Apr-2026": 102.82,  # OPCOM forward
-        "May-2026": 96.03,
-        "Jun-2026": 112.67,
-        "Jul-2026": 130.86,
-        "Aug-2026": 125.00,
-        "Sep-2026": 105.00,
-        "Oct-2026": 109.33,
-        "Nov-2026": 130.00,
-        "Dec-2026": 145.00,
-        "Jan-2027": 155.00,
-        "Feb-2027": 140.00,
-        "Q2-2026": 103.75,
-        "Q3-2026": 134.30,
-        "Q4-2026": 157.85,
-        "Q1-2027": 146.39,
-        "2027": 112.52,
-        "2028": 90.07,
-        "2029": 84.37,
-        "2030": 82.12,
-    }
+    # Market benchmark forward prices — loaded from EQ/Montel EEX forward curve data
+    # Updated automatically by live_refresh.py; falls back to static defaults if unavailable
+    market_forwards = {}
+    fwd_source = "hardcoded defaults"
+    fwd_file = DATA_DIR / "forward_prices.json"
+    if fwd_file.exists():
+        try:
+            with open(fwd_file) as _f:
+                fwd_data = json.load(_f)
+            market_forwards = fwd_data.get("prices", {})
+            fwd_source = fwd_data.get("last_updated", "unknown date")
+        except Exception:
+            market_forwards = {}
+
+    if not market_forwards:
+        # Fallback static values (last known good — updated 2026-03-24)
+        market_forwards = {
+            "Apr-2026": 102.82, "May-2026": 96.03, "Jun-2026": 112.67,
+            "Jul-2026": 130.86, "Aug-2026": 125.00, "Sep-2026": 105.00,
+            "Oct-2026": 109.33, "Nov-2026": 130.00, "Dec-2026": 145.00,
+            "Jan-2027": 155.00, "Feb-2027": 140.00,
+            "Q2-2026": 103.75, "Q3-2026": 134.30, "Q4-2026": 157.85,
+            "Q1-2027": 146.39, "2027": 112.52, "2028": 90.07,
+            "2029": 84.37, "2030": 82.12,
+        }
+        fwd_source = "static fallback (2026-03-24)"
+
+    st.caption(f"_Market forward source: {fwd_source}_")
 
     # Build comparison table
     rows = []

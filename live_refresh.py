@@ -94,6 +94,91 @@ def pull_eq(days: int = 14) -> dict:
     return results
 
 
+def pull_eq_forward_curve() -> dict:
+    """Pull latest RO power forward curve from EQ/Montel (EEX OHLC)."""
+    from energyquantified import EnergyQuantified
+    eq = EnergyQuantified(api_key=os.environ.get(
+        "EQ_API_KEY", "a466db92-91e67567-c042b829-e8ea3f73"))
+
+    results = {}
+    curve_name = "RO Futures Power Base EUR/MWh EEX OHLC"
+
+    try:
+        curves = eq.metadata.curves(q=curve_name)
+        if not curves:
+            logger.warning("  ⚠ No EQ curve found for: %s", curve_name)
+            return results
+
+        curve = curves[0]
+        fwd = eq.ohlc.latest_as_periods(curve, field="settlement")
+
+        forwards = {}
+        for item in fwd.data:
+            begin = pd.Timestamp(item.begin)
+            end = pd.Timestamp(item.end)
+            days = (end - begin).days
+            settlement = item.value
+
+            if settlement is None:
+                continue
+
+            # Classify tenor and build label
+            if days <= 32:
+                # Monthly contract
+                label = begin.strftime("%b-%Y")  # e.g. "Apr-2026"
+                tenor_type = "monthly"
+            elif days <= 93:
+                # Quarterly contract
+                q = (begin.month - 1) // 3 + 1
+                label = f"Q{q}-{begin.year}"  # e.g. "Q2-2026"
+                tenor_type = "quarterly"
+            else:
+                # Yearly contract
+                label = str(begin.year)  # e.g. "2027"
+                tenor_type = "yearly"
+
+            forwards[label] = {
+                "settlement": round(float(settlement), 2),
+                "delivery_start": begin.isoformat(),
+                "delivery_end": end.isoformat(),
+                "tenor_type": tenor_type,
+            }
+
+        results["forward_curve"] = forwards
+        logger.info("  ✓ EQ Forward Curve: %d tenors fetched", len(forwards))
+
+    except Exception as e:
+        logger.warning("  ⚠ EQ Forward Curve: %s", str(e)[:120])
+
+    return results
+
+
+def export_forward_prices(eq_fwd_data: dict):
+    """Export forward prices to JSON for Streamlit consumption."""
+    if not eq_fwd_data or "forward_curve" not in eq_fwd_data:
+        logger.info("  No forward curve data to export — skipping")
+        return
+
+    forwards = eq_fwd_data["forward_curve"]
+
+    # Build the flat dict matching the format expected by 03_forward_curve.py
+    # { "Apr-2026": 102.82, "Q2-2026": 103.75, "2027": 112.52, ... }
+    flat = {label: info["settlement"] for label, info in forwards.items()}
+
+    output = {
+        "prices": flat,
+        "detailed": forwards,
+        "last_updated": pd.Timestamp.now().isoformat(),
+        "source": "EQ/Montel — RO Futures Power Base EUR/MWh EEX OHLC",
+    }
+
+    outpath = OUT / "forward_prices.json"
+    with open(outpath, "w") as f:
+        json.dump(output, f, indent=2)
+
+    logger.info("  ✓ Forward prices exported: %s (%d tenors)", outpath.name, len(flat))
+
+
 def merge_and_process():
     """Merge live data with historical pre-loaded data and re-run processors."""
     from extractors.data_loader import (
@@ -213,6 +298,10 @@ def main():
 
         logger.info("Pulling from EQ/Montel...")
         eq_data = pull_eq(args.days)
+
+        logger.info("Pulling EQ forward curve...")
+        eq_fwd = pull_eq_forward_curve()
+        export_forward_prices(eq_fwd)
 
     logger.info("Processing and exporting...")
     kpis = merge_and_process()

@@ -1,0 +1,127 @@
+{
+  "prices": {
+    "Mar-2026": 88.14,
+    "Apr-2026": 97.33,
+    "May-2026": 95.05,
+    "Jun-2026": 108.93,
+    "Jul-2026": 125.87,
+    "Aug-2026": 125.24,
+    "Sep-2026": 138.11,
+    "Q4-2026": 151.49,
+    "Q1-2027": 141.72,
+    "Q2-2027": 88.37,
+    "Q3-2027": 101.87,
+    "Q4-2027": 119.3,
+    "2028": 93.88,
+    "2029": 86.52,
+    "2030": 82.86,
+    "2031": 80.12,
+    "2032": 77.93
+  },
+  "detailed": {
+    "Mar-2026": {
+      "settlement": 88.14,
+      "delivery_start": "2026-03-30T00:00:00+02:00",
+      "delivery_end": "2026-04-06T00:00:00+02:00",
+      "tenor_type": "monthly"
+    },
+    "Apr-2026": {
+      "settlement": 97.33,
+      "delivery_start": "2026-04-27T00:00:00+02:00",
+      "delivery_end": "2026-05-01T00:00:00+02:00",
+      "tenor_type": "monthly"
+    },
+    "May-2026": {
+      "settlement": 95.05,
+      "delivery_start": "2026-05-01T00:00:00+02:00",
+      "delivery_end": "2026-06-01T00:00:00+02:00",
+      "tenor_type": "monthly"
+    },
+    "Jun-2026": {
+      "settlement": 108.93,
+      "delivery_start": "2026-06-01T00:00:00+02:00",
+      "delivery_end": "2026-07-01T00:00:00+02:00",
+      "tenor_type": "monthly"
+    },
+    "Jul-2026": {
+      "settlement": 125.87,
+      "delivery_start": "2026-07-01T00:00:00+02:00",
+      "delivery_end": "2026-08-01T00:00:00+02:00",
+      "tenor_type": "monthly"
+    },
+    "Aug-2026": {
+      "settlement": 125.24,
+      "delivery_start": "2026-08-01T00:00:00+02:00",
+      "delivery_end": "2026-09-01T00:00:00+02:00",
+      "tenor_type": "monthly"
+    },
+    "Sep-2026": {
+      "settlement": 138.11,
+      "delivery_start": "2026-09-01T00:00:00+02:00",
+      "delivery_end": "2026-10-01T00:00:00+02:00",
+      "tenor_type": "monthly"
+    },
+    "Q4-2026": {
+      "settlement": 151.49,
+      "delivery_start": "2026-10-01T00:00:00+02:00",
+      "delivery_end": "2027-01-01T00:00:00+01:00",
+      "tenor_type": "quarterly"
+    },
+    "Q1-2027": {
+      "settlement": 141.72,
+      "delivery_start": "2027-01-01T00:00:00+01:00",
+      "delivery_end": "2027-04-01T00:00:00+02:00",
+      "tenor_type": "quarterly"
+    },
+    "Q2-2027": {
+      "settlement": 88.37,
+      "delivery_start": "2027-04-01T00:00:00+02:00",
+      "delivery_end": "2027-07-01T00:00:00+02:00",
+      "tenor_type": "quarterly"
+    },
+    "Q3-2027": {
+      "settlement": 101.87,
+      "delivery_start": "2027-07-01T00:00:00+02:00",
+      "delivery_end": "2027-10-01T00:00:00+02:00",
+      "tenor_type": "quarterly"
+    },
+    "Q4-2027": {
+      "settlement": 119.3,
+      "delivery_start": "2027-10-01T00:00:00+02:00",
+      "delivery_end": "2028-01-01T00:00:00+01:00",
+      "tenor_type": "quarterly"
+    },
+    "2028": {
+      "settlement": 93.88,
+      "delivery_start": "2028-01-01T00:00:00+01:00",
+      "delivery_end": "2029-01-01T00:00:00+01:00",
+      "tenor_type": "yearly"
+    },
+    "2029": {
+      "settlement": 86.52,
+      "delivery_start": "2029-01-01T00:00:00+01:00",
+      "delivery_end": "2030-01-01T00:00:00+01:00",
+      "tenor_type": "yearly"
+    },
+    "2030": {
+      "settlement": 82.86,
+      "delivery_start": "2030-01-01T00:00:00+01:00",
+      "delivery_end": "2031-01-01T00:00:00+01:00",
+      "tenor_type": "yearly"
+    },
+    "2031": {
+      "settlement": 80.12,
+      "delivery_start": "2031-01-01T00:00:00+01:00",
+      "delivery_end": "2032-01-01T00:00:00+01:00",
+      "tenor_type": "yearly"
+    },
+    "2032": {
+      "settlement": 77.93,
+      "delivery_start": "2032-01-01T00:00:00+01:00",
+      "delivery_end": "2033-01-01T00:00:00+01:00",
+      "tenor_type": "yearly"
+    }
+  },
+  "last_updated": "2026-03-24T10:20:15.150572",
+  "source": "EQ/Montel \u2014 RO Futures Power Base EUR/MWh EEX OHLC"
+}
