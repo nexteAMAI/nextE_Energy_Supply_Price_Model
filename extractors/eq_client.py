@@ -266,8 +266,8 @@ class EQClient:
         records = []
         for item in fwd.data:
             records.append({
-                "delivery_start": item.period.begin,
-                "delivery_end": item.period.end,
+                "delivery_start": item.begin,
+                "delivery_end": item.end,
                 "settlement": item.value,
             })
 
