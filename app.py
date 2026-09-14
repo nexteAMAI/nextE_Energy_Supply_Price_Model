@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from app import auth
 from app import brand as B
 from app import state as S
 from app.pages import (
@@ -28,6 +29,8 @@ from esb import __version__
 
 st.set_page_config(page_title="nextE ESB", page_icon=None, layout="wide", initial_sidebar_state="expanded")
 B.inject()
+if not auth.gate():
+    st.stop()
 state = S.get()
 
 with st.sidebar:
@@ -41,6 +44,12 @@ with st.sidebar:
         if state.last_error:
             st.markdown(f'<div class="esb-refusal">{state.last_error}</div>', unsafe_allow_html=True)
     status_slot = st.empty()
+    if auth.configured() is not None:
+        if st.button("Sign out", width="stretch"):
+            auth.sign_out()
+            st.rerun()
+    else:
+        st.markdown('<div class="esb-caption">Sign-in gate off: no [auth] secrets configured (local use).</div>', unsafe_allow_html=True)
 
 pages = [
     st.Page(overview.render, title="1 · Overview", default=True),

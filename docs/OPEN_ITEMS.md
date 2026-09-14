@@ -20,4 +20,4 @@ and from Phase 2. Items are closed here when the code or a ruling settles them.
 | C1 | Aurora scenario library 2026-2031 and multi-year runs | 7 | not modelled; stated on the Scenarios page |
 | NAMES | Names ever typed into the application persist only in scenario files and case bundles outside the repository; a scenario file must never be committed | 5 | standing rule (F-035) |
 | INPUT-FMT | Streamlit number fields take the dot as decimal separator while typing; every display uses the Romanian convention | 5 | noted (platform limitation) |
-| DEPLOY | Streamlit Cloud re-point, secrets by the CEO's hand, release pack to `01_Tool/07_production/` | 6 | open |
+| DEPLOY | Deployed 14.09.2026 (D102). Remaining: production access model (private slot, paid plan or SSO) and rotation of the initial sign-in credential | 6-7 | open |

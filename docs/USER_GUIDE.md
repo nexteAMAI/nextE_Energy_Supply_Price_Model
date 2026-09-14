@@ -1,6 +1,6 @@
 # USER GUIDE - nextE Energy Supply Bid Management Tool
 
-Application v0.4.0 (engine v0.4.0). Written for the person who prices and manages the retail
+Application v0.5.0 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
 supply portfolio, not for a developer. Every capability of the Excel model
 `Energy_Supply_Portfolio_Tracking_v03` is reachable through the twelve pages described here;
 nothing requires a command line.
@@ -15,9 +15,10 @@ uploaded in a standard template, results are read on screen and exported to Exce
 
 ## 2. Opening the application
 
-The application opens in the browser. On the desk machine, `Start_ESB_App.cmd` in the
-repository folder starts it and opens the browser tab; on Streamlit Cloud (Phase 6) it opens
-from its address. The left sidebar lists the twelve pages, shows the engine version, the
+The application opens in the browser at https://nexte-esb.streamlit.app and asks for the
+username and password issued by nextE; "Sign out" is at the bottom of the sidebar. It works in
+Chrome, Edge and Firefox and needs no installation. On the desk machine, `Start_ESB_App.cmd`
+in the repository folder starts a local copy without the sign-in gate. The left sidebar lists the twelve pages, shows the engine version, the
 scenario file in use and the state of the last run, and holds the "Run engine" button.
 
 The application starts with the coded Reference Case: the register of the frozen workbook
