@@ -1,8 +1,244 @@
-# Parameter register - Reference Case values (populated in Phase 3).
-# Keys follow the n* vocabulary; every entry carries unit, source, vintage, source_status.
-# Off-takers are referenced by code OT1..OT4 (merit-order position); names are never stored here.
+# Parameter register - Reference Case values, as read from the frozen workbook
+# Energy_Supply_Portfolio_Tracking_v03_[base].xlsx (md5 1c873718bcd08957229f1f46d5449b2a),
+# sheet Input and the price / strip tables. Every parameter is dynamic in the application; this
+# file is the Reference Case scenario only. Off-takers by code (merit-order position); names
+# never appear here. Cell references are the workbook origin of each value.
+# Vintage of regulatory values: "Forecast Q3 2026 basis" (workbook decisions D55 / D60);
+# source_status: unverified = quoted from the workbook, not checked against a primary source.
+
 meta:
   reference_case: "Energy_Supply_Portfolio_Tracking_v03 (as delivered 14.09.2026)"
   reference_case_md5: "1c873718bcd08957229f1f46d5449b2a"
   spine_year: 2027
-parameters: {}
+  currency: EUR
+
+scenario:                                   # Input!C6:C7
+  active: "Aurora Central"                  # Aurora Central | Aurora Low | User Forecast
+  names: ["Aurora Central", "Aurora Low", "User Forecast"]
+
+resell:                                     # Input!C9:C10 - wholesale resell of surplus PV
+  pv_cost_factor_vs_dam_curtailed: 0.93     # C9
+  pv_revenue_factor_vs_dam_curtailed: 1.05  # C10
+
+general:                                    # Input section A
+  case_start: "2027-01-01"                  # C14 (46388)
+  case_end: "2027-12-31"                    # C15 = MAX(contract end dates) (46752)
+  fx_ron_per_eur: 5.5                       # C16 - Forecast Q3 2026 (D54)
+  vat_rate: 0.21                            # C17 - Legea 227/2015 per workbook; source_status: unverified
+  tax_payment_day: 25                       # C18 - VAT and CIT payment day (ANAF)
+  cit_rate: 0.16                            # C19 - Legea 227/2015 art. 41 per workbook label; source_status: unverified
+  opening_cash_eur: 0.0                     # C20
+  opening_cash_ron: 0.0                     # C21 - not consumed (single EUR account)
+  portfolio_opex_eur_per_mwh_metered: 0.12  # C25
+  variable_opex_eur_per_mwh_metered: 0.10   # C26 (sales bonus)
+  shareholder_loan_rate_pa: 0.07            # C27
+  reverse_charge_vat_on_sources: true       # C34 "Yes" - art. 331 alin. (2) lit. e); adviser confirmation outstanding
+  debt_facility:                            # C28:C33 - present, not modelled (D62)
+    modelled: false
+    capacity_pct_of_peak_funding: 0.0
+    currency: EUR
+    base_rate_eur_pa: 0.025
+    base_rate_ron_pa: 0.065
+    margin_pa: 0.025
+
+premium_standard:                           # Input section B (reference only; engine uses per-off-taker B2)
+  volume: 3.0
+  price: 6.0
+  profile: 2.5
+  credit: 1.0
+  regulatory: 1.0
+  fx: 0.5
+  collateral: 1.0
+  target_gross_margin: 11.0                 # C45
+
+green_certificates:                         # Cons_P&L!B6:B11 (memo block; enters via the GC tariff component)
+  quota_gc_per_mwh: 0.499387                # B6 - vintage "current regulation, 2026 basis" (D85); source_status: unverified
+  reference_price_ron_per_gc: 148.2201      # B7
+  spot_share: 0.5                           # B9 (bilateral share = 1 - spot share)
+
+# Regulated tariff and charge components applied to every off-taker (Input!C54:F63, identical
+# across the four columns in the Reference Case - X-03 / X-20; EUR/MWh at FX 5,5, DEER MV set
+# with T_LV = 0). The GC component is derived: quota x reference price / FX.
+tariff_components_eur_per_mwh:
+  TL: 6.64363636363636                      # transport extraction
+  TG: 0.66                                  # transport injection
+  SS: 2.6727272727272702                    # system services
+  T_HV: 7.15818181818182                    # distribution HV
+  T_MV: 22.3272727272727                    # distribution MV
+  T_LV: 0.0                                 # distribution LV
+  cogeneration: 2.47272727272727
+  cfd: 0.0254545454545455
+  excise: 0.69818181818181801
+  # GC = 0.499387 x 148.2201 / 5.5 = 13.458034741581818 (Input!C60)
+
+offtakers:                                  # Input section C (columns C:F), B2 (rows 97-105), FW_Purch_Sell_Price constants, strips
+  - code: OT1                               # merit-order position 1 (Input column C)
+    active: true
+    contract_start: "2027-01-01"
+    contract_end: "2027-12-31"
+    payment_terms_days: 30
+    advance_pct: 0.0
+    contract_price_eur_per_mwh: 88.0        # FW_Purch_Sell_Price!P
+    pv_price_budget_eur_per_mwh: 50.0       # FW_Purch_Sell_Price!L
+    pv_price_forecast_eur_per_mwh: 50.0     # FW_Purch_Sell_Price!M
+    premium_budget: {volume: 0.0, price: 0.0, profile: 0.0, credit: 0.0, regulatory: 0.0, fx: 0.0, collateral: 0.0}
+    premium_forecast: {volume: 0.0, price: 0.0, profile: 0.0, credit: 0.0, regulatory: 0.0, fx: 0.0, collateral: 0.0}
+    target_gm_budget: 3.0
+    target_gm_forecast: 3.0
+    guarantee: {type: None, direction: Issued-to-Buyer, sizing: Fixed, fixed_amount: 0.0, coverage_months: 0, pct_of_contract_value: 0.0,
+                bgl_fee_pa: 0.015, bgl_fee_type: Monthly, cash_backing_pct: 0.0, start: "2027-01-01", end: "2027-12-31"}
+    strip_mw:                               # FW_Source_Purch_Volume!BZ7:CB18 - per month {BL24, Peak, OffPeak}
+      BL24: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    product_price_budget:                   # FW_Purch_Sell_Price!AK7:AM18
+      BL24: [110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    product_price_forecast:                 # FW_Purch_Sell_Price!AK27:AM38
+      BL24: [190.69, 188.14, 156.5, 110.3, 110.3, 110.3, 125.84, 125.84, 125.84, 134.56, 134.56, 134.56]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  - code: OT2                               # position 2 (Input column D)
+    active: true
+    contract_start: "2027-01-01"
+    contract_end: "2027-12-31"
+    payment_terms_days: 30
+    advance_pct: 0.0
+    contract_price_eur_per_mwh: 105.85
+    pv_price_budget_eur_per_mwh: 61.1
+    pv_price_forecast_eur_per_mwh: 61.1
+    premium_budget: {volume: 1.5, price: 1.5, profile: 3.1115878093396585, credit: 1.0, regulatory: 1.0, fx: 0.6, collateral: 1.0}
+    premium_forecast: {volume: 0.0, price: 0.0, profile: 0.0, credit: 0.0, regulatory: 0.0, fx: 0.0, collateral: 0.0}
+    target_gm_budget: 4.38
+    target_gm_forecast: 3.0
+    guarantee: {type: None, direction: Issued-to-Buyer, sizing: Fixed, fixed_amount: 0.0, coverage_months: 0, pct_of_contract_value: 0.0,
+                bgl_fee_pa: 0.015, bgl_fee_type: Monthly, cash_backing_pct: 0.0, start: "2027-01-01", end: "2027-12-31"}
+    strip_mw:
+      BL24: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    product_price_budget:
+      BL24: [113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    product_price_forecast:
+      BL24: [190.69, 188.14, 156.5, 110.3, 110.3, 110.3, 125.84, 125.84, 125.84, 134.56, 134.56, 134.56]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  - code: OT3                               # position 3 (Input column E) - placeholder off-taker, Active by ruling G0-D7
+    active: true
+    contract_start: "2027-01-01"
+    contract_end: "2027-12-31"
+    payment_terms_days: 30
+    advance_pct: 0.0
+    contract_price_eur_per_mwh: 123.0
+    pv_price_budget_eur_per_mwh: 61.1
+    pv_price_forecast_eur_per_mwh: 61.1
+    premium_budget: {volume: 3.0, price: 6.0, profile: 2.5, credit: 1.0, regulatory: 1.0, fx: 0.5, collateral: 1.0}
+    premium_forecast: {volume: 3.0, price: 6.0, profile: 2.5, credit: 1.0, regulatory: 1.0, fx: 0.5, collateral: 1.0}
+    target_gm_budget: 11.0
+    target_gm_forecast: 11.0
+    guarantee: {type: None, direction: Issued-to-Buyer, sizing: Fixed, fixed_amount: 0.0, coverage_months: 0, pct_of_contract_value: 0.0,
+                bgl_fee_pa: 0.015, bgl_fee_type: Monthly, cash_backing_pct: 0.0, start: "2027-01-01", end: "2027-12-31"}
+    strip_mw:
+      BL24: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    product_price_budget:
+      BL24: [190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    product_price_forecast:
+      BL24: [190.69, 188.14, 156.5, 110.3, 110.3, 110.3, 125.84, 125.84, 125.84, 134.56, 134.56, 134.56]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  - code: OT4                               # position 4 (Input column F) - placeholder off-taker, Active by ruling G0-D7
+    active: true
+    contract_start: "2027-01-01"
+    contract_end: "2027-12-31"
+    payment_terms_days: 30
+    advance_pct: 0.0
+    contract_price_eur_per_mwh: 143.0
+    pv_price_budget_eur_per_mwh: 61.1
+    pv_price_forecast_eur_per_mwh: 61.1
+    premium_budget: {volume: 3.0, price: 6.0, profile: 2.5, credit: 1.0, regulatory: 1.0, fx: 0.5, collateral: 1.0}
+    premium_forecast: {volume: 3.0, price: 6.0, profile: 2.5, credit: 1.0, regulatory: 1.0, fx: 0.5, collateral: 1.0}
+    target_gm_budget: 11.0
+    target_gm_forecast: 11.0
+    guarantee: {type: None, direction: Issued-to-Buyer, sizing: Fixed, fixed_amount: 0.0, coverage_months: 0, pct_of_contract_value: 0.0,
+                bgl_fee_pa: 0.015, bgl_fee_type: Monthly, cash_backing_pct: 0.0, start: "2027-01-01", end: "2027-12-31"}
+    strip_mw:
+      BL24: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    product_price_budget:
+      BL24: [190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69, 190.69]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    product_price_forecast:
+      BL24: [190.69, 188.14, 156.5, 110.3, 110.3, 110.3, 125.84, 125.84, 125.84, 134.56, 134.56, 134.56]
+      Peak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      OffPeak: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+counterparties:                             # Input section D (columns C:H)
+  pv:                                       # Forward Source 1
+    active: true
+    payment_terms_days: 30
+    advance_pct: 0.0
+    guarantee: {type: Bank Guarantee Letter, direction: Issued-to-Seller, sizing: Fixed, fixed_amount: null,   # C85 = AVERAGE(Cons_P&L!B49:M49)+AVERAGE(B116:M116) - derived by the engine
+                coverage_months: 1, pct_of_contract_value: 0.0, bgl_fee_pa: 0.015, bgl_fee_type: One-time at issuance,
+                cash_backing_pct: 0.0, start: "2027-01-01", end: "2027-12-31"}
+    k: -1                                   # FW_Source_Purch_Volume!AM - DSO metering sign convention
+  baseload:                                 # Forward Source 2
+    active: true
+    payment_terms_days: 15
+    advance_pct: 0.5
+    guarantee: {type: Bank Guarantee Letter, direction: Issued-to-Seller, sizing: "% of Contract Value", fixed_amount: 0.0,
+                coverage_months: 0, pct_of_contract_value: 0.3, bgl_fee_pa: 0.015, bgl_fee_type: One-time at issuance,
+                cash_backing_pct: 0.0, start: "2027-01-01", end: "2027-12-31"}
+    k: -1
+    deviation_pct: 0.0                      # FW_Source_Purch_Volume!BC (constant 0 in the Reference Case)
+    imbalance_deviation_pct: 0.0            # FW_Source_Purch_Volume!BJ
+  spot:                                     # OPCOM
+    active: true
+    payment_terms_days: 0
+    advance_pct: 0.0
+    guarantee: {type: Bank Guarantee Letter, direction: Issued-to-Operator, sizing: Regulatory formula, fixed_amount: 0.0,
+                coverage_months: 0, pct_of_contract_value: 0.0, bgl_fee_pa: 0.015, bgl_fee_type: One-time at issuance,
+                cash_backing_pct: 0.0, start: "2027-01-01", end: "2027-12-31"}
+  brp:                                      # imbalance settlement (Transelectrica)
+    active: true
+    payment_terms_days: 15
+    advance_pct: 0.0
+    guarantee: {type: Bank Guarantee Letter, direction: Issued-to-Operator, sizing: Regulatory formula, fixed_amount: 0.0,
+                coverage_months: 0, pct_of_contract_value: 0.0, bgl_fee_pa: 0.015, bgl_fee_type: One-time at issuance,
+                cash_backing_pct: 0.0, start: "2027-01-01", end: "2027-12-31"}
+  tso:                                      # transmission grid
+    active: true
+    payment_terms_days: 15
+    advance_pct: 0.0
+    guarantee: {type: Bank Guarantee Letter, direction: Issued-to-Operator, sizing: Regulatory formula, fixed_amount: 0.0,
+                coverage_months: 0, pct_of_contract_value: 0.0, bgl_fee_pa: 0.015, bgl_fee_type: One-time at issuance,
+                cash_backing_pct: 0.0, start: "2027-01-01", end: "2027-12-31"}
+  dso:                                      # distribution grid
+    active: true
+    payment_terms_days: 15
+    advance_pct: 0.0
+    guarantee: {type: Bank Guarantee Letter, direction: Issued-to-Operator, sizing: Regulatory formula, fixed_amount: 0.0,
+                coverage_months: 0, pct_of_contract_value: 0.0, bgl_fee_pa: 0.015, bgl_fee_type: One-time at issuance,
+                cash_backing_pct: 0.0, start: "2027-01-01", end: "2027-12-31"}
+
+market_guarantees:                          # Input section E - regulatory formulas
+  spot:
+    buffer_days: 4                          # C111
+    # peak daily notified spot buy (C112) and peak DAM price (C113) are derived by the engine
+  brp:
+    rate_ron_per_mw: 9000.0                 # C116 - "Transelectrica BRP rule"; source_status: unverified
+    generation_mw_in_brp: 160.0             # C117
+    # consumption peak MW (C118) derived by the engine
+  tso:
+    vtm_multiplier: 2.0                     # C121 - "Transelectrica PO 01.13"; source_status: unverified
+  dso:
+    vdm_multiplier: 1.0                     # C125 - "ANRE Order 129/2015"; source_status: unverified
+    overdue_addon_eur: 0.0                  # C126
