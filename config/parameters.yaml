@@ -11,6 +11,7 @@ meta:
   reference_case_md5: "1c873718bcd08957229f1f46d5449b2a"
   spine_year: 2027
   currency: EUR
+  kpi_retail_nm_target_eur_per_mwh: 3.0    # execution prompt section 10.1 page 10 - house benchmark (EW-NFR-01); D101
 
 scenario:                                   # Input!C6:C7
   active: "Aurora Central"                  # Aurora Central | Aurora Low | User Forecast

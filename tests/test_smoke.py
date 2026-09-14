@@ -21,7 +21,7 @@ MODULES = [
 
 
 def test_version():
-    assert esb.__version__ == "0.3.0"
+    assert esb.__version__ == "0.4.0"
 
 
 def test_modules_import():

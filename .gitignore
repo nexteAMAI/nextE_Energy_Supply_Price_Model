@@ -5,6 +5,10 @@
 .streamlit/secrets.toml
 api_keys.env
 
+# Scenario files and case bundles may carry counterparty names (F-035) - never committed
+*.esb-scn.json
+*.esb-case.zip
+
 # Bulk data - never committed (no time series in the repo)
 data/uploads/
 data/processed/

@@ -4,18 +4,18 @@ Python engine and Streamlit application that replace the Excel model
 `Energy_Supply_Portfolio_Tracking_v03` for the nextE retail supply portfolio
 (workflow `GW-ESB-01`, task `T12`).
 
-Status: Phase 3 - engine complete (imbalance rule book, sources, merit order, P&L, cash flow, daily ledger, guarantees, pricing, overview). Parity with the frozen Reference Case: 20.092 of 20.245 cached cells tied at 1e-6, 0 failures, 153 layout cells not applicable (`tools/parity_report.py`). Streamlit application follows in Phase 5.
+Status: Phase 5 - Streamlit application (twelve pages) on the parity-proven engine (Phase 3-4: 20.092 of 20.245 cached cells of the frozen Reference Case tied at 1e-6, 0 failures, 153 layout cells not applicable; gates G3 and G4 accepted 14.09.2026). Run-time parameters persist in a versioned scenario file (ruling PSTORE); runs are reproducible from a case bundle. Deployment and the documentation set follow in Phase 6.
 
 ## What this repository will contain
 
 | Folder | Purpose | Phase |
 |---|---|---|
 | `config/` | Parameter register (YAML, Reference Case values) and its schema | 3 (done) |
-| `esb/` | Engine: grid and importer (Phase 2); imbalance rule book, scenarios, sources, merit order, monthly layer, P&L, guarantees, cash flow, pricing, reporting, engine, parity (Phase 3) | 2-3 (done) |
-| `tests/` | Unit, edge and parity suites (77 tests) | 3-4 |
+| `esb/` | Engine: grid and importer (Phase 2); imbalance rule book, scenarios, sources, merit order, monthly layer, P&L, guarantees, cash flow, pricing, reporting, engine, parity (Phase 3); assembly of uploads, scenario file, case bundle, exports, labels (Phase 5) | 2-5 (done) |
+| `tests/` | Unit, edge, parity and application suites | 3-5 |
 | `data/reference/` | Reference Case input series and expected output cells (parquet, coded) | 2-3 (done) |
 | `docs/` | Methodology, parameters, data contract, user guide, decisions, open items | 3-6 |
-| `app/` | Streamlit application | 5 |
+| `app/` + `app.py` | Streamlit application: brand layer, session model, twelve pages | 5 (done) |
 | `tools/` | Build scripts (fixture extraction, parity report) | 2-3 |
 | `extractors/` | Market data connectors (reviewed from the `legacy` branch) | 7 |
 
@@ -30,9 +30,10 @@ Status: Phase 3 - engine complete (imbalance rule book, sources, merit order, P&
 ## Development
 
 ```
-pip install -e ".[dev]"
-pytest                                   # about 65 s; parity suite included
+pip install -e ".[dev,app]"
+pytest                                   # engine, parity and application suites
 python tools/parity_report.py out/       # PARITY_REPORT_<ddmmyyyy>.md + parity.json
+streamlit run app.py                     # the application (or Start_ESB_App.cmd on the desk machine)
 ```
 
 Run the engine on the Reference Case:

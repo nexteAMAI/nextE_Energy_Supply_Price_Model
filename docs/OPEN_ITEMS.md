@@ -11,7 +11,13 @@ and from Phase 2. Items are closed here when the code or a ruling settles them.
 | X-03 | Single tariff vector for all off-takers (DEER MV set with T_LV = 0); real DSO and voltage level per off-taker to be supplied before G5 | 5 | open |
 | X-29 | The workbook carries values on its 96 undated placeholder rows (prices; volumes 0). Not consumed by any date-keyed aggregation; not in the fixtures | 2 | noted |
 | G2-real | No real daylight-saving-bearing delivery available; G2 met on synthetic deliveries only | 2 | open until a real file is placed in `_sources/_internal/` |
-| PSTORE | Run-time parameter store for user-set parameters (all dynamic, incl. off-taker names): Supabase per stack vs versioned scenario file | 5 | decide at G4 |
+| PSTORE | Run-time parameter store | 5 | closed - versioned scenario file (CEO 14.09.2026; `esb.scenario_file`) |
 | AF:AG | Portfolio budget series `FW_Retail_Volume!AF:AG` not in the fixtures (only scale the placeholder off-takers, whose series are extracted directly) | 4 | noted |
 | PC-views | `Pricing_Calc` views of positions 1, 2 and 4 have no cached workbook values (the sheet shows one off-taker at a time); they cannot be tied cell by cell | 4 | noted (D94) |
-| G3 | Module tests cover the rule book, sources, guarantees, cash-flow keys, tax and eleven edge scenarios (77 tests); CEO review of the edge list against the specification | 3 | for G3 ruling |
+| G3 | Edge list accepted by the CEO 14.09.2026 | 3 | closed |
+| G2-real | (carried) still no real daylight-saving-bearing delivery; the Data page accepts `local_clock` files and will process one when placed | 5 | open |
+| C3 | Price types other than Fixed (Cap+Excess, DAM-indexed, IDM-indexed, floors, caps, index deltas, contract currency, invoice FX) of the C3 dashboard | 7 | not modelled; stated on the Sources and Contracts page |
+| C1 | Aurora scenario library 2026-2031 and multi-year runs | 7 | not modelled; stated on the Scenarios page |
+| NAMES | Names ever typed into the application persist only in scenario files and case bundles outside the repository; a scenario file must never be committed | 5 | standing rule (F-035) |
+| INPUT-FMT | Streamlit number fields take the dot as decimal separator while typing; every display uses the Romanian convention | 5 | noted (platform limitation) |
+| DEPLOY | Streamlit Cloud re-point, secrets by the CEO's hand, release pack to `01_Tool/07_production/` | 6 | open |

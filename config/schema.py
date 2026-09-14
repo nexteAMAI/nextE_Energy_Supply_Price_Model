@@ -5,7 +5,8 @@ nothing is a code constant.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import copy
+from dataclasses import asdict, dataclass, field
 from datetime import date
 from pathlib import Path
 
@@ -73,6 +74,12 @@ class Offtaker:
     product_price_budget: dict[str, list[float]]
     product_price_forecast: dict[str, list[float]]
     tariff_components: dict[str, float] | None = None  # per-off-taker override of the portfolio tariff set (Input!C54:F63)
+    name: str = ""  # display name, set in the application or a scenario file; never in the repository (F-035)
+    position: int = 0  # merit-order position (1-based); 0 = by list order
+
+    @property
+    def label(self) -> str:
+        return self.name or self.code
 
     @property
     def premium_budget_total(self) -> float:
@@ -110,6 +117,7 @@ class Counterparty:
     k: int | None = None
     deviation_pct: float = 0.0
     imbalance_deviation_pct: float = 0.0
+    name: str = ""  # display name (application / scenario file only)
 
     @classmethod
     def from_dict(cls, d: dict) -> Counterparty:
@@ -243,6 +251,45 @@ class Parameters:
             market_guarantees=d["market_guarantees"],
         )
 
+    def to_dict(self) -> dict:
+        """The register as a plain dict in the layout of config/parameters.yaml (round-trips through from_dict)."""
+
+        def g(x: Guarantee) -> dict:
+            d = asdict(x)
+            d["start"], d["end"] = x.start.isoformat(), x.end.isoformat()
+            return d
+
+        offtakers = []
+        for o in self.offtakers:
+            d = asdict(o)
+            d["contract_start"], d["contract_end"] = o.contract_start.isoformat(), o.contract_end.isoformat()
+            d["guarantee"] = g(o.guarantee)
+            offtakers.append(d)
+        counterparties = {}
+        for k, c in self.counterparties.items():
+            d = asdict(c)
+            d["guarantee"] = g(c.guarantee)
+            counterparties[k] = d
+        general = asdict(self.general)
+        general["case_start"], general["case_end"] = self.general.case_start.isoformat(), self.general.case_end.isoformat()
+        return {
+            "meta": dict(self.meta),
+            "scenario": {"active": self.scenario_active, "names": list(self.scenario_names)},
+            "resell": {"pv_cost_factor_vs_dam_curtailed": self.resell_pv_cost_factor,
+                       "pv_revenue_factor_vs_dam_curtailed": self.resell_pv_revenue_factor},
+            "general": general,
+            "premium_standard": dict(self.premium_standard),
+            "green_certificates": {"quota_gc_per_mwh": self.gc_quota, "reference_price_ron_per_gc": self.gc_reference_price_ron,
+                                   "spot_share": self.gc_spot_share},
+            "tariff_components_eur_per_mwh": dict(self.tariff_components),
+            "offtakers": offtakers,
+            "counterparties": counterparties,
+            "market_guarantees": copy.deepcopy(self.market_guarantees),
+        }
+
+    def copy(self) -> Parameters:
+        return Parameters.from_dict(copy.deepcopy(self.to_dict()))
+
     def validate(self) -> list[str]:
         errs: list[str] = []
         codes = [o.code for o in self.offtakers]
@@ -253,6 +300,11 @@ class Parameters:
                 errs.append(f"counterparty '{c}' missing")
         if not (0 <= self.general.vat_rate < 1 and 0 <= self.general.cit_rate < 1):
             errs.append("vat_rate / cit_rate out of range")
+        for o in self.offtakers:
+            if o.contract_end < o.contract_start:
+                errs.append(f"{o.code}: contract_end before contract_start")
+            if o.payment_terms_days < 0 or not (0 <= o.advance_pct <= 1):
+                errs.append(f"{o.code}: payment terms or advance out of range")
         return errs
 
 

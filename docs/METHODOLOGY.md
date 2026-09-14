@@ -1,4 +1,4 @@
-# METHODOLOGY - engine v0.3.0
+# METHODOLOGY - engine v0.4.0
 
 How the Python engine reproduces the frozen Reference Case workbook
 `Energy_Supply_Portfolio_Tracking_v03_[base].xlsx` (md5 `1c873718bcd08957229f1f46d5449b2a`).
@@ -161,7 +161,7 @@ selected off-taker) and the checks section (7). `strip_price_tripwire` (`Portf O
 sheets of the frozen workbook (20.245 cells). `mapped_cells` addresses each engine value by
 sheet and cell through the row and column maps above; `compare` applies the tolerance of
 ruling G0-D4 (`abs(py - xl) <= 1e-6 x max(abs(xl), 1)`). Result on the Reference Case, engine
-v0.3.0: 20.092 cells mapped and tied, 0 failures, 153 cells not applicable (layout artefacts:
+v0.3.0 and unchanged in v0.4.0: 20.092 cells mapped and tied, 0 failures, 153 cells not applicable (layout artefacts:
 `Portf Overview` W150:W427 label self-check and B10; `Pricing_Calc` C4, D4, G4, I4 and the
 blank manual column D). `tests/parity/test_parity_v03.py` enforces this on every test run.
 
@@ -172,3 +172,23 @@ blank manual column D). `tests/parity/test_parity_v03.py` enforces this on every
 - Times are EET on the grid (fixed 1 h offset to CET); documents use CET/CEST.
 - Regulatory constants are never hard-coded; they live in `config/parameters.yaml` with their
   workbook origin and verification status.
+
+## 12. Application layer (Phase 5)
+
+The application (`app.py`, package `app/`) adds no calculation: every number on screen comes
+from `esb.engine.run` on the assembled series. Four engine-side modules support it:
+
+- `esb.assemble` (D96) joins the accepted uploads and the optional Reference Case base layer
+  into the engine frame and reports coverage (off-takers, PV, scenarios) and problems.
+- `esb.scenario_file` (PSTORE) serialises the register with display names as the versioned
+  scenario file `ESB-SCN 1.0` and refuses files whose md5 does not match their register.
+- `esb.bundle` (D97) writes and re-opens the case bundle `ESB-CASE 1.0`.
+- `esb.export` writes the Excel workbook and CSV files of a run; `esb.labels` gives every
+  engine key its user-facing label.
+
+`app.state` holds the session (scenario file, uploads, assembled series, last run, log);
+`app.brand` holds the presentation layer (Montserrat, navy and neutrals, Romanian formats,
+tables, charts). Pages are `app/pages/*.py`, one `render()` each, in the order of the
+execution prompt section 10.1. Tests: `tests/unit/test_persistence.py` (round trips and
+refusals) and `tests/app/test_pages.py` (every page rendered headlessly on the Reference Case,
+the refusal path, a scenario switch, the manual case form, adding an off-taker).

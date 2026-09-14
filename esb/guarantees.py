@@ -154,3 +154,34 @@ def bgl_fee(g: Guarantee, outstanding: np.ndarray, year: int) -> np.ndarray:
 
 def _eom(s: date) -> date:
     return month_end(s)
+
+
+def sizing_comparison(pnl, params: Parameters) -> dict[str, dict[str, float]]:
+    """Application page 9: the peak outstanding amount every counterparty would need under each
+    sizing method, with the same bases the P&L used (annual base, regulatory amount, fixed amount)."""
+    import copy
+
+    from config.schema import GUARANTEE_SIZINGS
+
+    P = pnl.portfolio
+    cp = params.counterparties
+    year = params.spine_year
+    bases = {"pv": P.y("t_revenue"), "baseload": P.y("cost_bl_forecast") + P.y("rs_bl_cost_forecast"), "spot": P.y("t_revenue"),
+             "brp": P.y("t_revenue"), "tso": P.y("t_revenue"), "dso": P.y("t_revenue")}
+    required = {"pv": None, "baseload": None, **pnl.regulatory.by_counterparty()}
+    fixed = {k: (pnl.pv_fixed_guarantee if k == "pv" else float(cp[k].guarantee.fixed_amount or 0.0)) for k in cp}
+    out: dict[str, dict[str, float]] = {}
+    for k in ("pv", "baseload", "spot", "brp", "tso", "dso"):
+        row: dict[str, float] = {}
+        for sizing in GUARANTEE_SIZINGS:
+            g = copy.deepcopy(cp[k].guarantee)
+            g.sizing = sizing
+            if g.type in ("None", ""):
+                g.type = "Bank Guarantee Letter"
+            if sizing == "Regulatory formula" and required[k] is None:
+                row[sizing] = float("nan")
+                continue
+            amounts = counterparty_outstanding(g, True, bases[k], required[k], fixed[k], year)
+            row[sizing] = float(np.max(amounts)) if len(amounts) else 0.0
+        out[k] = row
+    return out
