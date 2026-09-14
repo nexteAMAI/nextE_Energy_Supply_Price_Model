@@ -1,4 +1,18 @@
 # DECISIONS
 
-Placeholder - written during Phases 2-6. The Phase 0 specification and discrepancy register
-(CEO folder, `00_Spec/01_current/`) are the source for this document.
+Decision numbers continue the D-series of the Reference Case workbook's `_CLAUDE_LOG`
+(D01-D86 in the workbook; D87/D88 are reserved for the `Pricing_Calc` corrections, see
+OPEN_ITEMS.md). Gate rulings are referenced by their G-ids from the Phase 0 specification.
+
+| ID | Date | Decision | Basis |
+|---|---|---|---|
+| G0-D2 | 14.09.2026 | The engine grid is positional (96 rows per day, EET labels, fixed 1 h offset to CET); daylight-saving rules are applied at import; the Reference Case series are frozen as they sit | CEO ruling on X-02 |
+| G0-D4 | 14.09.2026 | Numerical tolerance `abs(py - xl) <= 1e-6 x max(abs(xl), 1)` | CEO ruling |
+| G0-D6 | 14.09.2026 | Fixed evaluation order with an acyclicity assertion; no convergence iteration | CEO ruling on X-14 |
+| G0-D7 | 14.09.2026 | Reference Case keeps the placeholder off-takers (positions 3 and 4) Active | CEO ruling |
+| G0-F035 | 14.09.2026 | No counterparty names in the repository; entities are coded (`OT1`.. by merit-order position, `PV1`); names live in the application and in Excel files | CEO ruling |
+| G0-PAR | 14.09.2026 | All parameters, including off-taker names and count, are dynamic and set in the application; YAML registers carry Reference Case values only | CEO ruling |
+| G0-TS | 14.09.2026 | All time series are uploaded through the application against the standard template of docs/DATA_CONTRACT.md | CEO ruling |
+| D89 | 14.09.2026 | The 35.136-row workbook container is not reproduced: the engine grid has 365 x 96 rows in a common year (366 x 96 in a leap year); placeholder rows (29.02 in v03, `Outside` rows in the STD template) are dropped | every workbook aggregation is date-keyed; the two containers place the placeholder block differently (X-29) |
+| D90 | 14.09.2026 | Upload contract carries `time_basis` (`local_clock` / `fixed_96`) in `Std_Control` and `k` per volume slot in `Series_Registry`; both are declared, never inferred | SPEC section 4.3, X-24 |
+| D91-ESB | 14.09.2026 | Fixture workbooks are written by openpyxl (16 significant digits); the parquet built from the workbook's stored text is the canonical fixture | build_rc_fixtures.py |

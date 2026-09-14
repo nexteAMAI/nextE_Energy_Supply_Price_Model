@@ -1,0 +1,120 @@
+{
+  "source_workbook": "Energy_Supply_Portfolio_Tracking_v03_[base].xlsx",
+  "source_md5": "1c873718bcd08957229f1f46d5449b2a",
+  "spine_year": 2027,
+  "rows": 35040,
+  "grid": "365 x 96 dated rows of the workbook (rows 7..35142 minus the 96 placeholder rows 5671..5766)",
+  "entity_codes": {
+    "OT1": "merit-order position 1",
+    "OT2": "position 2",
+    "OT3": "position 3",
+    "OT4": "position 4",
+    "PV1": "Forward Source 1 (PV)"
+  },
+  "column_map": {
+    "FW_Retail_Volume": {
+      "AV": "OT1_metered_consumption_MWh",
+      "AW": "OT1_notified_consumption_MWh",
+      "BJ": "OT2_metered_consumption_MWh",
+      "BK": "OT2_notified_consumption_MWh",
+      "BX": "OT3_metered_consumption_MWh",
+      "BY": "OT3_notified_consumption_MWh",
+      "CL": "OT4_metered_consumption_MWh",
+      "CM": "OT4_notified_consumption_MWh"
+    },
+    "FW_Source_Purch_Volume": {
+      "AH": "PV1_forecast_generation_uncurtailed_MWh",
+      "AJ": "PV1_forecast_generation_deviation_pct",
+      "AQ": "PV1_imbalance_deviation_pct"
+    },
+    "Whol_Sport_Imb_Fcst": {
+      "central": {
+        "L": "DAM_price_EUR_MWh",
+        "M": "IDCT_VWAP15_price_EUR_MWh",
+        "P": "Surplus_imbalance_price_EUR_MWh",
+        "Q": "Deficit_imbalance_price_EUR_MWh",
+        "R": "System_imbalance_direction"
+      },
+      "low": {
+        "T": "DAM_price_EUR_MWh",
+        "U": "IDCT_VWAP15_price_EUR_MWh",
+        "X": "Surplus_imbalance_price_EUR_MWh",
+        "Y": "Deficit_imbalance_price_EUR_MWh",
+        "Z": "System_imbalance_direction"
+      }
+    }
+  },
+  "sums": {
+    "OT1_metered_consumption_MWh": 54979.818,
+    "OT1_notified_consumption_MWh": 55017.82090084,
+    "OT2_metered_consumption_MWh": 88285.08915361343,
+    "OT2_notified_consumption_MWh": 87834.0578786783,
+    "OT3_metered_consumption_MWh": 200000.0000000008,
+    "OT3_notified_consumption_MWh": 199372.26857283164,
+    "OT4_metered_consumption_MWh": 220000.00000000084,
+    "OT4_notified_consumption_MWh": 219309.49543011482,
+    "PV1_forecast_generation_uncurtailed_MWh": 411705.0000000011,
+    "PV1_forecast_generation_deviation_pct": -1609.8350185600339,
+    "PV1_imbalance_deviation_pct": -763.2726300244727,
+    "central__DAM_price_EUR_MWh": 4171064.2,
+    "central__IDCT_VWAP15_price_EUR_MWh": 4287271.48,
+    "central__Surplus_imbalance_price_EUR_MWh": 4480103.92,
+    "central__Deficit_imbalance_price_EUR_MWh": 4480103.92,
+    "low__DAM_price_EUR_MWh": 2557576.92,
+    "low__IDCT_VWAP15_price_EUR_MWh": 2618414.3600000003,
+    "low__Surplus_imbalance_price_EUR_MWh": 2902995.36,
+    "low__Deficit_imbalance_price_EUR_MWh": 2902995.36
+  },
+  "note": "The parquet is the canonical fixture (values exactly as stored in the workbook). The xlsx fixtures are written with openpyxl (16 significant digits) and may differ from the parquet by 1 ulp (relative 1e-16).",
+  "built_utc": "2026-09-14T21:24:58",
+  "fixture_workbooks": {
+    "RC_v03_offtaker_load_2027.xlsx": {
+      "md5": "4f837d735a229939f5f65da7c9171849",
+      "size": 2079822,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    "RC_v03_pv_generation_2027.xlsx": {
+      "md5": "e771b4dd4c57e04a4c4fffbd8940dfb5",
+      "size": 1081724,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    "RC_v03_wholesale_prices_central_2027.xlsx": {
+      "md5": "ccbc8ecdc16c9447c9343516c68fa798",
+      "size": 1185274,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    "RC_v03_wholesale_prices_low_2027.xlsx": {
+      "md5": "e250206828d7703cd6b730ac77aa663b",
+      "size": 1183939,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  }
+}
