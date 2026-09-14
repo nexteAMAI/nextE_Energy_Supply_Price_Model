@@ -1,0 +1,37 @@
+# Credentials - never committed (D-91 / execution prompt section 8)
+*.env
+.env*
+.nexte/
+.streamlit/secrets.toml
+api_keys.env
+
+# Bulk data - never committed (no time series in the repo)
+data/uploads/
+data/processed/
+data/raw/
+*.xlsx
+*.xlsm
+*.csv
+*.parquet
+!data/reference/*.parquet
+!data/reference/*.parquet.zst
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+~$*

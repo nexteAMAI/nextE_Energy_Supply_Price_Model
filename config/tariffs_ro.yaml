@@ -1,0 +1,6 @@
+# Regulated tariff components, RON/MWh, by network operator and voltage level (populated in Phase 3).
+# Source: Grid_Taxes_RO register (v1.1 template, C2); validity periods required for every row.
+meta:
+  currency: RON
+  unit: RON/MWh
+tariffs: []

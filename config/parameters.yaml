@@ -1,0 +1,8 @@
+# Parameter register - Reference Case values (populated in Phase 3).
+# Keys follow the n* vocabulary; every entry carries unit, source, vintage, source_status.
+# Off-takers are referenced by code OT1..OT4 (merit-order position); names are never stored here.
+meta:
+  reference_case: "Energy_Supply_Portfolio_Tracking_v03 (as delivered 14.09.2026)"
+  reference_case_md5: "1c873718bcd08957229f1f46d5449b2a"
+  spine_year: 2027
+parameters: {}

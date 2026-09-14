@@ -1,0 +1,7 @@
+# Romanian calendar facts used by the grid module (populated in Phase 3):
+# public holidays, DST transition dates, peak window (08:00-20:00 CET), EET-CET offset.
+meta:
+  timezone_grid: EET
+  offset_eet_cet_h: 1
+  peak_window_cet: ["08:00", "20:00"]
+years: {}
