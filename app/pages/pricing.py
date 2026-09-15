@@ -9,7 +9,7 @@ import streamlit as st
 from app import brand as B
 from app import state as S
 from config.schema import PREMIUM_COMPONENTS
-from esb.labels import label
+from esb.labels import RETAIL, label, tagged
 from esb.pricing import PRICING_ROWS, YEAR_ONLY, manual_case
 
 BUILDUP = [("purchase_price", "Purchase price"), ("imbalance_cost", "Imbalance cost"), ("premium_total", "Risk premium"), ("target_gm", "Target GM"),
@@ -40,10 +40,10 @@ def render() -> None:
     nm_spec = T.y("retail_nm_forecast_specific")
     with c2:
         B.kpi_row([
-            ("Energy price", y["energy_price"], "EUR/MWh", f"Physical cost {B.num(y['physical_cost'], 2)} + premium {B.num(y['premium_total'], 2)} + target GM {B.num(y['target_gm'], 2)}"),
-            ("Offer excl. VAT", y["offer_ex_vat"], "EUR/MWh", f"Incl. VAT {B.num(y['offer_incl_vat'], 2)} EUR/MWh"),
-            ("Contract minus offer", y["contract_minus_offer"], "EUR/MWh", f"Contract price {B.num(y['contract_price'], 2)}; implied GM {B.num(y['implied_gm'], 2)}"),
-            ("Retail NM pre-tax (forecast)", nm_spec, "EUR/MWh", f"Target {B.num(target, 2)} EUR/MWh · " + ("meets target" if nm_spec >= target else "below target")),
+            (tagged("Energy price", RETAIL), y["energy_price"], "EUR/MWh", f"Physical cost {B.num(y['physical_cost'], 2)} + premium {B.num(y['premium_total'], 2)} + target GM {B.num(y['target_gm'], 2)}"),
+            (tagged("Offer excl. VAT", RETAIL), y["offer_ex_vat"], "EUR/MWh", f"Incl. VAT {B.num(y['offer_incl_vat'], 2)} EUR/MWh"),
+            (tagged("Contract minus offer", RETAIL), y["contract_minus_offer"], "EUR/MWh", f"Contract price {B.num(y['contract_price'], 2)}; implied GM {B.num(y['implied_gm'], 2)}"),
+            (tagged("NM pre-tax forecasted (specific)", RETAIL), nm_spec, "EUR/MWh", f"Target {B.num(target, 2)} EUR/MWh · " + ("meets target" if nm_spec >= target else "below target")),
         ])
     st.markdown(f"KPI - retail NM pre-tax at least {B.num(target, 2)} EUR/MWh: {B.status(nm_spec >= target, 'MET', 'NOT MET')}", unsafe_allow_html=True)
     B.note("Cost to serve (C39) and the forecast premium (C46) use the corrected logic of decisions D87 / D88; the workbook's cached values are "
@@ -62,16 +62,16 @@ def render() -> None:
             months = pr.months.get(k)
             rows[k] = [y[k], *(list(months) if months is not None and k not in YEAR_ONLY else [float("nan")] * 12)]
     df = pd.DataFrame(rows, index=["Year", *B.MONTH_EN]).T
-    df.index = [f"{label(k)} [{PRICING_ROWS[k]}]" for k in df.index]
+    df.index = [f"{label(k, leg=RETAIL)} [{PRICING_ROWS[k]}]" for k in df.index]
     B.table(df, index_label="Line [row]", scroll=True)
     B.caption("EUR/MWh except metered / notified (MWh) and annual revenue (EUR); row numbers of the Reference Case sheet; year-only lines have no monthly values")
 
     st.markdown("## Re-pricing at the current forecast")
     B.kpi_row([
-        ("Forecast premium (C46, corrected)", y["forecast_premium"], "EUR/MWh", f"Derived forecast premium {B.num(y['derived_forecast_premium'], 2)} EUR/MWh"),
-        ("Re-priced energy price", y["repriced_energy_price"], "EUR/MWh", "Physical cost forecast + forecast premium + target GM forecast"),
-        ("Contract minus re-priced", y["contract_minus_repriced"], "EUR/MWh", "Negative: the contract price is below today's re-priced level"),
-        ("Reserve release (budget / forecast)", f"{B.num(y['reserve_release_budget'], 0)} / {B.num(y['reserve_release_forecast'], 0)}", "EUR", "Released at contract end"),
+        (tagged("Forecast premium (C46, corrected)", RETAIL), y["forecast_premium"], "EUR/MWh", f"Derived forecast premium {B.num(y['derived_forecast_premium'], 2)} EUR/MWh"),
+        (tagged("Re-priced energy price", RETAIL), y["repriced_energy_price"], "EUR/MWh", "Physical cost forecast + forecast premium + target GM forecast"),
+        (tagged("Contract minus re-priced", RETAIL), y["contract_minus_repriced"], "EUR/MWh", "Negative: the contract price is below today's re-priced level"),
+        (tagged("Reserve release (budget / forecast)", RETAIL), f"{B.num(y['reserve_release_budget'], 0)} / {B.num(y['reserve_release_forecast'], 0)}", "EUR", "Released at contract end"),
     ])
 
     st.markdown("## Manual case - a new off-taker or a what-if")
@@ -79,33 +79,33 @@ def render() -> None:
     with st.form("manual_case"):
         c1, c2, c3 = st.columns(3)
         with c1:
-            m_metered = st.number_input("Metered volume (MWh)", value=float(y["metered"]), step=1000.0, format="%.2f")
-            m_pp = st.number_input("Purchase price (EUR/MWh)", value=float(y["purchase_price"]), step=0.5, format="%.4f")
-            m_imb = st.number_input("Imbalance cost (EUR/MWh)", value=float(y["imbalance_cost"]), step=0.1, format="%.4f")
+            m_metered = B.num_input("Metered volume (MWh)", value=float(y["metered"]), decimals=2)
+            m_pp = B.num_input("Purchase price (EUR/MWh)", value=float(y["purchase_price"]), decimals=4)
+            m_imb = B.num_input("Imbalance cost (EUR/MWh)", value=float(y["imbalance_cost"]), decimals=4)
         with c2:
             prem = {}
             for c in PREMIUM_COMPONENTS[:4]:
-                prem[c] = st.number_input(f"Premium {c}", value=float(y[f"premium_{c}"]), step=0.25, format="%.4f", key=f"mc_{c}")
+                prem[c] = B.num_input(f"Premium {c}", value=float(y[f"premium_{c}"]), key=f"mc_{c}", decimals=4)
         with c3:
             for c in PREMIUM_COMPONENTS[4:]:
-                prem[c] = st.number_input(f"Premium {c}", value=float(y[f"premium_{c}"]), step=0.25, format="%.4f", key=f"mc_{c}")
-            m_gm = st.number_input("Target GM (EUR/MWh)", value=float(y["target_gm"]), step=0.25, format="%.4f")
-            m_pt = st.number_input("Pass-through (EUR/MWh)", value=float(y["passthrough"]), step=0.1, format="%.4f")
+                prem[c] = B.num_input(f"Premium {c}", value=float(y[f"premium_{c}"]), key=f"mc_{c}", decimals=4)
+            m_gm = B.num_input("Target GM (EUR/MWh)", value=float(y["target_gm"]), decimals=4)
+            m_pt = B.num_input("Pass-through (EUR/MWh)", value=float(y["passthrough"]), decimals=4)
         if st.form_submit_button("Compute the manual case", type="primary"):
             manual = {"metered": m_metered, "purchase_price": m_pp, "imbalance_cost": m_imb, "target_gm": m_gm, "passthrough": m_pt,
                       **{f"premium_{c}": v for c, v in prem.items()}}
             d = manual_case(pr, manual)
             st.session_state["manual_result"] = (code, d)
-            state.add_log("pricing", f"manual case computed for {code}: energy price {d['energy_price']:.2f} EUR/MWh")
+            state.add_log("pricing", f"manual case computed for {code}: energy price {B.num(d['energy_price'], 2)} EUR/MWh")
     mr = st.session_state.get("manual_result")
     if mr and mr[0] == code:
         d = mr[1]
         B.kpi_row([
-            ("Energy price (manual)", d["energy_price"], "EUR/MWh", f"Physical {B.num(d['physical_cost'], 2)} + premium {B.num(d['premium_total'], 2)} + GM {B.num(d['target_gm'], 2)}"),
-            ("Offer excl. VAT (manual)", d["offer_ex_vat"], "EUR/MWh", f"Incl. VAT {B.num(d['offer_incl_vat'], 2)}"),
-            ("Indicative NM (manual)", d["indicative_nm"], "EUR/MWh", f"Cost to serve of the base case {B.num(y['cost_to_serve'], 2)} EUR/MWh"),
-            ("Annual revenue (manual)", d["annual_revenue"], "EUR", f"{B.num(d['metered'], 0)} MWh x energy price"),
+            (tagged("Energy price (manual)", RETAIL), d["energy_price"], "EUR/MWh", f"Physical {B.num(d['physical_cost'], 2)} + premium {B.num(d['premium_total'], 2)} + GM {B.num(d['target_gm'], 2)}"),
+            (tagged("Offer excl. VAT (manual)", RETAIL), d["offer_ex_vat"], "EUR/MWh", f"Incl. VAT {B.num(d['offer_incl_vat'], 2)}"),
+            (tagged("Indicative NM (manual)", RETAIL), d["indicative_nm"], "EUR/MWh", f"Cost to serve of the base case {B.num(y['cost_to_serve'], 2)} EUR/MWh"),
+            (tagged("Annual revenue (manual)", RETAIL), d["annual_revenue"], "EUR", f"{B.num(d['metered'], 0)} MWh x energy price"),
         ])
-        cmp = pd.DataFrame({"Year column": [y.get(k, float("nan")) for k in d], "Manual case": list(d.values())}, index=[label(k) for k in d])
+        cmp = pd.DataFrame({"Year column": [y.get(k, float("nan")) for k in d], "Manual case": list(d.values())}, index=[label(k, leg=RETAIL) for k in d])
         cmp["Delta"] = cmp["Manual case"] - cmp["Year column"]
         B.table(cmp, index_label="Line")

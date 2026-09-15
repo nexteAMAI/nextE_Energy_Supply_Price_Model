@@ -1,6 +1,6 @@
 # USER GUIDE - nextE Energy Supply Bid Management Tool
 
-Application v0.5.0 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
+Application v0.6.0 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
 supply portfolio, not for a developer. Every capability of the Excel model
 `Energy_Supply_Portfolio_Tracking_v03` is reachable through the twelve pages described here;
 nothing requires a command line.
@@ -58,8 +58,13 @@ new inactive position, the last position can be removed), D Counterparties (PV, 
 Spot, BRP, TSO, DSO: Active, terms, advance, sign convention k, guarantee), E Market
 guarantees (regulatory formula inputs) and the admin tab for the regulated tariff components
 and green-certificate values. Every section applies with its own "Apply changes" button.
-Number fields use the dot as decimal separator while typing; all displays use the Romanian
-convention (84,50 EUR/MWh; 1.490 MW).
+Number fields are typed and shown in the Romanian convention (84,50; 1.234,56; 0,21): the dot
+groups thousands and the comma is the decimal separator. A single dot with other than three
+digits after it (0.21) is read as a decimal point; anything that is not a number is refused in
+place and the previous value is kept. Month-by-product grids follow the same rule.
+Every metric label ends with the leg it belongs to: Retail (the off-taker book), Wholesale spot
+resell (surplus PV and Baseload sold to the market) or Total (both legs, and the cost-to-serve,
+financing and tax lines below Total GM2). Checks, market series and parameters carry no leg.
 
 ### 4 - Sources and Contracts
 The contractual position as modelled: per source the nomination basis, price basis,

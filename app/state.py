@@ -28,6 +28,13 @@ REFERENCE_SERIES = ROOT / "data" / "reference" / "rc_v03_series.parquet"
 KEY = "esb"
 
 
+def _ro(x: float, decimals: int = 2) -> str:
+    """Romanian number format for log text (no dependency on the brand module)."""
+    v = float(x)
+    t = f"{abs(v):,.{decimals}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    return f"({t})" if v < 0 else t
+
+
 @dataclass
 class LogEntry:
     at_utc: str
@@ -114,8 +121,8 @@ class AppState:
             self.result = run(series.frame, self.params.copy(), selected_offtaker=sel, pricing_as_cached=pricing_as_cached)
             self.dirty = False
             s = self.result.summary()
-            self.add_log("run", f"engine run: scenario '{self.params.scenario_active}', NM forecast {s['nm_forecast']:,.2f} EUR, "
-                                f"{self.result.trace[-1][1]:.2f} s")
+            self.add_log("run", f"engine run: scenario '{self.params.scenario_active}', NM forecast (Total) {_ro(s['nm_forecast'], 2)} EUR, "
+                                f"{_ro(self.result.trace[-1][1], 2)} s")
             return self.result
         except Exception as e:  # the UI never shows a traceback (rule 6)
             self.last_error = f"Run refused: {type(e).__name__}: {e}"

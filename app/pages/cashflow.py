@@ -10,7 +10,7 @@ import streamlit as st
 from app import brand as B
 from app import state as S
 from esb.cashflow import CF_ROWS
-from esb.labels import label
+from esb.labels import TOTAL, label, tagged
 
 ROWMAP = {v: k for k, v in CF_ROWS.items()}
 GROUPS = {
@@ -27,7 +27,7 @@ GROUPS = {
 def _frame(cf, keys) -> pd.DataFrame:
     rows = {k: cf.rows[k] for k in keys if k in cf.rows}
     df = pd.DataFrame(rows, index=[*B.MONTH_EN, "Beyond Dec", "Year"]).T
-    df.index = [label(k) + (f" [{ROWMAP[k]}]" if k in ROWMAP else "") for k in df.index]
+    df.index = [label(k, fallback=TOTAL) + (f" [{ROWMAP[k]}]" if k in ROWMAP else "") for k in df.index]
     return df
 
 
@@ -42,14 +42,14 @@ def render() -> None:
     p = r.params
     ds = cf.daily_summary
     B.kpi_row([
-        ("Peak funding - monthly view", cf.y("peak_funding"), "EUR", "Maximum shareholder loan outstanding, month ends"),
-        ("Peak funding - daily ledger", ds.get("peak_funding", np.nan), "EUR", f"Daily minus monthly {B.num(ds.get('peak_vs_monthly', np.nan), 0)} EUR"),
-        ("Financing interest", cf.y("interest"), "EUR", f"Daily basis {B.num(ds.get('interest_daily_basis', np.nan), 0)} EUR · rate {B.pct(p.general.shareholder_loan_rate_pa)}"),
-        ("Cash trough", ds.get("cash_trough", np.nan), "EUR", f"Minimum free cash after tax {B.num(ds.get('min_free_cash_after_tax', np.nan), 0)} EUR"),
+        (tagged("Peak funding - monthly view", TOTAL), cf.y("peak_funding"), "EUR", "Maximum shareholder loan outstanding, month ends"),
+        (tagged("Peak funding - daily ledger", TOTAL), ds.get("peak_funding", np.nan), "EUR", f"Daily minus monthly {B.num(ds.get('peak_vs_monthly', np.nan), 0)} EUR"),
+        (tagged("Financing interest", TOTAL), cf.y("interest"), "EUR", f"Daily basis {B.num(ds.get('interest_daily_basis', np.nan), 0)} EUR · rate {B.pct(p.general.shareholder_loan_rate_pa)}"),
+        (tagged("Cash trough", TOTAL), ds.get("cash_trough", np.nan), "EUR", f"Minimum free cash after tax {B.num(ds.get('min_free_cash_after_tax', np.nan), 0)} EUR"),
     ])
     B.note("Calculation order (ruling G0-D6): the monthly cash flow reads the stage-1 P&L, its interest enters the net margin, and the tax "
            "outflows return to the cash flow the month after each quarter. There is no iteration; the trace of this run: "
-           + " → ".join(f"{n} ({t:.2f} s)" for n, t in r.trace) + ". Iteration count: 0 by construction.")
+           + " → ".join(f"{n} ({B.num(t, 2)} s)" for n, t in r.trace) + ". Iteration count: 0 by construction.")
 
     st.markdown("## Monthly position")
     c1, c2 = st.columns(2)
@@ -74,7 +74,7 @@ def render() -> None:
     B.eyebrow("Per off-taker receipts")
     keys = [k for k in cf.rows if k.endswith("_in_energy") or k.endswith("_in_passthrough") or k.endswith("_acc_revenue")]
     df = pd.DataFrame({k: cf.rows[k] for k in keys}, index=[*B.MONTH_EN, "Beyond Dec", "Year"]).T
-    df.index = [f"{p.offtaker(k.split('_')[0]).label} - {label(k.split('_', 1)[1])}" for k in df.index]
+    df.index = [f"{p.offtaker(k.split('_')[0]).label} - {label(k)}" for k in df.index]
     B.table(df, index_label="Line", scroll=True)
     B.caption("Settlement key of each line: the month containing month end + payment terms; December with terms > 0 settles beyond December (column N)")
 
@@ -87,7 +87,7 @@ def render() -> None:
                                     "Restricted floor": d["floor"].values}, y_title="EUR", height=340),
                         width="stretch", config={"displayModeBar": False})
         B.caption("CF_Daily_Ledger columns X, AB, V; EUR; settlement days = month end + terms, taxes on the payment day")
-        summ = pd.DataFrame({"Value": list(ds.values())}, index=[label(k) for k in ds])
+        summ = pd.DataFrame({"Value": list(ds.values())}, index=[label(k, fallback=TOTAL) for k in ds])
         c1, c2 = st.columns([1, 2])
         with c1:
             B.eyebrow("Ledger summary")
@@ -99,5 +99,5 @@ def render() -> None:
             show = d.copy()
             show["date"] = [B.dmy(v) for v in show["date"]]
             show = show.set_index("date")
-            show.columns = [label(c) for c in show.columns]
+            show.columns = [label(c, fallback=TOTAL) for c in show.columns]
             B.table(show, index_label="Date", decimals=0, scroll=True, max_rows=60)

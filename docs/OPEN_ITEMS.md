@@ -19,5 +19,7 @@ and from Phase 2. Items are closed here when the code or a ruling settles them.
 | C3 | Price types other than Fixed (Cap+Excess, DAM-indexed, IDM-indexed, floors, caps, index deltas, contract currency, invoice FX) of the C3 dashboard | 7 | not modelled; stated on the Sources and Contracts page |
 | C1 | Aurora scenario library 2026-2031 and multi-year runs | 7 | not modelled; stated on the Scenarios page |
 | NAMES | Names ever typed into the application persist only in scenario files and case bundles outside the repository; a scenario file must never be committed | 5 | standing rule (F-035) |
-| INPUT-FMT | Streamlit number fields take the dot as decimal separator while typing; every display uses the Romanian convention | 5 | noted (platform limitation) |
+| INPUT-FMT | Numeric entry and display are Romanian on every surface (text-based fields and grids, D106) | 5 | closed 15.09.2026 (0.6.0) |
+| TPL-CANON | The CEO formats the canonical input and output templates (CEO folder `00_Spec/01_current/{input,output}_data_template/`); the application is to serve the approved input templates from `data/templates/` and to fill the approved output layout at export | 7 | open (D108) |
+| G5 | Walk-through 15.09.2026: sidebar (D104), inactive off-taker without series and duplicate QH column (D107), leg tags (D105), Romanian formats (D106) fixed in 0.6.0; CEO acceptance of G5 on the live app outstanding | 6 | open |
 | DEPLOY | Deployed 14.09.2026 (D102). Remaining: production access model (private slot, paid plan or SSO) and rotation of the initial sign-in credential | 6-7 | open |

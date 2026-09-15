@@ -171,3 +171,19 @@ def test_leap_year_grid_with_synthetic_series(params):
 def test_series_of_wrong_length_is_refused(series, params):
     with pytest.raises(ValueError):
         run(series.iloc[:100], params)
+
+
+def test_added_inactive_offtaker_without_series_runs(series, params):
+    import copy
+
+    extra = copy.deepcopy(params.offtakers[-1])
+    extra.code, extra.active, extra.name = "OT5", False, ""
+    params.offtakers.append(extra)
+    r = run(series, params)  # no OT5 series in the frame
+    _checks_zero(r)
+    assert r.pnl.sections["OT5"].y("revenue") == 0
+    base = run(series, load_parameters())
+    assert r.pnl.portfolio.y("nm_forecast") == pytest.approx(base.pnl.portfolio.y("nm_forecast"))
+    extra.active = True
+    with pytest.raises(KeyError):
+        run(series, params)  # Active without series is a refusal, never a fill

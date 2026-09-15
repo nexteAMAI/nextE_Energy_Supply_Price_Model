@@ -39,13 +39,13 @@ def _guarantee_form(g: Guarantee, key: str, allow_fixed_none: bool = False) -> G
     with c2:
         fixed_default = float(g.fixed_amount) if g.fixed_amount is not None else 0.0
         derived = st.checkbox("Fixed amount derived by the engine", value=g.fixed_amount is None, key=f"{key}_derived") if allow_fixed_none else False
-        fixed = st.number_input("Fixed amount (EUR)", value=fixed_default, step=1000.0, format="%.2f", key=f"{key}_fixed", disabled=derived)
-        pctv = st.number_input("% of contract value (0,3 = 30 %)", value=float(g.pct_of_contract_value), step=0.01, format="%.4f", key=f"{key}_pct")
-        cov = st.number_input("Coverage months", value=float(g.coverage_months), step=0.5, format="%.2f", key=f"{key}_cov")
+        fixed = B.num_input("Fixed amount (EUR)", value=fixed_default, key=f"{key}_fixed", disabled=derived, decimals=2)
+        pctv = B.num_input("% of contract value (0,3 = 30 %)", value=float(g.pct_of_contract_value), key=f"{key}_pct", decimals=4)
+        cov = B.num_input("Coverage months", value=float(g.coverage_months), key=f"{key}_cov", decimals=2)
     with c3:
-        fee = st.number_input("BGL fee p.a. (0,015 = 1,5 %)", value=float(g.bgl_fee_pa), step=0.001, format="%.4f", key=f"{key}_fee")
+        fee = B.num_input("BGL fee p.a. (0,015 = 1,5 %)", value=float(g.bgl_fee_pa), key=f"{key}_fee", decimals=4)
         fee_type = st.selectbox("BGL fee type", BGL_FEE_TYPES, index=BGL_FEE_TYPES.index(g.bgl_fee_type), key=f"{key}_feetype")
-        cash = st.number_input("Cash backing share (0..1)", value=float(g.cash_backing_pct), step=0.05, format="%.2f", key=f"{key}_cash")
+        cash = B.num_input("Cash backing share (0..1)", value=float(g.cash_backing_pct), key=f"{key}_cash", decimals=2)
         start = st.date_input("Window start", g.start, key=f"{key}_start", format="DD.MM.YYYY")
         end = st.date_input("Window end", g.end, key=f"{key}_end", format="DD.MM.YYYY")
     return Guarantee(type=typ, direction=direction, sizing=sizing, fixed_amount=None if derived else float(fixed), coverage_months=float(cov),
@@ -56,7 +56,7 @@ def _guarantee_form(g: Guarantee, key: str, allow_fixed_none: bool = False) -> G
 def _month_table(title: str, data: dict[str, list[float]], key: str, unit: str) -> dict[str, list[float]]:
     B.eyebrow(f"{title} · {unit}")
     df = pd.DataFrame({p: data[p] for p in PRODUCTS}, index=MONTHS).T
-    edited = st.data_editor(df, key=key, width="stretch", column_config={m: st.column_config.NumberColumn(m, format="%.2f") for m in MONTHS})
+    edited = B.grid_input(df, key=key, decimals=2)
     return {p: [float(x) for x in edited.loc[p].tolist()] for p in PRODUCTS}
 
 
@@ -71,23 +71,22 @@ def _offtaker_form(o: Offtaker, key: str) -> Offtaker:
         n.contract_end = st.date_input("Contract end", o.contract_end, key=f"{key}_ce", format="DD.MM.YYYY")
     with c3:
         n.payment_terms_days = int(st.number_input("Payment terms (days)", value=int(o.payment_terms_days), min_value=0, step=1, key=f"{key}_terms"))
-        n.advance_pct = float(st.number_input("Advance share (0..1)", value=float(o.advance_pct), min_value=0.0, max_value=1.0, step=0.05, format="%.2f", key=f"{key}_adv"))
+        n.advance_pct = float(B.num_input("Advance share (0..1)", value=float(o.advance_pct), min_value=0.0, max_value=1.0, key=f"{key}_adv", decimals=2))
     with c4:
-        n.contract_price_eur_per_mwh = float(st.number_input("Contract price (EUR/MWh)", value=float(o.contract_price_eur_per_mwh), step=0.5, format="%.2f", key=f"{key}_cp"))
-        n.pv_price_budget_eur_per_mwh = float(st.number_input("PV price budget (EUR/MWh)", value=float(o.pv_price_budget_eur_per_mwh), step=0.5, format="%.2f", key=f"{key}_pvb"))
-        n.pv_price_forecast_eur_per_mwh = float(st.number_input("PV price forecast (EUR/MWh)", value=float(o.pv_price_forecast_eur_per_mwh), step=0.5, format="%.2f", key=f"{key}_pvf"))
+        n.contract_price_eur_per_mwh = float(B.num_input("Contract price (EUR/MWh)", value=float(o.contract_price_eur_per_mwh), key=f"{key}_cp", decimals=2))
+        n.pv_price_budget_eur_per_mwh = float(B.num_input("PV price budget (EUR/MWh)", value=float(o.pv_price_budget_eur_per_mwh), key=f"{key}_pvb", decimals=2))
+        n.pv_price_forecast_eur_per_mwh = float(B.num_input("PV price forecast (EUR/MWh)", value=float(o.pv_price_forecast_eur_per_mwh), key=f"{key}_pvf", decimals=2))
     B.eyebrow("Risk premium components (B2) · EUR/MWh")
     prem = pd.DataFrame({"Budget": [o.premium_budget[c] for c in PREMIUM_COMPONENTS], "Forecast": [o.premium_forecast[c] for c in PREMIUM_COMPONENTS]},
                         index=list(PREMIUM_COMPONENTS)).T
-    edited = st.data_editor(prem, key=f"{key}_prem", width="stretch",
-                            column_config={c: st.column_config.NumberColumn(c, format="%.4f") for c in PREMIUM_COMPONENTS})
+    edited = B.grid_input(prem, key=f"{key}_prem", decimals=4)
     n.premium_budget = {c: float(edited.loc["Budget", c]) for c in PREMIUM_COMPONENTS}
     n.premium_forecast = {c: float(edited.loc["Forecast", c]) for c in PREMIUM_COMPONENTS}
     c1, c2 = st.columns(2)
     with c1:
-        n.target_gm_budget = float(st.number_input("Target gross margin budget (EUR/MWh)", value=float(o.target_gm_budget), step=0.25, format="%.2f", key=f"{key}_gmb"))
+        n.target_gm_budget = float(B.num_input("Target gross margin budget (EUR/MWh)", value=float(o.target_gm_budget), key=f"{key}_gmb", decimals=2))
     with c2:
-        n.target_gm_forecast = float(st.number_input("Target gross margin forecast (EUR/MWh)", value=float(o.target_gm_forecast), step=0.25, format="%.2f", key=f"{key}_gmf"))
+        n.target_gm_forecast = float(B.num_input("Target gross margin forecast (EUR/MWh)", value=float(o.target_gm_forecast), key=f"{key}_gmf", decimals=2))
     n.strip_mw = _month_table("Baseload strips", o.strip_mw, f"{key}_strip", "MW per product and month")
     n.product_price_budget = _month_table("Product prices budget", o.product_price_budget, f"{key}_ppb", "EUR/MWh")
     n.product_price_forecast = _month_table("Product prices forecast", o.product_price_forecast, f"{key}_ppf", "EUR/MWh")
@@ -101,7 +100,7 @@ def _offtaker_form(o: Offtaker, key: str) -> Offtaker:
             cols = st.columns(3)
             for i, (k, help_) in enumerate(TARIFF_HELP.items()):
                 with cols[i % 3]:
-                    vals[k] = float(st.number_input(help_, value=float(base.get(k, 0.0)), step=0.01, format="%.6f", key=f"{key}_t_{k}"))
+                    vals[k] = float(B.num_input(help_, value=float(base.get(k, 0.0)), key=f"{key}_t_{k}", decimals=6))
             n.tariff_components = vals
         else:
             n.tariff_components = None
@@ -115,7 +114,7 @@ def render() -> None:
 
     # ---- scenario file (PSTORE) ------------------------------------------------------------
     st.markdown("## Scenario file")
-    B.note(f"Loaded: <b>{state.scenario.name}</b> · version {state.scenario.version} · saved {(state.scenario.saved_at_utc or '–').replace('T', ' ')[:16]} UTC · "
+    B.note(f"Loaded: <b>{state.scenario.name}</b> · version {state.scenario.version} · saved {B.dmy_hm(state.scenario.saved_at_utc)} UTC · "
            f"md5 {state.scenario.md5[:12] or '–'}. Names live in this file only; the repository holds the coded Reference Case register.")
     c1, c2, c3 = st.columns([2, 2, 2])
     with c1:
@@ -147,7 +146,8 @@ def render() -> None:
         if state.scenario.history:
             hist = pd.DataFrame(state.scenario.history).set_index("version")
             hist["md5"] = hist["md5"].str[:12]
-            hist["saved_at_utc"] = hist["saved_at_utc"].str.replace("T", " ").str[:16]
+            hist["saved_at_utc"] = [B.dmy_hm(v) for v in hist["saved_at_utc"]]
+            hist = hist.rename(columns={"saved_at_utc": "Saved (UTC)", "md5": "md5", "note": "Note"})
             B.table(hist, index_label="Version", decimals=0, scroll=True)
 
     tabs = st.tabs(["A · General", "B · Premium and margin", "C · Off-takers", "D · Counterparties", "E · Market guarantees", "Tariffs and GC (admin)"])
@@ -162,19 +162,19 @@ def render() -> None:
                 year = st.number_input("Spine year", value=int(p.spine_year), min_value=2020, max_value=2060, step=1)
                 cs = st.date_input("Case start", g.case_start, format="DD.MM.YYYY")
                 ce = st.date_input("Case end", g.case_end, format="DD.MM.YYYY")
-                fx = st.number_input("FX RON per EUR", value=float(g.fx_ron_per_eur), step=0.01, format="%.4f", help="Input!C16 - Forecast Q3 2026 basis (D54)")
+                fx = B.num_input("FX RON per EUR", value=float(g.fx_ron_per_eur), help="Input!C16 - Forecast Q3 2026 basis (D54)", decimals=4)
             with c2:
-                vat = st.number_input("VAT rate (0,21 = 21 %)", value=float(g.vat_rate), step=0.01, format="%.4f", help="Legea nr. 227/2015 per workbook; source_status: unverified")
-                cit = st.number_input("CIT rate (0,16 = 16 %)", value=float(g.cit_rate), step=0.01, format="%.4f", help="Legea nr. 227/2015 art. 41 per workbook label; unverified")
+                vat = B.num_input("VAT rate (0,21 = 21 %)", value=float(g.vat_rate), help="Legea nr. 227/2015 per workbook; source_status: unverified", decimals=4)
+                cit = B.num_input("CIT rate (0,16 = 16 %)", value=float(g.cit_rate), help="Legea nr. 227/2015 art. 41 per workbook label; unverified", decimals=4)
                 tax_day = st.number_input("Tax payment day of month", value=int(g.tax_payment_day), min_value=1, max_value=28, step=1)
                 rc = st.toggle("Reverse charge VAT on source purchases", value=bool(g.reverse_charge_vat_on_sources), help="art. 331 alin. (2) lit. e) Codul fiscal per workbook; adviser confirmation outstanding")
-                opening = st.number_input("Opening cash (EUR)", value=float(g.opening_cash_eur), step=1000.0, format="%.2f")
+                opening = B.num_input("Opening cash (EUR)", value=float(g.opening_cash_eur), decimals=2)
             with c3:
-                opex = st.number_input("Portfolio OPEX (EUR per metered MWh)", value=float(g.portfolio_opex_eur_per_mwh_metered), step=0.01, format="%.4f")
-                vopex = st.number_input("Variable OPEX / sales bonus (EUR per metered MWh)", value=float(g.variable_opex_eur_per_mwh_metered), step=0.01, format="%.4f")
-                shl = st.number_input("Shareholder loan rate p.a. (0,07 = 7 %)", value=float(g.shareholder_loan_rate_pa), step=0.005, format="%.4f")
-                rc_cost = st.number_input("PV resell cost factor vs curtailed DAM", value=float(p.resell_pv_cost_factor), step=0.01, format="%.4f", help="Input!C9")
-                rc_rev = st.number_input("PV resell revenue factor vs curtailed DAM", value=float(p.resell_pv_revenue_factor), step=0.01, format="%.4f", help="Input!C10")
+                opex = B.num_input("Portfolio OPEX (EUR per metered MWh)", value=float(g.portfolio_opex_eur_per_mwh_metered), decimals=4)
+                vopex = B.num_input("Variable OPEX / sales bonus (EUR per metered MWh)", value=float(g.variable_opex_eur_per_mwh_metered), decimals=4)
+                shl = B.num_input("Shareholder loan rate p.a. (0,07 = 7 %)", value=float(g.shareholder_loan_rate_pa), decimals=4)
+                rc_cost = B.num_input("PV resell cost factor vs curtailed DAM", value=float(p.resell_pv_cost_factor), help="Input!C9", decimals=4)
+                rc_rev = B.num_input("PV resell revenue factor vs curtailed DAM", value=float(p.resell_pv_revenue_factor), help="Input!C10", decimals=4)
             if st.form_submit_button("Apply changes", type="primary"):
                 p.scenario_active = scen
                 p.meta["spine_year"] = int(year)
@@ -196,9 +196,9 @@ def render() -> None:
             keys = list(p.premium_standard.keys())
             for i, k in enumerate(keys):
                 with cols[i % 4]:
-                    vals[k] = st.number_input(k, value=float(p.premium_standard[k]), step=0.25, format="%.4f", key=f"ps_{k}")
-            kpi_t = st.number_input("KPI target: retail NM pre-tax (EUR/MWh)", value=float(p.meta.get("kpi_retail_nm_target_eur_per_mwh", 3.0)), step=0.25, format="%.2f",
-                                    help="Execution prompt section 10.1 page 10; house benchmark (workflow EW-NFR-01)")
+                    vals[k] = B.num_input(k, value=float(p.premium_standard[k]), key=f"ps_{k}", decimals=4)
+            kpi_t = B.num_input("KPI target: retail NM pre-tax (EUR/MWh)", value=float(p.meta.get("kpi_retail_nm_target_eur_per_mwh", 3.0)),
+                                    help="Execution prompt section 10.1 page 10; house benchmark (workflow EW-NFR-01)", decimals=2)
             if st.form_submit_button("Apply changes", type="primary"):
                 p.premium_standard = {k: float(v) for k, v in vals.items()}
                 p.meta["kpi_retail_nm_target_eur_per_mwh"] = float(kpi_t)
@@ -252,13 +252,13 @@ def render() -> None:
                     active = st.toggle("Active", value=c.active, key=f"cp_{k}_active")
                 with c2:
                     terms = st.number_input("Payment terms (days)", value=int(c.payment_terms_days), min_value=0, step=1, key=f"cp_{k}_terms")
-                    adv = st.number_input("Advance share (0..1)", value=float(c.advance_pct), min_value=0.0, max_value=1.0, step=0.05, format="%.2f", key=f"cp_{k}_adv")
+                    adv = B.num_input("Advance share (0..1)", value=float(c.advance_pct), min_value=0.0, max_value=1.0, key=f"cp_{k}_adv", decimals=2)
                 with c3:
                     kk = st.selectbox("Sign convention k", ["not applicable", "-1 (DSO)", "+1 (BRP)"],
                                       index={None: 0, -1: 1, 1: 2}.get(c.k, 0), key=f"cp_{k}_k", help="Declared, never inferred (rule 3)")
                 with c4:
-                    dev = st.number_input("Deviation share (baseload)", value=float(c.deviation_pct), step=0.01, format="%.4f", key=f"cp_{k}_dev", disabled=k != "baseload")
-                    idev = st.number_input("Imbalance deviation share (baseload)", value=float(c.imbalance_deviation_pct), step=0.01, format="%.4f", key=f"cp_{k}_idev", disabled=k != "baseload")
+                    dev = B.num_input("Deviation share (baseload)", value=float(c.deviation_pct), key=f"cp_{k}_dev", disabled=k != "baseload", decimals=4)
+                    idev = B.num_input("Imbalance deviation share (baseload)", value=float(c.imbalance_deviation_pct), key=f"cp_{k}_idev", disabled=k != "baseload", decimals=4)
                 B.eyebrow("Guarantee")
                 gg = _guarantee_form(c.guarantee, f"cp_{k}_g", allow_fixed_none=(k == "pv"))
                 if st.form_submit_button("Apply changes", type="primary"):
@@ -276,15 +276,15 @@ def render() -> None:
         with st.form("form_mg"):
             c1, c2, c3, c4 = st.columns(4)
             with c1:
-                buf = st.number_input("Spot buffer days", value=float(mg["spot"]["buffer_days"]), step=1.0, format="%.0f", help="Input!C111")
+                buf = B.num_input("Spot buffer days", value=float(mg["spot"]["buffer_days"]), help="Input!C111", decimals=0)
             with c2:
-                rate = st.number_input("BRP rate (RON per MW)", value=float(mg["brp"]["rate_ron_per_mw"]), step=100.0, format="%.2f", help="Input!C116 - unverified")
-                gen = st.number_input("Generation MW in the BRP", value=float(mg["brp"]["generation_mw_in_brp"]), step=1.0, format="%.2f", help="Input!C117")
+                rate = B.num_input("BRP rate (RON per MW)", value=float(mg["brp"]["rate_ron_per_mw"]), help="Input!C116 - unverified", decimals=2)
+                gen = B.num_input("Generation MW in the BRP", value=float(mg["brp"]["generation_mw_in_brp"]), help="Input!C117", decimals=2)
             with c3:
-                vtm = st.number_input("TSO multiplier Vtm", value=float(mg["tso"]["vtm_multiplier"]), step=0.5, format="%.2f", help="Input!C121 - unverified")
+                vtm = B.num_input("TSO multiplier Vtm", value=float(mg["tso"]["vtm_multiplier"]), help="Input!C121 - unverified", decimals=2)
             with c4:
-                vdm = st.number_input("DSO multiplier Vdm", value=float(mg["dso"]["vdm_multiplier"]), step=0.5, format="%.2f", help="Input!C125 - unverified")
-                addon = st.number_input("DSO overdue add-on (EUR)", value=float(mg["dso"]["overdue_addon_eur"]), step=100.0, format="%.2f", help="Input!C126")
+                vdm = B.num_input("DSO multiplier Vdm", value=float(mg["dso"]["vdm_multiplier"]), help="Input!C125 - unverified", decimals=2)
+                addon = B.num_input("DSO overdue add-on (EUR)", value=float(mg["dso"]["overdue_addon_eur"]), help="Input!C126", decimals=2)
             if st.form_submit_button("Apply changes", type="primary"):
                 mg["spot"]["buffer_days"] = float(buf)
                 mg["brp"]["rate_ron_per_mw"], mg["brp"]["generation_mw_in_brp"] = float(rate), float(gen)
@@ -301,14 +301,14 @@ def render() -> None:
             vals = {}
             for i, (k, help_) in enumerate(TARIFF_HELP.items()):
                 with cols[i % 3]:
-                    vals[k] = st.number_input(help_, value=float(p.tariff_components[k]), step=0.01, format="%.6f", key=f"tar_{k}")
+                    vals[k] = B.num_input(help_, value=float(p.tariff_components[k]), key=f"tar_{k}", decimals=6)
             c1, c2, c3 = st.columns(3)
             with c1:
-                quota = st.number_input("GC quota (GC per MWh)", value=float(p.gc_quota), step=0.001, format="%.6f", help="Cons_P&L!B6 - unverified")
+                quota = B.num_input("GC quota (GC per MWh)", value=float(p.gc_quota), help="Cons_P&L!B6 - unverified", decimals=6)
             with c2:
-                gcp = st.number_input("GC reference price (RON per GC)", value=float(p.gc_reference_price_ron), step=0.01, format="%.4f", help="Cons_P&L!B7")
+                gcp = B.num_input("GC reference price (RON per GC)", value=float(p.gc_reference_price_ron), help="Cons_P&L!B7", decimals=4)
             with c3:
-                share = st.number_input("GC spot share (0..1)", value=float(p.gc_spot_share), step=0.05, format="%.2f", help="Cons_P&L!B9")
+                share = B.num_input("GC spot share (0..1)", value=float(p.gc_spot_share), help="Cons_P&L!B9", decimals=2)
             if st.form_submit_button("Apply changes", type="primary"):
                 p.tariff_components = {k: float(v) for k, v in vals.items()}
                 p.gc_quota, p.gc_reference_price_ron, p.gc_spot_share = float(quota), float(gcp), float(share)

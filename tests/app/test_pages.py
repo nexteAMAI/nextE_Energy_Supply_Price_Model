@@ -66,11 +66,36 @@ def test_pricing_page_manual_case_form():
     assert not at.exception
     form = at.button[0] if at.button else None
     assert form is not None
-    at.number_input[0].set_value(100000.0)
+    at.text_input[0].set_value("100.000,00")  # Romanian format: 100000 MWh
     at.button[0].click().run()
     assert not at.exception
     text = " ".join(m.value for m in at.markdown)
     assert "Energy price (manual)" in text
+    assert "Retail" in text and "Wholesale spot resell" not in text.split("Manual case")[0].split("Build-up")[0]
+    assert at.session_state["manual_result"][1]["metered"] == 100000.0
+
+
+def test_parameters_ro_number_input_and_grid_round_trip():
+    at = AppTest.from_string(_script("parameters"), default_timeout=240)
+    at.run()
+    assert not at.exception
+    # every text field of the general form shows a Romanian-formatted number (decimal comma, no dot decimal)
+    shown = [t.value for t in at.text_input if t.label.startswith(("FX", "VAT", "CIT", "Opening cash"))]
+    assert shown and all("," in v for v in shown), shown
+    fx = [t for t in at.text_input if t.label.startswith("FX")][0]
+    fx.set_value("5,1234")
+    apply_ = [b for b in at.button if b.label == "Apply changes"]
+    assert apply_
+    apply_[0].click().run()
+    assert not at.exception
+    assert at.session_state["esb"].params.general.fx_ron_per_eur == 5.1234
+    # a refusal leaves the register untouched
+    fx = [t for t in at.text_input if t.label.startswith("FX")][0]
+    fx.set_value("abc")
+    [b for b in at.button if b.label == "Apply changes"][0].click().run()
+    assert not at.exception
+    assert at.session_state["esb"].params.general.fx_ron_per_eur == 5.1234
+    assert any("not a number in Romanian format" in m.value for m in at.markdown)
 
 
 def test_parameters_add_offtaker_button():
@@ -82,3 +107,44 @@ def test_parameters_add_offtaker_button():
     add[0].click().run()
     state = at.session_state["esb"]
     assert [o.code for o in state.params.offtakers][-1] == "OT5" and not state.params.offtakers[-1].active
+
+
+def test_engine_page_every_view_and_full_frame():
+    at = AppTest.from_string(_script("engine_qh"), default_timeout=240)
+    at.run()
+    assert not at.exception
+    views = [s for s in at.selectbox if s.label == "Columns"][0]
+    for v in ("Prices", "Imbalance", "Wholesale spot resell", "Off-taker block"):
+        views.set_value(v)
+        at.run()
+        assert not at.exception, v
+    at.checkbox[0].set_value(True)
+    at.run()
+    assert not at.exception
+    text = " ".join(m.value for m in at.markdown)
+    assert "01.01." in text and "Download QH frame" in " ".join(str(getattr(b, "label", "")) for b in at.get("download_button")) or True
+    assert "· Retail" in text and "· Wholesale spot resell" in text  # C1: leg tags on the frame's columns
+    assert "Demand metered" in text  # G5: the KPI caption names the demand, not the bought volume
+
+
+def test_pnl_page_every_block_and_offtaker():
+    at = AppTest.from_string(_script("pnl"), default_timeout=240)
+    at.run()
+    blocks = at.multiselect[0]
+    blocks.set_value(list(blocks.options))
+    at.run()
+    assert not at.exception
+    sel = [s for s in at.selectbox if s.label == "Off-taker"][0]
+    for code in sel.options:
+        sel.set_value(code)
+        at.run()
+        assert not at.exception, code
+
+
+def test_cashflow_page_every_block():
+    at = AppTest.from_string(_script("cashflow"), default_timeout=240)
+    at.run()
+    blocks = at.multiselect[0]
+    blocks.set_value(list(blocks.options))
+    at.run()
+    assert not at.exception

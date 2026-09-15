@@ -56,6 +56,8 @@ def render() -> None:
     if state.scenario.history:
         hist = pd.DataFrame(state.scenario.history).set_index("version")
         hist["md5"] = hist["md5"].str[:12]
+        hist["saved_at_utc"] = [B.dmy_hm(v) for v in hist["saved_at_utc"]]
+        hist = hist.rename(columns={"saved_at_utc": "Saved (UTC)", "note": "Note"})
         B.table(hist, index_label="Version", decimals=0, scroll=True)
     B.eyebrow("Register verification status")
     rows = [("VAT rate", B.pct(p.general.vat_rate, 0), "Legea nr. 227/2015 (workbook)", "unverified"),

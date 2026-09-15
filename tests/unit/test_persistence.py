@@ -16,7 +16,7 @@ from esb.export import build_workbook, csv_bytes
 from esb.guarantees import sizing_comparison
 from esb.importer import import_workbook, preset_registry, raw_frame_fixed_96, write_delivery
 from esb.importer.contract import Control
-from esb.labels import label
+from esb.labels import RETAIL, label, leg_of
 
 ROOT = Path(__file__).resolve().parents[2]
 SERIES = ROOT / "data" / "reference" / "rc_v03_series.parquet"
@@ -201,9 +201,21 @@ def test_labels_are_readable_for_every_engine_key(series):
     for k in [*r.pnl.portfolio.order, *r.cashflow.rows, *r.pricing["OT1"].year]:
         text = label(k)
         assert text and text[0].isupper() and "_" not in text, k
-    assert label("nm_forecast") == "Net margin pre-tax forecasted"
-    assert label("g_out_pv") == "Guarantee outstanding - PV source"
-    assert label("acc_grid_cost") == "Accrual grid cost"  # deterministic humanisation of unknown keys
+    assert label("nm_forecast") == "Net margin pre-tax forecasted · Total"
+    assert label("g_out_pv") == "Guarantee outstanding - PV source · Total"
+    assert label("acc_grid_cost") == "Accrual grid cost"  # deterministic humanisation of unknown keys; no leg known
+    assert label("acc_grid_cost", fallback="Total") == "Accrual grid cost · Total"
+    # C1: every metric of the P&L carries its leg; checks and parameters carry none; the leg word is not repeated
+    assert label("revenue") == "Revenue · Retail" and label("rs_gm2_forecast") == "GM2 forecasted · Wholesale spot resell"
+    assert label("t_gm2_forecast") == "GM2 forecasted · Total" and label("retail_nm_forecast") == "NM pre-tax forecasted · Retail"
+    assert label("resell_nm_pct") == "NM % · Wholesale spot resell" and label("OT2_gm2_forecast") == "OT2 GM2 forecast · Retail"
+    assert leg_of("check_demand") == "" and leg_of("dam") == "" and leg_of("gc_quota") == "" and leg_of("acc_grid_cost") is None
+    assert label("check_net_cf", fallback="Total") == "Check net cash flow" and label("days_in_month", fallback="Total") == "Days in month"
+    for k in r.pnl.portfolio.order:
+        if not k.startswith("check") and k not in ("gc_quota", "gc_price_ron", "fx", "gc_spot_share", "gc_bilateral_share", "gc_price_eur", "dam_monthly", "idm_monthly"):
+            assert leg_of(k), k
+    for k in r.pnl.sections["OT1"].order:
+        assert label(k, leg=RETAIL).endswith(" · Retail"), k
 
 
 def test_sizing_comparison_matches_the_register_sizing(series):

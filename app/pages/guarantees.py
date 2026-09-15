@@ -11,6 +11,7 @@ from app import brand as B
 from app import state as S
 from config.schema import GUARANTEE_SIZINGS
 from esb.guarantees import sizing_comparison
+from esb.labels import TOTAL, tagged
 
 LABELS = {"pv": "PV source", "baseload": "Baseload source", "spot": "Spot (OPCOM)", "brp": "BRP", "tso": "TSO", "dso": "DSO"}
 
@@ -27,10 +28,10 @@ def render() -> None:
     reg = r.pnl.regulatory
     inp = r.pnl.reg_inputs
     B.kpi_row([
-        ("Guarantees outstanding (peak)", P.y("guarantees_outstanding"), "EUR", "Counterparties plus own guarantees, maximum month"),
-        ("Market BGL fees (year)", P.y("market_bgl_fees"), "EUR", f"Off-taker BGL fees {B.num(P.y('offtaker_bgl_fees'), 0)} EUR"),
-        ("PV fixed amount (derived)", r.pnl.pv_fixed_guarantee, "EUR", "mean(PV cost budget) + mean(PV resell cost), Input!C85"),
-        ("Regulatory total (spot + BRP + TSO + DSO)", reg.spot + reg.brp + reg.tso + reg.dso, "EUR", "Section E formulas on this run's inputs"),
+        (tagged("Guarantees outstanding (peak)", TOTAL), P.y("guarantees_outstanding"), "EUR", "Counterparties plus own guarantees, maximum month"),
+        (tagged("Market BGL fees (year)", TOTAL), P.y("market_bgl_fees"), "EUR", f"Off-taker BGL fees {B.num(P.y('offtaker_bgl_fees'), 0)} EUR"),
+        (tagged("PV fixed amount (derived)", TOTAL), r.pnl.pv_fixed_guarantee, "EUR", "mean(PV cost budget) + mean(PV resell cost), Input!C85"),
+        (tagged("Regulatory total (spot + BRP + TSO + DSO)", TOTAL), reg.spot + reg.brp + reg.tso + reg.dso, "EUR", "Section E formulas on this run's inputs"),
     ])
 
     st.markdown("## Outstanding by month · EUR")

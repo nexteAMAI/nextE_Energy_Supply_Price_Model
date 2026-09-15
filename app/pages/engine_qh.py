@@ -10,11 +10,11 @@ import streamlit as st
 
 from app import brand as B
 from app import state as S
-from esb.labels import label
+from esb.labels import RESELL, RETAIL, label, tagged
 from esb.merit_order import OFFTAKER_COLUMNS, WORKBOOK_COLUMNS
 
 STACK = [("pv_delivered", "PV delivered"), ("bl_delivered", "Baseload delivered"), ("spot_buy_notified", "Spot bought")]
-RESELL = [("resell_pv_volume", "PV resold"), ("resell_bl_volume", "Baseload resold")]
+RESOLD = [("resell_pv_volume", "PV resold"), ("resell_bl_volume", "Baseload resold")]
 
 
 def render() -> None:
@@ -30,31 +30,34 @@ def render() -> None:
     months = g["date"].dt.month.values
     dates = g["date"].dt.date.values
 
+    demand_notified = sum(q[f"{o.code}_demand_notified"].sum() for o in p.offtakers)
+    demand_metered = sum(q[f"{o.code}_demand_metered"].sum() for o in p.offtakers)
     B.kpi_row([
-        ("Retail demand notified", float(q["retail_buy_notified"].sum()), "MWh", f"Metered {B.num(float(q['retail_buy_metered'].sum()), 0)} MWh"),
-        ("PV available (notified)", float(q["pv_avail_notified"].sum()), "MWh", f"Delivered to off-takers {B.num(float(q['pv_delivered'].sum()), 0)} MWh"),
-        ("Baseload available (notified)", float(q["bl_avail_notified"].sum()), "MWh", f"Delivered {B.num(float(q['bl_delivered'].sum()), 0)} MWh"),
-        ("Spot bought (notified)", float(q["spot_buy_notified"].sum()), "MWh", f"Resold PV {B.num(float(q['resell_pv_volume'].sum()), 0)} · Baseload {B.num(float(q['resell_bl_volume'].sum()), 0)} MWh"),
+        (tagged("Demand notified", RETAIL), float(demand_notified), "MWh",
+         f"Demand metered {B.num(float(demand_metered), 0)} MWh · bought on the metered basis {B.num(float(q['retail_buy_metered'].sum()), 0)} MWh"),
+        (tagged("PV available (notified)", "Sources"), float(q["pv_avail_notified"].sum()), "MWh", f"Delivered to the retail book {B.num(float(q['pv_delivered'].sum()), 0)} MWh"),
+        (tagged("Baseload available (notified)", "Sources"), float(q["bl_avail_notified"].sum()), "MWh", f"Delivered to the retail book {B.num(float(q['bl_delivered'].sum()), 0)} MWh"),
+        (tagged("Spot bought (notified)", RETAIL), float(q["spot_buy_notified"].sum()), "MWh", f"Resold to the market: PV {B.num(float(q['resell_pv_volume'].sum()), 0)} · Baseload {B.num(float(q['resell_bl_volume'].sum()), 0)} MWh"),
     ])
 
     st.markdown("## Sourcing stack by month")
-    B.eyebrow("Delivered to the retail book and resold · MWh")
-    agg = pd.DataFrame({k: q[k].values for k, _ in STACK + RESELL}).groupby(months).sum()
-    st.plotly_chart(B.bars(B.MONTH_EN[: len(agg)], {lbl: agg[k].values for k, lbl in STACK + RESELL}, y_title="MWh", stacked=True, height=340),
+    B.eyebrow(f"Delivered to the retail book ({RETAIL}) and resold ({RESELL}) · MWh")
+    agg = pd.DataFrame({k: q[k].values for k, _ in STACK + RESOLD}).groupby(months).sum()
+    st.plotly_chart(B.bars(B.MONTH_EN[: len(agg)], {lbl: agg[k].values for k, lbl in STACK + RESOLD}, y_title="MWh", stacked=True, height=340),
                     width="stretch", config={"displayModeBar": False})
     B.caption("Monthly sums of QH_P&L columns CG, CQ, CU (delivered / bought) and CX, DD (resold); MWh")
 
     c1, c2 = st.columns(2)
     with c1:
-        B.eyebrow("Retail margin by month · EUR")
-        m = pd.DataFrame({"GM2 budget": q["retail_gm2_budget"].values, "GM2 forecast": q["retail_gm2_forecast"].values,
-                          "Resell GM2": q["resell_gm2"].values}).groupby(months).sum()
+        B.eyebrow("GM2 by month and leg · EUR")
+        m = pd.DataFrame({tagged("GM2 budget", RETAIL): q["retail_gm2_budget"].values, tagged("GM2 forecast", RETAIL): q["retail_gm2_forecast"].values,
+                          tagged("GM2", RESELL): q["resell_gm2"].values}).groupby(months).sum()
         st.plotly_chart(B.bars(B.MONTH_EN[: len(m)], {c: m[c].values for c in m.columns}, y_title="EUR"), width="stretch", config={"displayModeBar": False})
         B.caption("Sums of BD, BE (retail GM2) and BK (resell GM2); EUR")
     with c2:
         B.eyebrow("Imbalance by month · EUR")
-        m = pd.DataFrame({"Source imbalance": q["retail_source_imb"].values, "Off-taker imbalance": q["retail_offtaker_imb"].values,
-                          "Resell source imbalance": q["resell_source_imb"].values}).groupby(months).sum()
+        m = pd.DataFrame({tagged("Source imbalance", RETAIL): q["retail_source_imb"].values, tagged("Off-taker imbalance", RETAIL): q["retail_offtaker_imb"].values,
+                          tagged("Source imbalance", RESELL): q["resell_source_imb"].values}).groupby(months).sum()
         st.plotly_chart(B.bars(B.MONTH_EN[: len(m)], {c: m[c].values for c in m.columns}, y_title="EUR"), width="stretch", config={"displayModeBar": False})
         B.caption("Sums of AZ, BA, BJ; EUR (positive = revenue to the BRP)")
 
@@ -64,8 +67,8 @@ def render() -> None:
         c = o.code
         rows.append({"Off-taker": f"{o.label} ({c})", "Notified": q[f"{c}_demand_notified"].sum(), "Metered": q[f"{c}_demand_metered"].sum(),
                      "PV": q[f"{c}_pv_buy_notified"].sum(), "Baseload": q[f"{c}_bl_buy_notified"].sum(), "Spot": q[f"{c}_spot_buy_notified"].sum(),
-                     "Strip notified": q[f"{c}_strip_notified"].sum(), "Resell attributed (LIFO)": q[f"{c}_resell_attributed"].sum(),
-                     "GM2 forecast": q[f"{c}_gm2_forecast"].sum(), "Off-taker imbalance": q[f"{c}_offtaker_imb"].sum()})
+                     tagged("Strip notified", RETAIL): q[f"{c}_strip_notified"].sum(), tagged("Attributed (LIFO)", RESELL): q[f"{c}_resell_attributed"].sum(),
+                     tagged("GM2 forecast", RETAIL): q[f"{c}_gm2_forecast"].sum(), tagged("Off-taker imbalance", RETAIL): q[f"{c}_offtaker_imb"].sum()})
     df = pd.DataFrame(rows).set_index("Off-taker")
     B.table(df, index_label="Off-taker", decimals=0)
     B.caption("Year sums; MWh for volumes, EUR for margins. LIFO: Baseload surplus is attributed to the last position first, position 1 takes the remainder")
@@ -73,7 +76,7 @@ def render() -> None:
     st.markdown("## Checks")
     chk = {k: float(q[k].abs().sum()) for k in ("check_demand", "check_pv", "check_bl", "check_imb", "check_origin")}
     html = '<table class="esb"><thead><tr><th>Check</th><th>Sum of absolute residuals</th><th>State</th></tr></thead><tbody>'
-    html += "".join(f"<tr><td>{label(k)}</td><td>{B.num(v, 6)}</td><td>{B.status(v < 1e-6)}</td></tr>" for k, v in chk.items())
+    html += "".join(f"<tr><td>{label(k, leg='')}</td><td>{B.num(v, 6)}</td><td>{B.status(v < 1e-6)}</td></tr>" for k, v in chk.items())
     st.markdown(html + "</tbody></table>", unsafe_allow_html=True)
 
     st.markdown("## Drill-down to the quarter-hour")
@@ -83,7 +86,7 @@ def render() -> None:
         d0 = date(p.spine_year, 1, 1)
         d1 = date(p.spine_year, 12, 31)
         day = st.date_input("Day", value=d0, min_value=d0, max_value=d1, format="DD.MM.YYYY")
-        view = st.selectbox("Columns", ["Sourcing", "Prices", "Imbalance", "Resell", "Off-taker block"])
+        view = st.selectbox("Columns", ["Sourcing", "Prices", "Imbalance", "Wholesale spot resell", "Off-taker block"])
         code = st.selectbox("Off-taker (for the block view)", [o.code for o in p.offtakers], format_func=lambda c: f"{p.offtaker(c).label} ({c})")
     with c2:
         mask = dates == day
@@ -101,7 +104,7 @@ def render() -> None:
             cols = {"Source imbalance": sub["retail_source_imb"].values, "Off-taker imbalance": sub["retail_offtaker_imb"].values}
             st.plotly_chart(B.bars(x, cols, y_title="EUR"), width="stretch", config={"displayModeBar": False})
             keys = ["pv_metered", "pv_specific_imb", "bl_specific_imb", "retail_source_imb", "retail_offtaker_imb", "total_imb_all_legs"]
-        elif view == "Resell":
+        elif view == "Wholesale spot resell":
             cols = {"PV resold": sub["resell_pv_volume"].values, "Baseload resold": sub["resell_bl_volume"].values}
             st.plotly_chart(B.bars(x, cols, y_title="MWh per QH", stacked=True), width="stretch", config={"displayModeBar": False})
             keys = ["resell_pv_volume", "resell_pv_cost", "resell_pv_revenue", "resell_pv_source_imb", "resell_bl_volume", "resell_bl_cost_forecast",
@@ -118,11 +121,17 @@ def render() -> None:
         B.table(tbl, index_label="QH", decimals=4, scroll=True)
 
     with st.expander("Full quarter-hour frame (35.040 rows) - load on demand"):
-        if st.checkbox("Show the frame (first 500 rows) and enable the CSV download"):
+        if st.checkbox("Show the frame (first day, 96 rows) and enable the CSV download of all rows"):
             full = q.copy()
-            full.insert(0, "interval", g["interval"].values)
-            full.insert(0, "date", dates)
-            st.dataframe(full.head(500), width="stretch", height=400)
+            for col, vals in (("interval", g["interval"].values), ("date", dates)):
+                if col in full.columns:
+                    full = full.drop(columns=col)
+                full.insert(0, col, vals)
+            show = full.head(96).copy()
+            show["date"] = [B.dmy(v) for v in show["date"]]
+            show = show.set_index("date")
+            show.columns = [_col_label(c) for c in show.columns]
+            B.table(show, index_label="Date", decimals=4, scroll=True, decimals_by_col={"Interval": 0})
             from esb.export import csv_bytes
 
             st.download_button("Download QH frame (CSV, ';' separated, decimal comma)", data=csv_bytes(full, index=False),

@@ -65,6 +65,7 @@ table.esb {{ border-collapse: collapse; width: 100%; font-size: 0.8rem; margin-b
 table.esb th {{ background: {NAVY}; color: {WHITE}; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
   padding: 0.35rem 0.5rem; text-align: right; border: none; white-space: nowrap; }}
 table.esb th:first-child, table.esb td:first-child {{ text-align: left; }}
+table.esb th.txt, table.esb td.txt {{ text-align: left; white-space: normal; }}
 table.esb td {{ padding: 0.28rem 0.5rem; border-bottom: 1px solid {LINE}; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }}
 table.esb tr:nth-child(even) td {{ background: {PAPER}; }}
 table.esb tr.total td {{ font-weight: 700; border-top: 2px solid {INK}; }}
@@ -113,6 +114,84 @@ def dmy(d) -> str:
     if isinstance(d, (pd.Timestamp, datetime)):
         d = d.date()
     return d.strftime("%d.%m.%Y")
+
+
+def parse_num(text: str) -> float:
+    """Parse a number typed in Romanian format: '.' groups thousands, ',' is the decimal separator.
+
+    Rule for a string without a comma: exactly one dot NOT followed by exactly three digits is read as a
+    decimal point ('0.21' -> 0,21); otherwise dots are thousands separators ('1.234' -> 1234).
+    A blank string, '–' or '-' is a refusal (ValueError): blank is not zero.
+    """
+    t = (text or "").strip().replace(" ", "").replace("\u00a0", "")
+    if t in ("", "–", "-", "(", ")"):
+        raise ValueError("blank")
+    neg = t.startswith("(") and t.endswith(")")
+    if neg:
+        t = t[1:-1]
+    if "," in t:
+        t = t.replace(".", "").replace(",", ".")
+    elif t.count(".") == 1 and not (len(t) - t.index(".") - 1 == 3 and t[t.index(".") + 1 :].isdigit()):
+        pass  # a single dot with other than three digits after it is a decimal point
+    else:
+        t = t.replace(".", "")
+    v = float(t)
+    return -v if neg else v
+
+
+def num_input(label: str, value, decimals: int = 2, key: str | None = None, help: str | None = None,  # noqa: A002
+              min_value: float | None = None, max_value: float | None = None, disabled: bool = False) -> float:
+    """A numeric field in Romanian format (text-based). Shows 1.234,56; returns the parsed float.
+
+    An unparseable entry or one outside [min_value, max_value] is refused in place and the previous value
+    is returned, so a typing error never reaches the parameter register silently.
+    """
+    shown = num(value, decimals) if value is not None else ""
+    text = st.text_input(label, value=shown, key=key, help=help, disabled=disabled)
+    try:
+        v = parse_num(text)
+    except ValueError:
+        refusal(f"'{text}' is not a number in Romanian format (example: 1.234,56). The previous value {shown} is kept.")
+        return float(value) if value is not None else 0.0
+    if min_value is not None and v < min_value:
+        refusal(f"{num(v, decimals)} is below the minimum {num(min_value, decimals)}. The previous value {shown} is kept.")
+        return float(value)
+    if max_value is not None and v > max_value:
+        refusal(f"{num(v, decimals)} is above the maximum {num(max_value, decimals)}. The previous value {shown} is kept.")
+        return float(value)
+    return float(v)
+
+
+def grid_input(df: pd.DataFrame, key: str, decimals: int = 2) -> pd.DataFrame:
+    """An editable grid in Romanian format: cells are shown as 1.234,56 text and parsed back.
+
+    A cell that cannot be parsed keeps its previous value and is reported below the grid.
+    """
+    shown = df.map(lambda v: num(v, decimals))
+    cfg = {str(c): st.column_config.TextColumn(str(c), width="small") for c in shown.columns}
+    edited = st.data_editor(shown, key=key, width="stretch", column_config=cfg)
+    out = df.copy().astype(float)
+    bad = []
+    for c in df.columns:
+        for i in df.index:
+            try:
+                out.loc[i, c] = parse_num(str(edited.loc[i, c]))
+            except (ValueError, KeyError):
+                bad.append(f"{i} / {c}: '{edited.loc[i, c] if c in edited.columns and i in edited.index else ''}'")
+    if bad:
+        refusal("Kept the previous value for cells that are not numbers in Romanian format: " + "; ".join(bad))
+    return out
+
+
+def dmy_hm(iso: str | None) -> str:
+    """ISO-8601 UTC timestamp -> dd.mm.yyyy HH:MM; '–' when absent."""
+    if not iso:
+        return "–"
+    try:
+        t = datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+    except ValueError:
+        return str(iso)
+    return t.strftime("%d.%m.%Y %H:%M")
 
 
 MONTH_SHORT = ["Ian", "Feb", "Mar", "Apr", "Mai", "Iun", "Iul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -188,12 +267,15 @@ def table(df: pd.DataFrame, decimals: int = 2, index_label: str = "", pct_rows: 
     total_rows = total_rows or set()
     decimals_by_col = decimals_by_col or {}
     d = df if max_rows is None else df.head(max_rows)
-    head = "".join(f"<th>{c}</th>" for c in [index_label, *[str(c) for c in d.columns]])
+    text_cols = {c for c in d.columns if not pd.api.types.is_numeric_dtype(d[c]) and not pd.api.types.is_datetime64_any_dtype(d[c])
+                 and all(isinstance(v, str) for v in d[c] if v is not None and v == v)}
+    left = ' class="txt"'
+    head = f"<th>{index_label}</th>" + "".join(f"<th{left if c in text_cols else ''}>{c}</th>" for c in d.columns)
     rows = []
     for idx, rec in d.iterrows():
         key = str(idx)
         is_pct = key in pct_rows or key.endswith("_pct") or key.endswith(" %")
-        cells = "".join(f"<td>{_fmt_cell(v, decimals_by_col.get(str(c), decimals), is_pct)}</td>" for c, v in rec.items())
+        cells = "".join(f"<td{left if c in text_cols else ''}>{_fmt_cell(v, decimals_by_col.get(str(c), decimals), is_pct)}</td>" for c, v in rec.items())
         cls = ' class="total"' if key in total_rows else ""
         rows.append(f"<tr{cls}><td>{key}</td>{cells}</tr>")
     html = f'<table class="esb"><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table>'
@@ -211,8 +293,8 @@ def layout(fig: go.Figure, height: int = 320, y_title: str = "", x_title: str = 
         font={"family": "Montserrat, system-ui, Arial", "color": INK, "size": 12},
         paper_bgcolor=WHITE, plot_bgcolor=WHITE, height=height,
         margin={"l": 10, "r": 10, "t": 10, "b": 10},
-        legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "x": 0, "font": {"size": 11}} if legend else None,
-        showlegend=legend, colorway=SERIES, hovermode="x unified",
+        legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "x": 0, "font": {"size": 11}, "traceorder": "normal"} if legend else None,
+        showlegend=legend, colorway=SERIES, hovermode="x unified", separators=",.",
     )
     fig.update_xaxes(showgrid=False, linecolor=LINE, title=x_title, tickfont={"size": 11})
     fig.update_yaxes(gridcolor=LINE, griddash="dash", gridwidth=1, zeroline=True, zerolinecolor=LINE, title=y_title,

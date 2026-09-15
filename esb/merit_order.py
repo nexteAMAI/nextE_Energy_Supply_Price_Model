@@ -125,8 +125,14 @@ def run_qh(series: pd.DataFrame, grid: pd.DataFrame, params: Parameters, pv_code
     for o in params.offtakers:
         c = o.code
         a = 1.0 if o.active else 0.0
-        met_dso = series[f"{c}_metered_consumption_MWh"].to_numpy(dtype=float)
-        not_dso = series[f"{c}_notified_consumption_MWh"].to_numpy(dtype=float)
+        # an Inactive off-taker without series contributes zeros (D96); an Active one must have them
+        cm, cn = f"{c}_metered_consumption_MWh", f"{c}_notified_consumption_MWh"
+        if not o.active and (cm not in series.columns or cn not in series.columns):
+            met_dso = np.zeros(n)
+            not_dso = np.zeros(n)
+        else:
+            met_dso = series[cm].to_numpy(dtype=float)
+            not_dso = series[cn].to_numpy(dtype=float)
         blk = imbalance.consumption_block(met_dso, not_dso, sur, dfc, k=imbalance.K_DSO)
         imb_blocks[c] = blk
         p_pv_b = np.full(n, float(o.pv_price_budget_eur_per_mwh))

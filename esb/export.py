@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import io
 import json
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
 import numpy as np
 import pandas as pd
@@ -21,7 +21,7 @@ from openpyxl.utils import get_column_letter
 
 from esb import __version__
 from esb.engine import RunResult
-from esb.labels import label
+from esb.labels import RESELL, RETAIL, TOTAL, label
 
 NAVY = "1F3E66"
 INK = "0E1C2E"
@@ -67,7 +67,11 @@ def _write_table(ws, row0: int, df: pd.DataFrame, index_label: str = "", pct_row
         cell.border = Border(bottom=_hair)
     r = row0 + 1
     for i, (idx, rec) in enumerate(df.iterrows()):
-        c0 = ws.cell(row=r, column=1, value=str(idx))
+        if isinstance(idx, (pd.Timestamp, datetime, date)):  # dates as dates (dd.mm.yyyy), not as text
+            c0 = ws.cell(row=r, column=1, value=idx.to_pydatetime().date() if isinstance(idx, pd.Timestamp) else idx)
+            c0.number_format = "dd.mm.yyyy"
+        else:
+            c0 = ws.cell(row=r, column=1, value=str(idx))
         c0.font = _body_font
         if i % 2 == 1:
             c0.fill = _alt_fill
@@ -99,9 +103,9 @@ def _write_table(ws, row0: int, df: pd.DataFrame, index_label: str = "", pct_row
     return r + 1
 
 
-def _labelled(df: pd.DataFrame) -> pd.DataFrame:
+def _labelled(df: pd.DataFrame, **kw) -> pd.DataFrame:
     out = df.copy()
-    out.index = [label(k) for k in out.index]
+    out.index = [label(k, **kw) for k in out.index]
     return out
 
 
@@ -122,12 +126,12 @@ def build_workbook(run: RunResult, include_qh: bool = False, scenario_name: str 
     for o in P.offtakers:
         ren[f"{o.code}_budget"] = f"{o.label} budget"
         ren[f"{o.code}_forecast"] = f"{o.label} forecast"
-    ov = ov.rename(columns={"portfolio_budget": "Portfolio budget", "portfolio_forecast": "Portfolio forecast", "delta": "Delta", "resell": "Resell", **ren})
+    ov = ov.rename(columns={"portfolio_budget": "Portfolio budget", "portfolio_forecast": "Portfolio forecast", "delta": "Delta", "resell": RESELL, **ren})
     r = _write_table(ws, r, _labelled(ov), "Line")
     for title, block in (("Cash flow", run.overview.cashflow), ("Pricing (selected off-taker)", run.overview.pricing), ("Checks and tripwires", run.overview.checks)):
         ws.cell(row=r, column=1, value=title).font = _title_font
         r += 1
-        df = pd.DataFrame({"Value": list(block.values())}, index=[label(k) for k in block])
+        df = pd.DataFrame({"Value": list(block.values())}, index=[label(k, leg=(TOTAL if title == "Cash flow" else RETAIL if title.startswith("Pricing") else "")) for k in block])
         r = _write_table(ws, r, df, "Item")
 
     # ---- Cons_P&L ---------------------------------------------------------------------------
@@ -140,14 +144,14 @@ def build_workbook(run: RunResult, include_qh: bool = False, scenario_name: str 
         ws.cell(row=r, column=1, value=name).font = _title_font
         r += 1
         T.columns = MONTH_COLUMNS
-        r = _write_table(ws, r, _labelled(T), name)
+        r = _write_table(ws, r, _labelled(T, leg=RETAIL), name)
 
     # ---- CF_Mth -----------------------------------------------------------------------------
     ws = wb.create_sheet("CF_Mth")
     r = _sheet_header(ws, "Monthly cash flow", "Accruals, settlement keys, receipts, payments, VAT, financing (EUR)", run)
     cf = run.cashflow.frame()
     cf.columns = [*MONTH_COLUMNS[:12], "Beyond Dec", "Year"]
-    r = _write_table(ws, r, _labelled(cf), "Line")
+    r = _write_table(ws, r, _labelled(cf, fallback=TOTAL), "Line")
 
     # ---- CF_Daily_Ledger --------------------------------------------------------------------
     ws = wb.create_sheet("CF_Daily_Ledger")
@@ -156,11 +160,11 @@ def build_workbook(run: RunResult, include_qh: bool = False, scenario_name: str 
         d = run.cashflow.daily.copy()
         if "date" in d.columns:
             d = d.set_index("date")
-        d.columns = [label(c) for c in d.columns]
+        d.columns = [label(c, fallback=TOTAL) for c in d.columns]
         r = _write_table(ws, r, d, "Date")
     ws.cell(row=r, column=1, value="Summary").font = _title_font
     r += 1
-    r = _write_table(ws, r, pd.DataFrame({"Value": list(run.cashflow.daily_summary.values())}, index=[label(k) for k in run.cashflow.daily_summary]), "Item")
+    r = _write_table(ws, r, pd.DataFrame({"Value": list(run.cashflow.daily_summary.values())}, index=[label(k, fallback=TOTAL) for k in run.cashflow.daily_summary]), "Item")
 
     # ---- Pricing_Calc per off-taker -------------------------------------------------------------
     for code, pr in run.pricing.items():
@@ -172,11 +176,11 @@ def build_workbook(run: RunResult, include_qh: bool = False, scenario_name: str 
             months = pr.months.get(k)
             rows[k] = [v, *(list(months) if months is not None else [np.nan] * 12)]
         df = pd.DataFrame(rows, index=["Year", *MONTH_COLUMNS[:12]]).T
-        r = _write_table(ws, r, _labelled(df), "Line")
+        r = _write_table(ws, r, _labelled(df, leg=RETAIL), "Line")
         if pr.manual:
             ws.cell(row=r, column=1, value="Manual case").font = _title_font
             r += 1
-            r = _write_table(ws, r, pd.DataFrame({"Value": list(pr.manual.values())}, index=[label(k) for k in pr.manual]), "Line")
+            r = _write_table(ws, r, pd.DataFrame({"Value": list(pr.manual.values())}, index=[label(k, leg=RETAIL) for k in pr.manual]), "Line")
 
     # ---- Guarantees ----------------------------------------------------------------------------
     ws = wb.create_sheet("Guarantees")
@@ -202,7 +206,7 @@ def build_workbook(run: RunResult, include_qh: bool = False, scenario_name: str 
     if include_qh:
         ws = wb.create_sheet("QH_full")
         r = _sheet_header(ws, "Quarter-hour engine - full frame", "35.040 rows; every named column of the engine", run)
-        full = q.copy()
+        full = q.drop(columns=[c for c in ("date", "interval") if c in q.columns]).copy()
         full.insert(0, "interval", g["interval"].values)
         full.insert(0, "date", g["date"].dt.date.values)
         full = full.set_index("date")

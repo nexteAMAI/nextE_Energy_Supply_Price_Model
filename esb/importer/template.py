@@ -26,10 +26,15 @@ from esb.importer.contract import (
     preset_registry,
 )
 
-NAVY = "1F3A5F"
-GREY = "F2F2F2"
-HEAD_FONT = Font(name="Montserrat", bold=True, color="FFFFFF")
-BODY_FONT = Font(name="Montserrat")
+NAVY = "1F3E66"  # nexte-brand navy (app.brand.NAVY)
+INK = "0E1C2E"
+MUTED = "6A6A6A"
+GREY = "F7F6F3"  # brand paper: the cells the deliverer fills
+HEAD_FONT = Font(name="Montserrat", size=9, bold=True, color="FFFFFF")
+BODY_FONT = Font(name="Montserrat", size=9, color=INK)
+TITLE_FONT = Font(name="Montserrat", size=12, bold=True, color=NAVY)
+EYEBROW_FONT = Font(name="Montserrat", size=8, bold=True, color=MUTED)
+NUM_FORMAT = "#,##0.000;(#,##0.000);0.000"  # locale-aware tokens: a Romanian Excel renders 1.234,500
 HEAD_FILL = PatternFill("solid", fgColor=NAVY)
 INPUT_FILL = PatternFill("solid", fgColor=GREY)
 
@@ -73,15 +78,27 @@ def _style_header(ws, ncols: int) -> None:
         cell.font = HEAD_FONT
         cell.fill = HEAD_FILL
         cell.alignment = Alignment(vertical="center", wrap_text=True)
+    ws.row_dimensions[1].height = 30
     ws.freeze_panes = "A2"
+    _style_body(ws)
+
+
+def _style_body(ws) -> None:
+    """Montserrat on every written cell below the header (brand: one typeface on every surface)."""
+    for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+        for cell in row:
+            if cell.value is not None and cell.font.name != "Montserrat":
+                cell.font = BODY_FONT
 
 
 def _write_instructions(wb: Workbook) -> None:
     ws = wb.active
     ws.title = "Instructions"
-    for i, line in enumerate(INSTRUCTIONS, start=1):
+    ws["A1"] = "CONFIDENTIAL - nextE"
+    ws["A1"].font = EYEBROW_FONT
+    for i, line in enumerate(INSTRUCTIONS, start=2):
         cell = ws.cell(row=i, column=1, value=line)
-        cell.font = Font(name="Montserrat", bold=(i == 1 or line[:2].isdigit()))
+        cell.font = TITLE_FONT if i == 2 else (Font(name="Montserrat", size=9, bold=True, color=NAVY) if line[:2].isdigit() else BODY_FONT)
     ws.column_dimensions["A"].width = 120
 
 
@@ -168,10 +185,20 @@ def _write_raw(wb: Workbook, registry: Registry, data: pd.DataFrame | None) -> i
             n += 1
     _style_header(ws, 3 + len(slots))
     ws.column_dimensions["A"].width = 12
+    for j, s in enumerate(registry.slots, start=4):  # column-level formats so typed values render 1.234,500 in a Romanian Excel
+        col = ws.column_dimensions[get_column_letter(j)]
+        col.width = 16
+        col.number_format = "@" if s.cls == "Categorical" else NUM_FORMAT
+        col.font = BODY_FONT
+    for letter, fmt in (("A", "dd.mm.yyyy"), ("B", "hh:mm"), ("C", "hh:mm")):
+        ws.column_dimensions[letter].number_format = fmt
+        ws.column_dimensions[letter].font = BODY_FONT
     for r in range(2, ws.max_row + 1):
         ws.cell(row=r, column=1).number_format = "dd.mm.yyyy"
         ws.cell(row=r, column=2).number_format = "hh:mm"
         ws.cell(row=r, column=3).number_format = "hh:mm"
+        for j, s in enumerate(registry.slots, start=4):
+            ws.cell(row=r, column=j).number_format = "@" if s.cls == "Categorical" else NUM_FORMAT
     return n
 
 
