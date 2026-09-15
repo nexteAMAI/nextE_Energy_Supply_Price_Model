@@ -34,8 +34,8 @@ html, body, .stApp, .stApp *:not([class*="material"]):not([data-testid="stIconMa
 }}
 .stApp {{ color: {INK}; }}
 .stApp {{ background: {WHITE}; }}
-[data-testid="stToolbar"], [data-testid="stDecoration"], #MainMenu, footer, [data-testid="stStatusWidget"] {{ visibility: hidden; height: 0; }}
-.stAppDeployButton {{ display: none; }}
+[data-testid="stDecoration"], footer, [data-testid="stAppDeployButton"], .stAppDeployButton, [data-testid="stMainMenu"], #MainMenu {{ display: none !important; }}
+[data-testid="stExpandSidebarButton"] {{ visibility: visible !important; }}
 section[data-testid="stSidebar"] {{ background: {PAPER}; border-right: 1px solid {LINE}; }}
 h1, h2, h3, h4 {{ font-family: 'Montserrat', system-ui, Arial, sans-serif; color: {NAVY}; font-weight: 600; letter-spacing: 0; }}
 h1 {{ font-size: 1.5rem; }} h2 {{ font-size: 1.15rem; margin-top: 1.2rem; }} h3 {{ font-size: 1rem; }}
