@@ -187,3 +187,52 @@ def test_added_inactive_offtaker_without_series_runs(series, params):
     extra.active = True
     with pytest.raises(KeyError):
         run(series, params)  # Active without series is a refusal, never a fill
+
+
+def test_grid_tariff_table_reproduces_the_reference_set_and_cascades(params):
+    """D109: DEER at MV DSO is the Reference Case set; the distribution tariffs cascade; an operator without rows is refused."""
+    from config.schema import TARIFF_KEYS, VOLTAGE_LEVELS
+
+    deer = params.tariffs_by_grid("Distributie Energie Electrica Romania", "MV (6-20 kV) DSO")
+    for k in TARIFF_KEYS:
+        assert deer[k] == pytest.approx(params.tariff_components[k], abs=1e-9), k
+    hv_tso = params.tariffs_by_grid("Delgaz Grid", VOLTAGE_LEVELS[0])
+    assert hv_tso["T_HV"] == 0.0 and hv_tso["T_MV"] == 0.0 and hv_tso["T_LV"] == 0.0 and hv_tso["TL"] > 0
+    lv = params.tariffs_by_grid("Delgaz Grid", "LV (0,4 kV) DSO")
+    assert lv["T_HV"] > 0 and lv["T_MV"] > 0 and lv["T_LV"] == pytest.approx(317.39 / params.general.fx_ron_per_eur)
+    with pytest.raises(ValueError):
+        params.tariffs_by_grid("Retele Electrice Romania", "MV (6-20 kV) DSO")
+    with pytest.raises(ValueError):
+        params.tariffs_by_grid("Delgaz Grid", "kV")
+    # the off-taker fields round-trip through the register dict and validation refuses a half selection
+    o = params.offtakers[0]
+    o.dso, o.voltage_level = "Delgaz Grid", "LV (0,4 kV) DSO"
+    assert params.tariff_total_for(o) == pytest.approx(sum(lv.values()) + params.gc_unit_cost)
+    q = params.copy()
+    assert q.offtakers[0].dso == "Delgaz Grid" and q.offtakers[0].voltage_level == "LV (0,4 kV) DSO" and len(q.grid_tariffs) == len(params.grid_tariffs)
+    o.voltage_level = None
+    assert any("DSO and voltage level" in e for e in params.validate())
+
+
+def test_offtaker_dso_selection_changes_passthrough_in_the_engine(series, params):
+    """The pricing pass-through and the DSO guarantee basis follow the off-taker's grid selection."""
+    base = run(series, params)
+    p2 = params.copy()
+    p2.offtakers[0].dso, p2.offtakers[0].voltage_level = "Delgaz Grid", "LV (0,4 kV) DSO"
+    r = run(series, p2)
+    assert r.pricing["OT1"].year["passthrough"] > base.pricing["OT1"].year["passthrough"]
+    assert r.pricing["OT2"].year["passthrough"] == pytest.approx(base.pricing["OT2"].year["passthrough"])
+    _checks_zero(r)
+
+
+def test_pv_fixed_guarantee_is_a_user_input_with_the_workbook_derivation_as_default(series, params):
+    """D110: fixed_amount None -> Input!C85 derivation (parity); a value set by the user drives the PV guarantee."""
+    base = run(series, params)
+    derived = base.pnl.pv_fixed_guarantee
+    assert derived == pytest.approx(float(base.pnl.portfolio.m("cost_pv_budget").mean() + base.pnl.portfolio.m("rs_pv_cost").mean()))
+    p2 = params.copy()
+    p2.counterparties["pv"].guarantee.fixed_amount = 1_000_000.0
+    r = run(series, p2)
+    assert r.pnl.pv_fixed_guarantee == 1_000_000.0
+    assert float(np.max(r.pnl.portfolio.m("g_out_pv"))) == pytest.approx(1_000_000.0)
+    assert float(np.max(base.pnl.portfolio.m("g_out_pv"))) == pytest.approx(derived)

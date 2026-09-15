@@ -10,7 +10,7 @@ import streamlit as st
 
 from app import brand as B
 from app import state as S
-from esb.labels import RESELL, RETAIL, label, tagged
+from esb.labels import RESELL, RETAIL, label, tagged, unit_of
 from esb.merit_order import OFFTAKER_COLUMNS, WORKBOOK_COLUMNS
 
 STACK = [("pv_delivered", "PV delivered"), ("bl_delivered", "Baseload delivered"), ("spot_buy_notified", "Spot bought")]
@@ -70,13 +70,15 @@ def render() -> None:
                      tagged("Strip notified", RETAIL): q[f"{c}_strip_notified"].sum(), tagged("Attributed (LIFO)", RESELL): q[f"{c}_resell_attributed"].sum(),
                      tagged("GM2 forecast", RETAIL): q[f"{c}_gm2_forecast"].sum(), tagged("Off-taker imbalance", RETAIL): q[f"{c}_offtaker_imb"].sum()})
     df = pd.DataFrame(rows).set_index("Off-taker")
-    B.table(df, index_label="Off-taker", decimals=0)
-    B.caption("Year sums; MWh for volumes, EUR for margins. LIFO: Baseload surplus is attributed to the last position first, position 1 takes the remainder")
+    B.table(df, index_label="Off-taker", decimals=0,
+            col_units={"Notified": "MWh", "Metered": "MWh", "PV": "MWh", "Baseload": "MWh", "Spot": "MWh", tagged("Strip notified", RETAIL): "MWh",
+                       tagged("Attributed (LIFO)", RESELL): "MWh", tagged("GM2 forecast", RETAIL): "EUR", tagged("Off-taker imbalance", RETAIL): "EUR"})
+    B.caption("Year sums; unit in every column header. LIFO: Baseload surplus is attributed to the last position first, position 1 takes the remainder")
 
     st.markdown("## Checks")
     chk = {k: float(q[k].abs().sum()) for k in ("check_demand", "check_pv", "check_bl", "check_imb", "check_origin")}
-    html = '<table class="esb"><thead><tr><th>Check</th><th>Sum of absolute residuals</th><th>State</th></tr></thead><tbody>'
-    html += "".join(f"<tr><td>{label(k, leg='')}</td><td>{B.num(v, 6)}</td><td>{B.status(v < 1e-6)}</td></tr>" for k, v in chk.items())
+    html = '<table class="esb"><thead><tr><th>Check</th><th class="txt">Unit</th><th>Sum of absolute residuals</th><th>State</th></tr></thead><tbody>'
+    html += "".join(f"<tr><td>{label(k, leg='')}</td><td class=\"unit\">{'MWh' if k in ('check_demand', 'check_pv', 'check_bl', 'check_origin') else 'EUR'}</td><td>{B.num(v, 6)}</td><td>{B.status(v < 1e-6)}</td></tr>" for k, v in chk.items())
     st.markdown(html + "</tbody></table>", unsafe_allow_html=True)
 
     st.markdown("## Drill-down to the quarter-hour")
@@ -118,7 +120,7 @@ def render() -> None:
         tbl = sub[keys].copy()
         tbl.index = x
         tbl.columns = [_col_label(c) for c in keys]
-        B.table(tbl, index_label="QH", decimals=4, scroll=True)
+        B.table(tbl, index_label="QH", decimals=4, scroll=True, col_units={_col_label(c): _qh_unit(c) for c in keys})
 
     with st.expander("Full quarter-hour frame (35.040 rows) - load on demand"):
         if st.checkbox("Show the frame (first day, 96 rows) and enable the CSV download of all rows"):
@@ -130,12 +132,18 @@ def render() -> None:
             show = full.head(96).copy()
             show["date"] = [B.dmy(v) for v in show["date"]]
             show = show.set_index("date")
+            cu = {_col_label(c): _qh_unit(c) for c in show.columns if c != "interval"}
             show.columns = [_col_label(c) for c in show.columns]
-            B.table(show, index_label="Date", decimals=4, scroll=True, decimals_by_col={"Interval": 0})
+            B.table(show, index_label="Date", decimals=4, scroll=True, decimals_by_col={"Interval": 0}, col_units=cu)
             from esb.export import csv_bytes
 
             st.download_button("Download QH frame (CSV, ';' separated, decimal comma)", data=csv_bytes(full, index=False),
                                file_name=f"QH_frame_{p.spine_year}.csv", mime="text/csv")
+
+
+def _qh_unit(c: str) -> str:
+    """Quarter-hour frame units: energy per interval is MWh, MW columns MW, prices EUR/MWh, money EUR."""
+    return unit_of(c)
 
 
 def _col_label(c: str) -> str:

@@ -153,3 +153,54 @@ def tagged(text: str, leg: str) -> str:
 
 def label_series(keys, **kw) -> list[str]:
     return [label(k, **kw) for k in keys]
+
+
+# ---- units (G5 request 2) --------------------------------------------------------------------
+EUR, MWH, MW, EURMWH, PCT = "EUR", "MWh", "MW", "EUR/MWh", "%"
+_UNIT_EXPLICIT: dict[str, str] = {
+    "gc_quota": "GC/MWh", "gc_price_ron": "RON/GC", "fx": "RON/EUR", "gc_spot_share": PCT, "gc_bilateral_share": PCT, "gc_price_eur": "EUR/GC",
+    "gc_count": "GC", "gc_spot": "GC", "gc_bilateral": "GC", "gc_value": EUR, "gc_unit": EURMWH,
+    "sell_price": EURMWH, "market_ref": EURMWH, "dam": EURMWH, "idct": EURMWH, "dam_curtailed": EURMWH, "idct_curtailed": EURMWH,
+    "surplus_price": EURMWH, "deficit_price": EURMWH, "dam_monthly": EURMWH, "idm_monthly": EURMWH, "direction": "sign",
+    "pv_ratio": "ratio", "bl_ratio": "ratio", "ratio": "ratio", "peak": "flag", "seq": "#", "interval": "#", "month": "#", "days_in_month": "days",
+    "premium_deviation": EURMWH, "budget_minus_forecast": EUR, "budget_minus_forecast_price": EURMWH, "budget_minus_forecast_cost": EUR,
+    "days_to_settle": "days", "spot_buy_mwh": MWH, "strip_price_tripwire": "#", "label_self_check": "", "peak_dam_price": EURMWH,
+    "peak_retail_buy_mw": MW, "peak_daily_spot_buy_mwh": MWH, "cumulative_s": "s", "net_imbalance_volume": MWH, "date": "",
+    "vat_cash_year": EUR, "vat_collected": EUR, "vat_paid": EUR, "vat_input": EUR, "strip_notified": MWH,
+}
+_VOLUME_TOKENS = ("notified", "metered", "volume", "delivered", "avail", "remaining", "settlement", "buy", "resold", "attributed", "count")
+_PRICE_TOKENS = ("price", "specific", "purchase_price", "imbalance_cost", "physical_cost", "premium_", "target_gm", "energy_price", "offer_",
+                 "contract_", "implied_gm", "cost_to_serve", "forecast_nm_specific", "indicative_nm", "repriced", "derived_forecast_premium",
+                 "forecast_premium", "passthrough", "tariff", "premium", "vat")
+
+
+def unit_of(key: str) -> str:
+    """The unit of an engine key: EUR unless the key names a volume (MWh), a rate (EUR/MWh), a share (%) or a special case."""
+    k = key
+    if k.startswith("OT") and "_" in k and k[2 : k.index("_")].isdigit():
+        k = k[k.index("_") + 1 :]
+    if k in _UNIT_EXPLICIT:
+        return _UNIT_EXPLICIT[k]
+    if k.startswith("check") or k.endswith("_check") or k.endswith("_checks"):
+        return EUR
+    if k.endswith("_pct") or k.startswith("share_") or k.endswith("_share"):
+        return PCT
+    if k.endswith("_mw") or k.startswith("strip_"):
+        return MW
+    if k == "premium_volume" or k.startswith("premium_") and k not in ("premium_monthly", "premium_cumulative", "premium_settlement",
+                                                                         "premium_settlement_cumulative", "premium_total_eur"):
+        return EURMWH if k in ("premium_volume", "premium_price", "premium_profile", "premium_credit", "premium_regulatory", "premium_fx",
+                               "premium_collateral", "premium_total", "premium_budget_input", "premium_forecast_input", "premium_forecast_derived") else EUR
+    if k in ("premium_monthly", "premium_cumulative", "premium_settlement", "premium_settlement_cumulative", "premium", "reserve",
+             "reserve_balance", "reserve_release", "reserve_release_budget", "reserve_release_forecast", "settlement_cumulative", "passthrough_revenue",
+             "passthrough_cost", "annual_revenue", "vat_cash", "vat_output", "vat_input", "vat_net_position", "vat_paid", "vat_credit"):
+        return EUR
+    if any(t in k for t in ("_specific", "price_", "_price")) or k.startswith(_PRICE_TOKENS) or k in ("passthrough", "vat"):
+        return EURMWH
+    if any(t in k for t in _VOLUME_TOKENS) and not any(t in k for t in ("cost", "revenue", "imb", "gm", "fee", "acc_", "in_", "out_", "pay_", "receipts")):
+        return MWH
+    return EUR
+
+
+def unit_series(keys) -> list[str]:
+    return [unit_of(k) for k in keys]

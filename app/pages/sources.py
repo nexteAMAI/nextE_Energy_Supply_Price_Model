@@ -46,7 +46,7 @@ def render() -> None:
             "BGL fee": f"{B.pct(g.bgl_fee_pa, 2)} {g.bgl_fee_type}" if g.type == "Bank Guarantee Letter" else "–",
         })
     df = pd.DataFrame(rows).set_index("Counterparty")
-    B.table(df, index_label="Counterparty", decimals=0)
+    B.table(df, index_label="Counterparty", decimals=0, col_units={"Terms (days)": "days"})
     B.caption("Source: parameter register sections D and E; k per volume series is declared in the upload registry (docs/DATA_CONTRACT.md)")
 
     st.markdown("## Off-taker contracts")
@@ -69,11 +69,14 @@ def render() -> None:
             "Terms (days)": o.payment_terms_days,
             "Advance": B.pct(o.advance_pct, 0),
             "Own guarantee": f"{o.guarantee.type} · {o.guarantee.sizing}" if o.guarantee.type != "None" else "None",
-            "Tariff set": "own" if o.tariff_components else "portfolio",
+            "Tariff set": (f"{o.dso} · {o.voltage_level}" if o.dso else ("own override" if o.tariff_components else "portfolio set")),
+            "Pass-through": B.num(p.tariff_total_for(o), 2, "EUR/MWh"),
         })
     df = pd.DataFrame(rows).set_index("Off-taker")
-    B.table(df, index_label="Off-taker", decimals=0, scroll=True)
-    B.caption("EUR/MWh unless stated; strips in MW; the Baseload availability is the sum of the active off-takers' strips (D77)")
+    B.table(df, index_label="Off-taker", decimals=0, scroll=True,
+            col_units={"PV price budget / forecast": "EUR/MWh", "BL24 price budget (avg)": "EUR/MWh", "BL24 price forecast (avg)": "EUR/MWh",
+                       "Premium budget / forecast": "EUR/MWh", "Target GM budget / forecast": "EUR/MWh", "Terms (days)": "days"})
+    B.caption("Units in the column headers; strips in MW; the Baseload availability is the sum of the active off-takers' strips (D77)")
 
     st.markdown("## Strips by month")
     for o in p.offtakers:
@@ -83,5 +86,5 @@ def render() -> None:
                 "BL24 budget": o.product_price_budget["BL24"], "Peak budget": o.product_price_budget["Peak"], "Off-Peak budget": o.product_price_budget["OffPeak"],
                 "BL24 forecast": o.product_price_forecast["BL24"], "Peak forecast": o.product_price_forecast["Peak"], "Off-Peak forecast": o.product_price_forecast["OffPeak"],
             }, index=B.MONTH_EN)
-            B.table(df, index_label="Month")
+            B.table(df, index_label="Month", col_units={c: ("MW" if c.endswith(" MW") else "EUR/MWh") for c in df.columns})
     B.caption("Cover flags: a strip with MW > 0 and a 0 product price trips the overview tripwire (Portf Overview!E148). Edit on the Parameters page.")

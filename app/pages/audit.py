@@ -50,7 +50,7 @@ def render() -> None:
     if state.result is not None:
         B.eyebrow("Calculation-order trace of the last run (ruling G0-D6: fixed order, no iteration)")
         tr = pd.DataFrame({"Cumulative seconds": [t for _, t in state.result.trace]}, index=[n for n, _ in state.result.trace])
-        B.table(tr, index_label="Stage", decimals=3)
+        B.table(tr, index_label="Stage", decimals=3, col_units={"Cumulative seconds": "s"})
 
     st.markdown("## Scenario file history")
     if state.scenario.history:

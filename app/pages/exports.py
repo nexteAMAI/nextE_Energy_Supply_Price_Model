@@ -97,8 +97,10 @@ def render() -> None:
                     ok = all(x["status"] == "PASS" for x in rows)
                     st.markdown(f"Reproduction: {B.status(ok, 'REPRODUCED', 'DIFFERS')}", unsafe_allow_html=True)
                     df = pd.DataFrame(rows).set_index("key")
+                    keys = list(df.index)
                     df.index = [k.replace("_", " ") for k in df.index]
-                    B.table(df, index_label="Headline value", decimals=2)
+                    B.table(df, index_label="Headline value", decimals=2,
+                            units=["MWh" if k in ("metered", "notified") else "EUR" for k in keys])
                     state.add_log("bundle", f"bundle reproduced: {'PASS' if ok else 'DIFFERS'}")
             except ValueError as e:
                 B.refusal(str(e))

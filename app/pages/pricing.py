@@ -9,7 +9,7 @@ import streamlit as st
 from app import brand as B
 from app import state as S
 from config.schema import PREMIUM_COMPONENTS
-from esb.labels import RETAIL, label, tagged
+from esb.labels import RETAIL, label, tagged, unit_of
 from esb.pricing import PRICING_ROWS, YEAR_ONLY, manual_case
 
 BUILDUP = [("purchase_price", "Purchase price"), ("imbalance_cost", "Imbalance cost"), ("premium_total", "Risk premium"), ("target_gm", "Target GM"),
@@ -62,9 +62,10 @@ def render() -> None:
             months = pr.months.get(k)
             rows[k] = [y[k], *(list(months) if months is not None and k not in YEAR_ONLY else [float("nan")] * 12)]
     df = pd.DataFrame(rows, index=["Year", *B.MONTH_EN]).T
+    units = [unit_of(k) for k in df.index]
     df.index = [f"{label(k, leg=RETAIL)} [{PRICING_ROWS[k]}]" for k in df.index]
-    B.table(df, index_label="Line [row]", scroll=True)
-    B.caption("EUR/MWh except metered / notified (MWh) and annual revenue (EUR); row numbers of the Reference Case sheet; year-only lines have no monthly values")
+    B.table(df, index_label="Line [row]", scroll=True, units=units)
+    B.caption("Unit per line in the Unit column; row numbers of the Reference Case sheet; year-only lines have no monthly values")
 
     st.markdown("## Re-pricing at the current forecast")
     B.kpi_row([
@@ -108,4 +109,4 @@ def render() -> None:
         ])
         cmp = pd.DataFrame({"Year column": [y.get(k, float("nan")) for k in d], "Manual case": list(d.values())}, index=[label(k, leg=RETAIL) for k in d])
         cmp["Delta"] = cmp["Manual case"] - cmp["Year column"]
-        B.table(cmp, index_label="Line")
+        B.table(cmp, index_label="Line", units=[unit_of(k) for k in d])

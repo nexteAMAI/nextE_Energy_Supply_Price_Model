@@ -10,7 +10,7 @@ import streamlit as st
 from app import brand as B
 from app import state as S
 from esb.cashflow import CF_ROWS
-from esb.labels import TOTAL, label, tagged
+from esb.labels import TOTAL, label, tagged, unit_of
 
 ROWMAP = {v: k for k, v in CF_ROWS.items()}
 GROUPS = {
@@ -28,6 +28,7 @@ def _frame(cf, keys) -> pd.DataFrame:
     rows = {k: cf.rows[k] for k in keys if k in cf.rows}
     df = pd.DataFrame(rows, index=[*B.MONTH_EN, "Beyond Dec", "Year"]).T
     df.index = [label(k, fallback=TOTAL) + (f" [{ROWMAP[k]}]" if k in ROWMAP else "") for k in df.index]
+    df.attrs["units"] = [unit_of(k) for k in rows]
     return df
 
 
@@ -70,12 +71,13 @@ def render() -> None:
     which = st.multiselect("Blocks", list(GROUPS), default=["Receipts", "Payments", "VAT", "Financing"])
     for name in which:
         B.eyebrow(f"{name} · workbook row in brackets")
-        B.table(_frame(cf, GROUPS[name]), index_label="Line", scroll=len(GROUPS[name]) > 12)
+        fr = _frame(cf, GROUPS[name])
+        B.table(fr, index_label="Line", scroll=len(GROUPS[name]) > 12, units=fr.attrs["units"])
     B.eyebrow("Per off-taker receipts")
     keys = [k for k in cf.rows if k.endswith("_in_energy") or k.endswith("_in_passthrough") or k.endswith("_acc_revenue")]
     df = pd.DataFrame({k: cf.rows[k] for k in keys}, index=[*B.MONTH_EN, "Beyond Dec", "Year"]).T
     df.index = [f"{p.offtaker(k.split('_')[0]).label} - {label(k)}" for k in df.index]
-    B.table(df, index_label="Line", scroll=True)
+    B.table(df, index_label="Line", scroll=True, units=[unit_of(k) for k in keys])
     B.caption("Settlement key of each line: the month containing month end + payment terms; December with terms > 0 settles beyond December (column N)")
 
     st.markdown("## Daily ledger")
@@ -88,10 +90,11 @@ def render() -> None:
                         width="stretch", config={"displayModeBar": False})
         B.caption("CF_Daily_Ledger columns X, AB, V; EUR; settlement days = month end + terms, taxes on the payment day")
         summ = pd.DataFrame({"Value": list(ds.values())}, index=[label(k, fallback=TOTAL) for k in ds])
+        summ_units = [unit_of(k) for k in ds]
         c1, c2 = st.columns([1, 2])
         with c1:
             B.eyebrow("Ledger summary")
-            B.table(summ, index_label="Item")
+            B.table(summ, index_label="Item", units=summ_units)
             ok = abs(ds.get("check_net_cf", 0.0)) < 1e-4 and abs(ds.get("check_receipts", 0.0)) < 1e-4
             st.markdown(f"Ledger reconciles to the monthly table: {B.status(ok)}", unsafe_allow_html=True)
         with c2:
@@ -99,5 +102,6 @@ def render() -> None:
             show = d.copy()
             show["date"] = [B.dmy(v) for v in show["date"]]
             show = show.set_index("date")
+            cu = {label(c, fallback=TOTAL): unit_of(c) for c in show.columns}
             show.columns = [label(c, fallback=TOTAL) for c in show.columns]
-            B.table(show, index_label="Date", decimals=0, scroll=True, max_rows=60)
+            B.table(show, index_label="Date", decimals=0, scroll=True, max_rows=60, col_units=cu)

@@ -51,16 +51,16 @@ def render() -> None:
                      "Peak outstanding": float(np.max(out)), "Months outstanding": int((out > 0).sum()), "Window": f"{B.dmy(g.start)} - {B.dmy(g.end)}",
                      "BGL fee p.a.": B.pct(g.bgl_fee_pa, 2), "Fee type": g.bgl_fee_type, "Fee (year)": float(fee.sum()), "Cash backing": B.pct(g.cash_backing_pct, 0)})
     df = pd.DataFrame(rows).set_index("Counterparty")
-    B.table(df, index_label="Counterparty", decimals=0)
+    B.table(df, index_label="Counterparty", decimals=0, col_units={"Peak outstanding": "EUR", "Months outstanding": "months", "Fee (year)": "EUR"})
 
     st.markdown("## Required amount under each sizing method · EUR (peak month)")
     cmp = sizing_comparison(r.pnl, p)
     df = pd.DataFrame(cmp).T
     df.index = [LABELS[k] for k in df.index]
     df = df[list(GUARANTEE_SIZINGS)]
-    B.table(df, index_label="Counterparty", decimals=0)
+    B.table(df, index_label="Counterparty", decimals=0, col_units={c: "EUR" for c in df.columns})
     B.caption("Same bases as the P&L: annual contract value (revenue for PV, spot, BRP, TSO, DSO; forecast Baseload cost incl. resell for Baseload), "
-              "the regulatory amount where a formula exists, the fixed amount of the register (PV: derived). The register's own sizing is the one in force")
+              "the regulatory amount where a formula exists, the fixed amount of the register (PV: the user's input, or the workbook derivation of Input!C85 when none is set - D110). The register's own sizing is the one in force")
 
     st.markdown("## Regulatory formulas · inputs of this run")
     mg = p.market_guarantees
@@ -83,5 +83,5 @@ def render() -> None:
         out = T.m("own_guarantee") if "own_guarantee" in T else np.zeros(12)
         rows.append({"Off-taker": f"{o.label} ({o.code})", "Type": g.type, "Sizing": g.sizing, "Peak outstanding": float(np.max(out)),
                      "BGL fee (year)": T.y("own_bgl_fee") if "own_bgl_fee" in T else 0.0, "Window": f"{B.dmy(g.start)} - {B.dmy(g.end)}" if g.type != "None" else "–"})
-    B.table(pd.DataFrame(rows).set_index("Off-taker"), index_label="Off-taker", decimals=0)
+    B.table(pd.DataFrame(rows).set_index("Off-taker"), index_label="Off-taker", decimals=0, col_units={"Peak outstanding": "EUR", "BGL fee (year)": "EUR"})
     B.caption("Dynamic sizing is monthly (X-26): pct x monthly revenue; Regulatory formula is not defined for off-takers and yields 0")

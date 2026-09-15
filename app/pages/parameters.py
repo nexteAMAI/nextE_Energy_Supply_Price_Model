@@ -17,8 +17,12 @@ from config.schema import (
     GUARANTEE_TYPES,
     PREMIUM_COMPONENTS,
     PRODUCTS,
+    TARIFF_KEYS,
+    VOLTAGE_LEVELS,
     Guarantee,
     Offtaker,
+    distribution_operators,
+    load_grid_tariffs,
 )
 from esb.scenario_file import ScenarioFile
 
@@ -30,16 +34,16 @@ TARIFF_HELP = {
 }
 
 
-def _guarantee_form(g: Guarantee, key: str, allow_fixed_none: bool = False) -> Guarantee:
+def _guarantee_form(g: Guarantee, key: str, fixed_default: float | None = None, fixed_help: str = "") -> Guarantee:
+    """fixed_default: the value shown when the register holds no fixed amount (e.g. the engine's derivation of Input!C85, D110)."""
     c1, c2, c3 = st.columns(3)
     with c1:
         typ = st.selectbox("Type", GUARANTEE_TYPES, index=GUARANTEE_TYPES.index(g.type), key=f"{key}_type")
         sizing = st.selectbox("Sizing", GUARANTEE_SIZINGS, index=GUARANTEE_SIZINGS.index(g.sizing), key=f"{key}_sizing")
         direction = st.text_input("Direction", g.direction, key=f"{key}_dir")
     with c2:
-        fixed_default = float(g.fixed_amount) if g.fixed_amount is not None else 0.0
-        derived = st.checkbox("Fixed amount derived by the engine", value=g.fixed_amount is None, key=f"{key}_derived") if allow_fixed_none else False
-        fixed = B.num_input("Fixed amount (EUR)", value=fixed_default, key=f"{key}_fixed", disabled=derived, decimals=2)
+        shown = float(g.fixed_amount) if g.fixed_amount is not None else float(fixed_default or 0.0)
+        fixed = B.num_input("Fixed amount (EUR)", value=shown, key=f"{key}_fixed", decimals=2, help=fixed_help or None)
         pctv = B.num_input("% of contract value (0,3 = 30 %)", value=float(g.pct_of_contract_value), key=f"{key}_pct", decimals=4)
         cov = B.num_input("Coverage months", value=float(g.coverage_months), key=f"{key}_cov", decimals=2)
     with c3:
@@ -48,7 +52,7 @@ def _guarantee_form(g: Guarantee, key: str, allow_fixed_none: bool = False) -> G
         cash = B.num_input("Cash backing share (0..1)", value=float(g.cash_backing_pct), key=f"{key}_cash", decimals=2)
         start = st.date_input("Window start", g.start, key=f"{key}_start", format="DD.MM.YYYY")
         end = st.date_input("Window end", g.end, key=f"{key}_end", format="DD.MM.YYYY")
-    return Guarantee(type=typ, direction=direction, sizing=sizing, fixed_amount=None if derived else float(fixed), coverage_months=float(cov),
+    return Guarantee(type=typ, direction=direction, sizing=sizing, fixed_amount=float(fixed), coverage_months=float(cov),
                      pct_of_contract_value=float(pctv), bgl_fee_pa=float(fee), bgl_fee_type=fee_type, cash_backing_pct=float(cash),
                      start=start, end=end)
 
@@ -92,19 +96,48 @@ def _offtaker_form(o: Offtaker, key: str) -> Offtaker:
     n.product_price_forecast = _month_table("Product prices forecast", o.product_price_forecast, f"{key}_ppf", "EUR/MWh")
     with st.expander("Own guarantee issued to this off-taker"):
         n.guarantee = _guarantee_form(o.guarantee, f"{key}_g")
-    with st.expander("Regulated tariff components for this off-taker (override of the portfolio set)"):
-        use_override = st.checkbox("Use an off-taker-specific tariff set", value=o.tariff_components is not None, key=f"{key}_tov")
-        if use_override:
-            base = o.tariff_components or S.get().params.tariff_components
+    return n
+
+
+def _tariff_block(o: Offtaker, key: str, state) -> None:
+    """Source of the regulated components of one off-taker (D109). Outside the off-taker form so that the
+    selection re-renders at once; applied with its own button."""
+    P = state.params
+    with st.expander("Regulated tariff components for this off-taker", expanded=o.dso is not None):
+        n = copy.deepcopy(o)
+        modes = ["Portfolio set (Reference Case)", "By DSO and voltage level (grid tariff table)", "Manual override"]
+        mode0 = 1 if o.dso else (2 if o.tariff_components else 0)
+        mode = st.radio("Source of the components", modes, index=mode0, key=f"{key}_tmode", horizontal=True)
+        n.dso, n.voltage_level, n.tariff_components = None, None, None
+        if mode == modes[1]:
+            dsos = distribution_operators(P.grid_tariffs)
+            c1, c2 = st.columns(2)
+            with c1:
+                n.dso = st.selectbox("Distribution operator serving the metering point", dsos, index=dsos.index(o.dso) if o.dso in dsos else 1, key=f"{key}_dso")
+            with c2:
+                n.voltage_level = st.selectbox("Metering point voltage level", list(VOLTAGE_LEVELS),
+                                               index=VOLTAGE_LEVELS.index(o.voltage_level) if o.voltage_level in VOLTAGE_LEVELS else 2, key=f"{key}_vl")
+            try:
+                t = P.tariffs_by_grid(n.dso, n.voltage_level)
+                df = pd.DataFrame({"EUR/MWh": [t[k] for k in TARIFF_KEYS] + [P.gc_unit_cost, sum(t.values()) + P.gc_unit_cost]},
+                                  index=[TARIFF_HELP[k].split(" - ")[0] for k in TARIFF_KEYS] + ["Green certificates (quota x price / FX)", "Regulated pass-through total"])
+                B.table(df, index_label="Component", decimals=4, units=["EUR/MWh"] * len(df), total_rows={"Regulated pass-through total"})
+                B.caption(f"Cascading rule of the v1.1 template (D109): TL, TG, SS, cogeneration, CfD and excise at every level; T_HV from HV DSO down, "
+                          f"T_MV from MV DSO down, T_LV at LV DSO only; RON/MWh values of the grid tariff table at FX {B.num(P.general.fx_ron_per_eur, 4)}")
+            except ValueError as e:
+                B.refusal(f"{e}. Add the rows in the admin tab or choose another operator.")
+        elif mode == modes[2]:
+            base = o.tariff_components or P.tariff_components
             vals = {}
             cols = st.columns(3)
             for i, (k, help_) in enumerate(TARIFF_HELP.items()):
                 with cols[i % 3]:
                     vals[k] = float(B.num_input(help_, value=float(base.get(k, 0.0)), key=f"{key}_t_{k}", decimals=6))
             n.tariff_components = vals
-        else:
-            n.tariff_components = None
-    return n
+        if st.button("Apply tariff source", key=f"{key}_tapply", type="primary"):
+            o.dso, o.voltage_level, o.tariff_components = n.dso, n.voltage_level, n.tariff_components
+            state.mark_dirty(f"off-taker {o.code} tariff source applied")
+            st.rerun()
 
 
 def render() -> None:
@@ -228,6 +261,7 @@ def render() -> None:
                         p.offtakers.pop(i)
                         state.mark_dirty(f"off-taker {o.code} removed")
                         st.rerun()
+                _tariff_block(o, f"ot_{o.code}", state)
         with sub[-1]:
             B.caption("A new off-taker takes the last merit-order position and starts from a copy of the last one (inactive until switched on).")
             if st.button("Add off-taker"):
@@ -260,7 +294,13 @@ def render() -> None:
                     dev = B.num_input("Deviation share (baseload)", value=float(c.deviation_pct), key=f"cp_{k}_dev", disabled=k != "baseload", decimals=4)
                     idev = B.num_input("Imbalance deviation share (baseload)", value=float(c.imbalance_deviation_pct), key=f"cp_{k}_idev", disabled=k != "baseload", decimals=4)
                 B.eyebrow("Guarantee")
-                gg = _guarantee_form(c.guarantee, f"cp_{k}_g", allow_fixed_none=(k == "pv"))
+                derived_pv = None
+                if k == "pv" and c.guarantee.fixed_amount is None:
+                    res = state.result if state.result is not None else S.require_result(state)  # one run for the default shown
+                    derived_pv = float(res.pnl.pv_fixed_guarantee) if res is not None else None
+                gg = _guarantee_form(c.guarantee, f"cp_{k}_g", fixed_default=derived_pv,
+                                     fixed_help=("User input (D110). Shown by default: the workbook derivation of Input!C85 from the last run, "
+                                                 "mean(PV cost budget) + mean(PV resell cost)" if k == "pv" else None) or "")
                 if st.form_submit_button("Apply changes", type="primary"):
                     c.name, c.active, c.payment_terms_days, c.advance_pct = name, bool(active), int(terms), float(adv)
                     c.k = {"not applicable": None, "-1 (DSO)": -1, "+1 (BRP)": 1}[kk]
@@ -314,6 +354,23 @@ def render() -> None:
                 p.gc_quota, p.gc_reference_price_ron, p.gc_spot_share = float(quota), float(gcp), float(share)
                 state.mark_dirty("tariffs and GC (admin) applied")
                 st.rerun()
+        st.markdown("## Grid tariff table · RON/MWh")
+        cfg = load_grid_tariffs()
+        B.note(f"Source: {cfg['meta'].get('source', '')} · validity {cfg['meta'].get('validity', '')} · source_status: <b>{cfg['meta'].get('source_status', '')}</b>. "
+               "Rows by regulatory charge owner and component; distribution rows by operator. An off-taker that names its DSO and voltage level "
+               "takes its components from here (D109). Retele Electrice Romania has no distribution rows in the source sheet.")
+        with st.form("form_grid_tariffs"):
+            rows = pd.DataFrame(p.grid_tariffs)
+            grid = pd.DataFrame({"RON/MWh": rows["ron_per_mwh"].astype(float).values},
+                                index=[f"{r['owner']} · {r['component']}" for r in p.grid_tariffs])
+            edited = B.grid_input(grid, key="grid_tariffs_editor", decimals=2)
+            if st.form_submit_button("Apply grid tariff table", type="primary"):
+                for r, v in zip(p.grid_tariffs, edited["RON/MWh"].tolist(), strict=True):
+                    r["ron_per_mwh"] = float(v)
+                state.mark_dirty("grid tariff table applied")
+                st.rerun()
+        B.caption("Applicability of the non-distribution rows per voltage level and the validity year are carried from the source sheet; "
+                  "EUR values shown on the off-taker forms are derived at the register FX")
         B.kpi_row([
             ("GC unit cost", p.gc_unit_cost, "EUR/MWh", "quota x reference price / FX (Input!C60)"),
             ("Regulated pass-through total", p.tariff_total, "EUR/MWh", "Input!C64 = sum of the components incl. GC"),

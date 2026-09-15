@@ -148,3 +148,43 @@ def test_cashflow_page_every_block():
     blocks.set_value(list(blocks.options))
     at.run()
     assert not at.exception
+
+
+def test_tables_carry_units_and_white_rows():
+    at = AppTest.from_string(_script("pnl"), default_timeout=240)
+    at.run()
+    assert not at.exception
+    html = " ".join(m.value for m in at.markdown)
+    assert '<th class="txt">Unit</th>' in html and '<td class="unit">EUR</td>' in html and '<td class="unit">MWh</td>' in html
+    assert "nth-child(even)" not in html  # no alternating fill: every row white (G5 request 1)
+
+
+def test_parameters_offtaker_dso_voltage_selection_applies():
+    at = AppTest.from_string(_script("parameters"), default_timeout=240)
+    at.run()
+    assert not at.exception
+    radios = [r for r in at.radio if r.key == "ot_OT1_tmode"]
+    assert radios
+    radios[0].set_value("By DSO and voltage level (grid tariff table)")
+    at.run()
+    assert not at.exception
+    [s for s in at.selectbox if s.key == "ot_OT1_dso"][0].set_value("Delgaz Grid")
+    [s for s in at.selectbox if s.key == "ot_OT1_vl"][0].set_value("LV (0,4 kV) DSO")
+    at.run()
+    [b for b in at.button if b.key == "ot_OT1_tapply"][0].click().run()
+    assert not at.exception
+    p = at.session_state["esb"].params
+    o = p.offtaker("OT1")
+    assert o.dso == "Delgaz Grid" and o.voltage_level == "LV (0,4 kV) DSO" and o.tariff_components is None
+    assert p.tariff_total_for(o) > p.tariff_total
+    text = " ".join(m.value for m in at.markdown)
+    assert "Grid tariff table" in text
+
+
+def test_parameters_pv_fixed_amount_is_editable_not_derived_checkbox():
+    at = AppTest.from_string(_script("parameters"), default_timeout=240)
+    at.run()
+    assert not at.exception
+    assert not [c for c in at.checkbox if "derived" in c.label.lower()]
+    fields = [t for t in at.text_input if t.key == "cp_pv_g_fixed"]
+    assert fields and not fields[0].disabled

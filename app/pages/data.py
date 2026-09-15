@@ -57,7 +57,7 @@ def render() -> None:
         o = p.offtaker(code)
         rows.append((f"{o.label} ({code})", "Active" if o.active else "Inactive", "yes" if c["metered"] else "no", "yes" if c["notified"] else "no"))
     df = pd.DataFrame(rows, columns=["Off-taker", "State", "Metered series", "Notified series"]).set_index("Off-taker")
-    B.table(df, index_label="Off-taker")
+    B.table(df, index_label="Off-taker")  # text table: no numbers
     pv = pd.DataFrame({"Loaded": ["yes" if v else "no" for v in cov.pv.values()]}, index=list(cov.pv))
     sc = pd.DataFrame({"Loaded": ["yes" if v else "no" for v in cov.scenarios.values()],
                        "Active": ["yes" if k == p.scenario_active else "" for k in cov.scenarios]}, index=list(cov.scenarios))

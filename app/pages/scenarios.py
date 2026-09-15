@@ -53,7 +53,9 @@ def render() -> None:
                 "Long share": float(np.mean(blk["direction"] == "Positive (Long)")),
             })
         df = pd.DataFrame(rows).set_index("Scenario")
-        B.table(df, index_label="Scenario", pct_rows=set(), decimals=2, decimals_by_col={"Negative DAM hours": 0})
+        B.table(df, index_label="Scenario", pct_rows=set(), decimals=2, decimals_by_col={"Negative DAM hours": 0},
+                col_units={"DAM mean (non-zero)": "EUR/MWh", "IDCT mean (non-zero)": "EUR/MWh", "Surplus mean": "EUR/MWh", "Deficit mean": "EUR/MWh", "DAM min": "EUR/MWh",
+                           "DAM max": "EUR/MWh", "Negative DAM hours": "h", "Long share": "share"})
         B.caption("Non-zero means as the workbook's row 3 (IFERROR(AVERAGEIF(range, '<>0'), 0)); the loaded Reference Case scenarios carry Surplus = Deficit (X-19)")
 
     active_prefix = SCENARIO_PREFIX.get(p.scenario_active)
@@ -98,7 +100,7 @@ def render() -> None:
                 first = df.columns[0]
                 for c in df.columns[1:]:
                     df[f"{c} - {first}"] = df[c] - df[first]
-            B.table(df, index_label="Year value (EUR)", decimals=0)
+            B.table(df, index_label="Year value", decimals=0, units=["EUR"] * len(df))
             state.add_log("run", f"scenario comparison on {', '.join(results)}")
     st.markdown("## Price columns of the contract")
     B.table(pd.DataFrame({"Unit": ["EUR/MWh"] * 4 + ["flag"], "Role": ["Day-ahead reference; curtailed twin MAX(p, 0)", "Intraday continuous VWAP 15 min; curtailed twin",

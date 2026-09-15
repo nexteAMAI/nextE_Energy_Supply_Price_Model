@@ -1,6 +1,6 @@
 # USER GUIDE - nextE Energy Supply Bid Management Tool
 
-Application v0.6.0 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
+Application v0.6.1 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
 supply portfolio, not for a developer. Every capability of the Excel model
 `Energy_Supply_Portfolio_Tracking_v03` is reachable through the twelve pages described here;
 nothing requires a command line.
@@ -62,6 +62,12 @@ Number fields are typed and shown in the Romanian convention (84,50; 1.234,56; 0
 groups thousands and the comma is the decimal separator. A single dot with other than three
 digits after it (0.21) is read as a decimal point; anything that is not a number is refused in
 place and the previous value is kept. Month-by-product grids follow the same rule.
+Every table shows the unit of measurement of every number: a Unit column after the line label, or the
+unit in the column header. Off-takers take their regulated tariff components from the grid tariff
+table by naming their distribution operator and metering-point voltage level (admin tab holds the
+table in RON/MWh); the portfolio set and a manual override remain available. The fixed guarantee
+amount of every counterparty is typed by the user; for the PV source the field shows the workbook
+derivation from the last run until a value is entered.
 Every metric label ends with the leg it belongs to: Retail (the off-taker book), Wholesale spot
 resell (surplus PV and Baseload sold to the market) or Total (both legs, and the cost-to-serve,
 financing and tax lines below Total GM2). Checks, market series and parameters carry no leg.

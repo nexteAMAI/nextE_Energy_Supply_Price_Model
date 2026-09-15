@@ -18,6 +18,25 @@ GUARANTEE_SIZINGS = ("Fixed", "% of Contract Value", "Coverage Months", "Dynamic
 GUARANTEE_TYPES = ("None", "Bank Guarantee Letter", "Cash Collateral", "Parent Company Guarantee")
 BGL_FEE_TYPES = ("Monthly", "One-time at issuance")
 COUNTERPARTIES = ("pv", "baseload", "spot", "brp", "tso", "dso")
+TARIFF_KEYS = ("TL", "TG", "SS", "T_HV", "T_MV", "T_LV", "cogeneration", "cfd", "excise")
+VOLTAGE_LEVELS = ("HV (>=110 kV) TSO", "HV (110 kV) DSO", "MV (6-20 kV) DSO", "LV (0,4 kV) DSO")
+
+
+def load_grid_tariffs(path: str | Path | None = None) -> dict:
+    """config/tariffs_ro.yaml: the RON/MWh grid tariff table with its operators, levels and provenance (D109)."""
+    path = Path(path) if path else Path(__file__).with_name("tariffs_ro.yaml")
+    with open(path, encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+def distribution_operators(rows: list[dict] | None = None) -> list[str]:
+    cfg = load_grid_tariffs()
+    listed = list(cfg.get("distribution_operators", []))
+    if rows:
+        for r in rows:
+            if r["component"] in ("T_HV", "T_MV", "T_LV") and r["owner"] not in listed:
+                listed.append(r["owner"])
+    return listed
 
 
 def _d(v) -> date:
@@ -74,6 +93,8 @@ class Offtaker:
     product_price_budget: dict[str, list[float]]
     product_price_forecast: dict[str, list[float]]
     tariff_components: dict[str, float] | None = None  # per-off-taker override of the portfolio tariff set (Input!C54:F63)
+    dso: str | None = None  # distribution operator serving the metering point (grid tariff table, D109)
+    voltage_level: str | None = None  # one of VOLTAGE_LEVELS; with dso set, the components are derived by the cascading rule
     name: str = ""  # display name, set in the application or a scenario file; never in the repository (F-035)
     position: int = 0  # merit-order position (1-based); 0 = by list order
 
@@ -166,6 +187,7 @@ class Parameters:
     offtakers: list[Offtaker]
     counterparties: dict[str, Counterparty]
     market_guarantees: dict
+    grid_tariffs: list[dict] = field(default_factory=list)  # RON/MWh rows by owner and component (config/tariffs_ro.yaml, D109)
 
     # ---- derived ----------------------------------------------------------------------
     @property
@@ -207,11 +229,43 @@ class Parameters:
         return t["T_HV"] + t["T_MV"] + t["T_LV"]  # Input!C127 basis (rows 57..59)
 
     def tariffs_for(self, o: Offtaker) -> dict[str, float]:
-        """The regulated component set of one off-taker (its own column of Input rows 54-63 or the portfolio set)."""
+        """The regulated component set of one off-taker: derived from the grid tariff table when the off-taker
+        names its DSO and voltage level (D109, cascading rule of the v1.1 template), else its own override
+        column (Input rows 54-63), else the portfolio set."""
+        if o.dso and o.voltage_level:
+            return self.tariffs_by_grid(o.dso, o.voltage_level)
         t = dict(self.tariff_components)
         if o.tariff_components:
             t.update({k: float(v) for k, v in o.tariff_components.items()})
         return t
+
+    def tariffs_by_grid(self, dso: str, voltage_level: str) -> dict[str, float]:
+        """EUR/MWh components at the register FX from the RON/MWh grid tariff table (v1.1 Dashboard_Input rows 304-313):
+        TL, TG, SS, cogeneration, CfD and excise per their applicability flags at the voltage level; the distribution
+        tariffs of the named DSO cascade (T_HV from HV DSO down, T_MV from MV DSO down, T_LV at LV DSO only).
+        A DSO without distribution rows is refused (blank is not zero)."""
+        if voltage_level not in VOLTAGE_LEVELS:
+            raise ValueError(f"voltage level '{voltage_level}' not in {VOLTAGE_LEVELS}")
+        lvl = VOLTAGE_LEVELS.index(voltage_level)  # 0 = HV TSO ... 3 = LV DSO
+        fx = float(self.general.fx_ron_per_eur)
+        out = {k: 0.0 for k in TARIFF_KEYS}
+        dso_rows = {r["component"]: r for r in self.grid_tariffs if r.get("owner") == dso and r["component"] in ("T_HV", "T_MV", "T_LV")}
+        for r in self.grid_tariffs:
+            comp = r["component"]
+            if comp in ("T_HV", "T_MV", "T_LV"):
+                continue
+            flags = r.get("applies") or [True, True, True, True]
+            if flags[lvl]:
+                out[comp] = float(r["ron_per_mwh"]) / fx
+        cascade = {"T_HV": lvl >= 1, "T_MV": lvl >= 2, "T_LV": lvl >= 3}
+        if any(cascade.values()) and not dso_rows:
+            raise ValueError(f"no distribution tariff rows for '{dso}' in the grid tariff table")
+        for comp, applies in cascade.items():
+            if applies:
+                if comp not in dso_rows:
+                    raise ValueError(f"grid tariff table lacks {comp} for '{dso}'")
+                out[comp] = float(dso_rows[comp]["ron_per_mwh"]) / fx
+        return out
 
     def tariff_total_for(self, o: Offtaker) -> float:
         t = self.tariffs_for(o)
@@ -249,6 +303,7 @@ class Parameters:
             offtakers=[Offtaker.from_dict(o) for o in d["offtakers"]],
             counterparties={k: Counterparty.from_dict(v) for k, v in d["counterparties"].items()},
             market_guarantees=d["market_guarantees"],
+            grid_tariffs=[dict(r) for r in (d.get("grid_tariffs") if d.get("grid_tariffs") is not None else load_grid_tariffs()["tariffs"])],
         )
 
     def to_dict(self) -> dict:
@@ -285,6 +340,7 @@ class Parameters:
             "offtakers": offtakers,
             "counterparties": counterparties,
             "market_guarantees": copy.deepcopy(self.market_guarantees),
+            "grid_tariffs": copy.deepcopy(self.grid_tariffs),
         }
 
     def copy(self) -> Parameters:
@@ -305,6 +361,18 @@ class Parameters:
                 errs.append(f"{o.code}: contract_end before contract_start")
             if o.payment_terms_days < 0 or not (0 <= o.advance_pct <= 1):
                 errs.append(f"{o.code}: payment terms or advance out of range")
+            if (o.dso is None) != (o.voltage_level is None):
+                errs.append(f"{o.code}: DSO and voltage level must be set together")
+            if o.dso and o.voltage_level:
+                try:
+                    self.tariffs_by_grid(o.dso, o.voltage_level)
+                except ValueError as e:
+                    errs.append(f"{o.code}: {e}")
+        for r in self.grid_tariffs:
+            if r.get("component") not in TARIFF_KEYS:
+                errs.append(f"grid tariff table: unknown component '{r.get('component')}'")
+            if r.get("ron_per_mwh") is None:
+                errs.append(f"grid tariff table: {r.get('owner')} {r.get('component')} has no value (blank is not zero)")
         return errs
 
 

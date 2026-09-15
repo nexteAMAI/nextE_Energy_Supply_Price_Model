@@ -8,7 +8,7 @@ import streamlit as st
 from app import brand as B
 from app import state as S
 from esb import __version__
-from esb.labels import RESELL, RETAIL, TOTAL, label, tagged
+from esb.labels import RESELL, RETAIL, TOTAL, label, tagged, unit_of
 
 OVERVIEW_ORDER = [
     "notified", "metered", "pv_buy_notified", "bl_buy_notified", "spot_buy_notified", "share_pv_bl", "price_pv", "price_bl", "price_spot",
@@ -51,7 +51,7 @@ def render() -> None:
     ])
 
     st.markdown("## Margins by leg")
-    B.eyebrow("Year values · budget vs forecast · EUR unless stated")
+    B.eyebrow("Year values · budget vs forecast · unit per line")
     ov = r.overview.table.copy()
     keep = [k for k in OVERVIEW_ORDER if k in ov.index]
     ov = ov.loc[keep]
@@ -62,7 +62,7 @@ def render() -> None:
     ov = ov.rename(columns=ren)
     ov.index = [label(k) for k in ov.index]
     B.table(ov, decimals=2, index_label="Line", pct_rows={label(k) for k in keep if k.endswith("_pct")},
-            total_rows={label("total_gm2"), label("nm")}, scroll=True)
+            total_rows={label("total_gm2"), label("nm")}, scroll=True, units=[unit_of(k) for k in keep])
     B.caption(f"Source: engine v{__version__} on the loaded series; delta = forecast - budget; percentages of revenue")
 
     c1, c2 = st.columns(2)
@@ -110,8 +110,8 @@ def render() -> None:
         else:
             ok, shown = abs(v) < 1e-6, B.num(v, 6)
         rows.append((label(k, leg=""), shown, B.status(ok)))
-    html = '<table class="esb"><thead><tr><th>Check</th><th>Value</th><th>State</th></tr></thead><tbody>'
-    html += "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in rows)
+    html = '<table class="esb"><thead><tr><th>Check</th><th class="txt">Unit</th><th>Value</th><th>State</th></tr></thead><tbody>'
+    html += "".join(f'<tr><td>{a}</td><td class="unit">{"EUR" if a not in (label("label_self_check", leg=""), label("strip_price_tripwire", leg="")) else "–"}</td><td>{b}</td><td>{c}</td></tr>' for a, b, c in rows)
     html += "</tbody></table>"
     st.markdown(html, unsafe_allow_html=True)
     all_ok = all(abs(v) < 1e-6 for k, v in checks.items() if k not in ("label_self_check", "strip_price_tripwire")) and checks["strip_price_tripwire"] == 0

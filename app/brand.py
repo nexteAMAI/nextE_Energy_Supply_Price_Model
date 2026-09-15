@@ -67,7 +67,8 @@ table.esb th {{ background: {NAVY}; color: {WHITE}; font-size: 11px; font-weight
 table.esb th:first-child, table.esb td:first-child {{ text-align: left; }}
 table.esb th.txt, table.esb td.txt {{ text-align: left; white-space: normal; }}
 table.esb td {{ padding: 0.28rem 0.5rem; border-bottom: 1px solid {LINE}; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }}
-table.esb tr:nth-child(even) td {{ background: {PAPER}; }}
+table.esb td {{ background: {WHITE}; }}
+table.esb td.unit {{ text-align: left; color: {MUTED}; font-size: 0.72rem; white-space: nowrap; }}
 table.esb tr.total td {{ font-weight: 700; border-top: 2px solid {INK}; }}
 .esb-scroll {{ overflow-x: auto; max-height: 560px; overflow-y: auto; border: 1px solid {LINE}; margin-bottom: 0.8rem; }}
 .esb-scroll table.esb {{ margin-bottom: 0; }}
@@ -261,23 +262,45 @@ def _fmt_cell(v, decimals: int, pct_row: bool) -> str:
 
 def table(df: pd.DataFrame, decimals: int = 2, index_label: str = "", pct_rows: set[str] | None = None,
           total_rows: set[str] | None = None, scroll: bool = False, decimals_by_col: dict[str, int] | None = None,
-          max_rows: int | None = None) -> None:
-    """Brand table: navy header, alternating rows, right-aligned tabular numerals, RO formats."""
-    pct_rows = pct_rows or set()
+          max_rows: int | None = None, units: list[str] | dict[str, str] | None = None,
+          col_units: dict[str, str] | None = None) -> None:
+    """Brand table: navy header, white rows, right-aligned tabular numerals, RO formats.
+
+    units: the unit of every row (list aligned with the rows, or dict by row label) - shown in a Unit column after
+    the label so every number in the table carries its unit of measurement (G5 request 2). A row whose unit is "%"
+    is formatted as a percentage. col_units: the unit of every column, shown in the header as "Column (unit)".
+    """
+    pct_rows = set(pct_rows or set())
     total_rows = total_rows or set()
     decimals_by_col = decimals_by_col or {}
+    col_units = col_units or {}
     d = df if max_rows is None else df.head(max_rows)
+    if isinstance(units, dict):
+        unit_list = [units.get(str(i), "") for i in d.index]
+    elif units is not None:
+        unit_list = [str(u) for u in list(units)[: len(d)]]
+    else:
+        unit_list = None
+    if unit_list is not None:
+        pct_rows |= {str(i) for i, u in zip(d.index, unit_list, strict=False) if u == "%"}
     text_cols = {c for c in d.columns if not pd.api.types.is_numeric_dtype(d[c]) and not pd.api.types.is_datetime64_any_dtype(d[c])
                  and all(isinstance(v, str) for v in d[c] if v is not None and v == v)}
     left = ' class="txt"'
-    head = f"<th>{index_label}</th>" + "".join(f"<th{left if c in text_cols else ''}>{c}</th>" for c in d.columns)
+
+    def _h(c) -> str:
+        u = col_units.get(str(c), "")
+        return f"{c} ({u})" if u else str(c)
+
+    head = f"<th>{index_label}</th>" + ('<th class="txt">Unit</th>' if unit_list is not None else "")
+    head += "".join(f"<th{left if c in text_cols else ''}>{_h(c)}</th>" for c in d.columns)
     rows = []
-    for idx, rec in d.iterrows():
+    for n, (idx, rec) in enumerate(d.iterrows()):
         key = str(idx)
         is_pct = key in pct_rows or key.endswith("_pct") or key.endswith(" %")
         cells = "".join(f"<td{left if c in text_cols else ''}>{_fmt_cell(v, decimals_by_col.get(str(c), decimals), is_pct)}</td>" for c, v in rec.items())
         cls = ' class="total"' if key in total_rows else ""
-        rows.append(f"<tr{cls}><td>{key}</td>{cells}</tr>")
+        ucell = f'<td class="unit">{unit_list[n] if n < len(unit_list) else ""}</td>' if unit_list is not None else ""
+        rows.append(f"<tr{cls}><td>{key}</td>{ucell}{cells}</tr>")
     html = f'<table class="esb"><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table>'
     if scroll:
         html = f'<div class="esb-scroll">{html}</div>'

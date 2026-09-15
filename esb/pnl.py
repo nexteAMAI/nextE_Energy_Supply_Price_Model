@@ -378,8 +378,10 @@ def build_pnl(qh: QHResult, params: Parameters) -> PnLResult:
         metered_year_by_offtaker={c: S[c].y("metered") for c in codes},
     )
     reg = gr.regulatory_amounts(params, reg_inp)
-    pv_fixed = float(P.m("cost_pv_budget").mean() + P.m("rs_pv_cost").mean())  # Input!C85
     cp = params.counterparties
+    pv_derived = float(P.m("cost_pv_budget").mean() + P.m("rs_pv_cost").mean())  # Input!C85 as the workbook derives it
+    # D110: the PV fixed amount is a user input; the workbook derivation is the default when the register holds none
+    pv_fixed = float(cp["pv"].guarantee.fixed_amount) if cp["pv"].guarantee.fixed_amount is not None else pv_derived
     bases = {"pv": P.y("t_revenue"), "baseload": P.y("cost_bl_forecast") + P.y("rs_bl_cost_forecast"), "spot": P.y("t_revenue"),
              "brp": P.y("t_revenue"), "tso": P.y("t_revenue"), "dso": P.y("t_revenue")}
     required = {"pv": None, "baseload": None, **reg.by_counterparty()}
