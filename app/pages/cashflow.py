@@ -11,6 +11,7 @@ from app import brand as B
 from app import state as S
 from esb.cashflow import CF_ROWS
 from esb.labels import TOTAL, label, tagged, unit_of
+from esb.layout import roles_for
 
 ROWMAP = {v: k for k, v in CF_ROWS.items()}
 GROUPS = {
@@ -29,6 +30,8 @@ def _frame(cf, keys) -> pd.DataFrame:
     df = pd.DataFrame(rows, index=[*B.MONTH_EN, "Beyond Dec", "Year"]).T
     df.index = [label(k, fallback=TOTAL) + (f" [{ROWMAP[k]}]" if k in ROWMAP else "") for k in df.index]
     df.attrs["units"] = [unit_of(k) for k in rows]
+    roles = roles_for("CF_Mth")
+    df.attrs["roles"] = [roles.get(k, "data") for k in rows]
     return df
 
 
@@ -72,12 +75,12 @@ def render() -> None:
     for name in which:
         B.eyebrow(f"{name} · workbook row in brackets")
         fr = _frame(cf, GROUPS[name])
-        B.table(fr, index_label="Line", scroll=len(GROUPS[name]) > 12, units=fr.attrs["units"])
+        B.table(fr, index_label="Line", scroll=len(GROUPS[name]) > 12, units=fr.attrs["units"], roles=fr.attrs["roles"])
     B.eyebrow("Per off-taker receipts")
     keys = [k for k in cf.rows if k.endswith("_in_energy") or k.endswith("_in_passthrough") or k.endswith("_acc_revenue")]
     df = pd.DataFrame({k: cf.rows[k] for k in keys}, index=[*B.MONTH_EN, "Beyond Dec", "Year"]).T
     df.index = [f"{p.offtaker(k.split('_')[0]).label} - {label(k)}" for k in df.index]
-    B.table(df, index_label="Line", scroll=True, units=[unit_of(k) for k in keys])
+    B.table(df, index_label="Line", scroll=True, units=[unit_of(k) for k in keys], roles=[roles_for("CF_Mth").get(k, "data") for k in keys])
     B.caption("Settlement key of each line: the month containing month end + payment terms; December with terms > 0 settles beyond December (column N)")
 
     st.markdown("## Daily ledger")
@@ -91,10 +94,11 @@ def render() -> None:
         B.caption("CF_Daily_Ledger columns X, AB, V; EUR; settlement days = month end + terms, taxes on the payment day")
         summ = pd.DataFrame({"Value": list(ds.values())}, index=[label(k, fallback=TOTAL) for k in ds])
         summ_units = [unit_of(k) for k in ds]
+        summ_roles = [roles_for("CF_Daily_Ledger").get(k, "data") for k in ds]
         c1, c2 = st.columns([1, 2])
         with c1:
             B.eyebrow("Ledger summary")
-            B.table(summ, index_label="Item", units=summ_units)
+            B.table(summ, index_label="Item", units=summ_units, roles=summ_roles, granularity="daily")
             ok = abs(ds.get("check_net_cf", 0.0)) < 1e-4 and abs(ds.get("check_receipts", 0.0)) < 1e-4
             st.markdown(f"Ledger reconciles to the monthly table: {B.status(ok)}", unsafe_allow_html=True)
         with c2:
@@ -104,4 +108,4 @@ def render() -> None:
             show = show.set_index("date")
             cu = {label(c, fallback=TOTAL): unit_of(c) for c in show.columns}
             show.columns = [label(c, fallback=TOTAL) for c in show.columns]
-            B.table(show, index_label="Date", decimals=0, scroll=True, max_rows=60, col_units=cu)
+            B.table(show, index_label="Date", decimals=0, scroll=True, max_rows=60, col_units=cu, granularity="daily")

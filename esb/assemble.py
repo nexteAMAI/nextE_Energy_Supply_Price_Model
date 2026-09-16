@@ -29,6 +29,7 @@ class Coverage:
     offtakers: dict[str, dict[str, bool]] = field(default_factory=dict)  # code -> {metered, notified}
     pv: dict[str, bool] = field(default_factory=dict)
     scenarios: dict[str, bool] = field(default_factory=dict)  # scenario name -> loaded
+    notes: list[str] = field(default_factory=list)  # informational (not refusals)
     baseload_nomination: list[str] = field(default_factory=list)  # slot names present (not consumed by the engine)
     problems: list[str] = field(default_factory=list)
 
@@ -94,14 +95,29 @@ def assemble(params: Parameters, imports: list[tuple[ImportResult, str | None]],
         cls = res.provenance.input_class
         slot_names = [s.name for s in res.registry.slots]
         if cls == "wholesale_prices":
-            prefix = scenario_prefix_of(res.provenance.scenario, choice)
-            if prefix is None:
-                cov.problems.append(f"{res.provenance.filename}: scenario not identified (Std_Control scenario "
-                                    f"'{res.provenance.scenario}') - choose Aurora Central, Aurora Low or User Forecast")
-                continue
-            for name in slot_names:
-                if name in f.columns:
-                    out[f"{prefix}__{name}"] = f[name].to_numpy()
+            blocks = res.provenance.scenario_blocks
+            if blocks:  # 1.1 (D112): one file, several scenario blocks keyed by scenario_name
+                unmapped = []
+                for block in blocks:
+                    prefix = scenario_prefix_of(block, choice if len(blocks) == 1 else None)
+                    if prefix is None:
+                        unmapped.append(block)
+                        continue
+                    for s in res.registry.slots:
+                        if s.scenario_name == block and s.frame_name in f.columns:
+                            out[f"{prefix}__{s.name}"] = f[s.frame_name].to_numpy()
+                if unmapped:  # informational, not a refusal: the blocks are kept in the upload, unused until the scenario library (Phase 7)
+                    cov.notes.append(f"{res.provenance.filename}: scenario block(s) {unmapped} are not one of the application's scenarios "
+                                     f"({', '.join(SCENARIO_PREFIX)}) and are not used")
+            else:
+                prefix = scenario_prefix_of(res.provenance.scenario, choice)
+                if prefix is None:
+                    cov.problems.append(f"{res.provenance.filename}: scenario not identified (Std_Control scenario "
+                                        f"'{res.provenance.scenario}') - choose Aurora Central, Aurora Low or User Forecast")
+                    continue
+                for name in slot_names:
+                    if name in f.columns:
+                        out[f"{prefix}__{name}"] = f[name].to_numpy()
         else:
             for name in slot_names:
                 if name in f.columns:
@@ -109,8 +125,9 @@ def assemble(params: Parameters, imports: list[tuple[ImportResult, str | None]],
             if cls == "baseload_nomination":
                 cov.baseload_nomination += [n for n in slot_names if n in f.columns]
         sources.append({"kind": cls, "filename": res.provenance.filename, "md5": res.provenance.md5,
-                        "scenario": res.provenance.scenario, "time_basis": res.provenance.time_basis,
-                        "imported_at_utc": res.provenance.imported_at_utc, "k": res.provenance.k})
+                        "scenario": res.provenance.scenario or ", ".join(res.provenance.scenario_blocks), "time_basis": res.provenance.time_basis,
+                        "imported_at_utc": res.provenance.imported_at_utc, "k": res.provenance.k,
+                        "not_delivered": list(res.provenance.not_delivered), "rows": int(len(f))})
 
     # ---- coverage --------------------------------------------------------------------------
     for o in params.offtakers:

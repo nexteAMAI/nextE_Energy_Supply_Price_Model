@@ -9,6 +9,7 @@ import streamlit as st
 from app import brand as B
 from app import state as S
 from esb.labels import RESELL, RETAIL, TOTAL, label, tagged, unit_of
+from esb.layout import roles_for
 from esb.pnl import SECTION_ROWS, WORKBOOK_ROWS
 
 GROUPS = {
@@ -71,6 +72,8 @@ def _frame(T, keys, rowmap: dict | None = None, position: int | None = None) -> 
         labels.append((label(k, leg=RETAIL) if position is not None else label(k)) + ref)
     df.index = labels
     df.attrs["units"] = [unit_of(k) for k in rows]
+    roles = roles_for("Cons_P&L", "section" if position is not None else "portfolio")
+    df.attrs["roles"] = [roles.get(k, "data") for k in rows]
     return df
 
 
@@ -102,7 +105,8 @@ def render() -> None:
     for name in which:
         B.eyebrow(f"{name} · workbook row in brackets")
         df = _frame(P, GROUPS[name], WORKBOOK_ROWS)
-        B.table(df, index_label="Line", scroll=len(df) > 14, pct_rows={i for i in df.index if "%" in i or "pct" in i}, units=df.attrs["units"])
+        B.table(df, index_label="Line", scroll=len(df) > 14, pct_rows={i for i in df.index if "%" in i or "pct" in i}, units=df.attrs["units"],
+                roles=df.attrs["roles"])
     B.caption("Unit per line in the Unit column; year column per the workbook rule (sum, last, max or mean)")
 
     st.markdown("## Off-taker sections")
@@ -119,11 +123,11 @@ def render() -> None:
     for name, keys in SECTION_GROUPS.items():
         with st.expander(name, expanded=name == "Revenue and margins"):
             df = _frame(T, keys, position=pos)
-            B.table(df, index_label="Line", pct_rows={i for i in df.index if "%" in i}, units=df.attrs["units"])
+            B.table(df, index_label="Line", pct_rows={i for i in df.index if "%" in i}, units=df.attrs["units"], roles=df.attrs["roles"])
     B.caption("Section rows are addressed relative to the position-1 anchor (row 266, pitch 136); references in brackets are the Reference Case layout")
 
     st.markdown("## Checks")
     df = _frame(P, GROUPS["Checks"], WORKBOOK_ROWS)
     ok = bool((df["Year"].abs() < 1e-6 * max(1.0, abs(P.y("t_revenue")))).all())
     st.markdown(f"All P&L checks: {B.status(ok)}", unsafe_allow_html=True)
-    B.table(df[["Year"]], index_label="Check", decimals=6, units=df.attrs["units"])
+    B.table(df[["Year"]], index_label="Check", decimals=6, units=df.attrs["units"], roles=df.attrs["roles"])

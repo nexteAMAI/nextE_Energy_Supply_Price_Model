@@ -100,11 +100,11 @@ def check_energy(labelled: pd.DataFrame, std: pd.DataFrame, registry: Registry) 
             continue
         n += 1
         raw_total = float(pd.to_numeric(labelled[col], errors="coerce").sum())
-        std_total = float(std[s.name].sum())
+        std_total = float(std[s.frame_name].sum())
         if not _within(std_total, raw_total):
             items.append(f"{s.name}: year {std_total:.6f} vs raw {raw_total:.6f}")
         raw_day = pd.to_numeric(labelled[col], errors="coerce").groupby(labelled["date"].values).sum()
-        std_day = std.groupby(std["date"].dt.date.values)[s.name].sum()
+        std_day = std.groupby(std["date"].dt.date.values)[s.frame_name].sum()
         diff = (std_day.reindex(raw_day.index).fillna(0) - raw_day).abs()
         tol = TOL_REL * np.maximum(raw_day.abs(), TOL_FLOOR)
         bad = diff[diff > tol]
@@ -117,9 +117,9 @@ def check_gaps(std: pd.DataFrame, registry: Registry) -> CheckResult:
     items: list[str] = []
     optional_blanks: dict[str, int] = {}
     for s in registry.slots:
-        if s.name not in std.columns:
+        if s.frame_name not in std.columns:
             continue
-        col = std[s.name]
+        col = std[s.frame_name]
         blanks = col.isna() if s.cls != "Categorical" else col.isna() | (col.astype(object) == "")
         nb = int(blanks.sum())
         if nb == 0:

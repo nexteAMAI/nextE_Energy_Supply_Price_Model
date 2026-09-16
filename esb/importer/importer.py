@@ -39,6 +39,8 @@ class Provenance:
     k: dict[str, int]
     imported_at_utc: str
     checks: list[dict] = field(default_factory=list)
+    not_delivered: list[str] = field(default_factory=list)  # 1.1 (D112): declared slots with an entirely blank column
+    scenario_blocks: list[str] = field(default_factory=list)  # 1.1: scenario names found in the registry (wholesale)
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), indent=2, default=str)
@@ -99,5 +101,7 @@ def import_workbook(path: str | Path) -> ImportResult:
         k={s.name: s.k for s in delivery.registry.slots if s.k is not None},
         imported_at_utc=datetime.now(UTC).isoformat(timespec="seconds"),
         checks=[{"code": c.code, "name": c.name, "status": c.status, "detail": c.detail} for c in checks],
+        not_delivered=list(delivery.not_delivered),
+        scenario_blocks=sorted({s.scenario_name for s in delivery.registry.slots if s.scenario_name}),
     )
     return ImportResult(ok=ok, checks=checks, frame=std if ok else None, provenance=prov, control=delivery.control, registry=delivery.registry)

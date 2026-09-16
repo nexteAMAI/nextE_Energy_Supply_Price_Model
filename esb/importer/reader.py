@@ -38,6 +38,7 @@ class RawDelivery:
     formula_cells: list[str] = field(default_factory=list)
     undeclared_columns: list[str] = field(default_factory=list)
     non_numeric: dict[str, int] = field(default_factory=dict)  # slot -> count of non-numeric cells
+    not_delivered: list[str] = field(default_factory=list)  # 1.1: declared slots whose RAW column is entirely blank (D112)
 
 
 def file_md5(path: Path) -> str:
@@ -156,6 +157,8 @@ def _read_registry(ws) -> tuple[Registry, list[str]]:
                     paired_volume_slot=(str(cell("paired_volume_slot")).strip() or None) if cell("paired_volume_slot") else None,
                     k=int(k) if k is not None else None,
                     basis=(str(cell("basis")).strip() or None) if cell("basis") else None,
+                    scenario_name=(str(cell("scenario_name")).strip() or None) if cell("scenario_name") else None,
+                    entity_name=(str(cell("entity_name") or cell("entity_name_reference") or "").strip() or None),
                     entity_code=(str(cell("entity_code")).strip() or None) if cell("entity_code") else None,
                     required=str(cell("required") or "Y").strip().upper() != "N",
                     notes=str(cell("notes") or ""),
@@ -224,6 +227,16 @@ def read_workbook(path: str | Path) -> RawDelivery:
             problems.append(f"RAW_EET_QH date/time column unreadable: {e}")
     keep = list(RAW_FIXED_COLUMNS) + [c for c in slot_cols if c in declared]
     df = df[[c for c in keep if c in df.columns]]
+    not_delivered: list[str] = []
+    if control.contract_11:  # D112: an entirely blank declared column is "not delivered", never a gap and never zero
+        for spec in list(registry.slots):
+            col = df[spec.slot] if spec.slot in df.columns else None
+            blank = col is None or bool(col.map(lambda v: v is None or v == "" or (isinstance(v, float) and v != v)).all())
+            if blank:
+                not_delivered.append(spec.slot)
+        if not_delivered:
+            registry = Registry([s for s in registry.slots if s.slot not in not_delivered])
+            df = df[[c for c in df.columns if c not in not_delivered]]
     non_numeric: dict[str, int] = {}
     for spec in registry.slots:
         if spec.slot in df.columns:
@@ -248,6 +261,7 @@ def read_workbook(path: str | Path) -> RawDelivery:
         header=header,
         problems=problems,
         formula_cells=formula_cells,
+        not_delivered=not_delivered,
         undeclared_columns=sorted(undeclared_seen),
         non_numeric=non_numeric,
     )

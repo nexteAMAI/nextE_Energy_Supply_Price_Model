@@ -1,6 +1,6 @@
 # USER GUIDE - nextE Energy Supply Bid Management Tool
 
-Application v0.6.1 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
+Application v0.7.0 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
 supply portfolio, not for a developer. Every capability of the Excel model
 `Energy_Supply_Portfolio_Tracking_v03` is reachable through the twelve pages described here;
 nothing requires a command line.
@@ -122,10 +122,15 @@ off-taker or a what-if. Cost to serve and the forecast premium use the corrected
 decisions D87 and D88.
 
 ### 11 - Exports
-Excel workbook of the run (Portf Overview, Cons_P&L, CF_Mth, CF_Daily_Ledger, one pricing
-sheet per off-taker, guarantees, daily QH aggregates, parameters, provenance; the full QH
-frame on request), CSV files (semicolon, decimal comma), the case bundle and the parity
-report. The case bundle is one zip with the scenario file, every accepted upload, the
+Excel workbook of the run in the house output layout (Portf Overview, Cons_P&L, CF_Mth,
+CF_Daily_Ledger, one pricing sheet per off-taker, guarantees, QH_daily, parameters,
+provenance; the full quarter-hour frame QH_full on request - about 54 MB, allow half a
+minute). Every sheet carries the CONFIDENTIAL banner, the sheet title, a subtitle and, in
+row 4, the engine version, scenario, year and export time; the header row is row 6, column B
+is the unit of every line, values are formatted with their unit (1.234 MWh, 84,50 €/MWh),
+totals are navy, reconciliation checks show six decimals, and the off-taker blocks repeat
+once per off-taker with the display name in the block header. CSV files (semicolon, decimal
+comma), the case bundle and the parity report are unchanged. The case bundle is one zip with the scenario file, every accepted upload, the
 provenance and the headline results; re-uploading it on this page re-imports the deliveries,
 re-runs the engine and states whether the headline values were reproduced. A number that
 cannot be reproduced is not put in front of an off-taker.

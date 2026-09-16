@@ -70,6 +70,10 @@ table.esb td {{ padding: 0.28rem 0.5rem; border-bottom: 1px solid {LINE}; text-a
 table.esb td {{ background: {WHITE}; }}
 table.esb td.unit {{ text-align: left; color: {MUTED}; font-size: 0.72rem; white-space: nowrap; }}
 table.esb tr.total td {{ font-weight: 700; border-top: 2px solid {INK}; }}
+table.esb tr.subtotal td {{ font-weight: 700; }}
+table.esb tr.memo td {{ font-style: italic; color: {MUTED}; }}
+table.esb tr.check td {{ color: {MUTED}; }}
+table.esb tr.section td {{ font-weight: 700; color: {NAVY}; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.7rem; border-bottom: 2px solid {NAVY}; }}
 .esb-scroll {{ overflow-x: auto; max-height: 560px; overflow-y: auto; border: 1px solid {LINE}; margin-bottom: 0.8rem; }}
 .esb-scroll table.esb {{ margin-bottom: 0; }}
 .esb-scroll table.esb th {{ position: sticky; top: 0; }}
@@ -260,15 +264,27 @@ def _fmt_cell(v, decimals: int, pct_row: bool) -> str:
     return num(v, decimals)
 
 
+UNIT_DECIMALS = {  # decimals by unit and granularity - the number-format catalogue of the output workbook (D113)
+    "monthly": {"EUR": 0, "MWh": 0, "MW": 1, "EUR/MWh": 2, "%": 1, "check": 6, "ratio": 4, "GC": 0, "GC/MWh": 3, "RON/GC": 4, "RON/EUR": 4, "EUR/GC": 2, "days": 0, "#": 0},
+    "daily": {"EUR": 0, "MWh": 3, "MW": 1, "EUR/MWh": 2, "%": 1, "check": 6, "ratio": 4, "days": 0, "#": 0},
+    "qh": {"EUR": 2, "MWh": 4, "MW": 3, "EUR/MWh": 2, "%": 1, "check": 6, "ratio": 4, "#": 0},
+}
+ROLE_CLASSES = ("total", "subtotal", "memo", "check", "section")
+
+
 def table(df: pd.DataFrame, decimals: int = 2, index_label: str = "", pct_rows: set[str] | None = None,
           total_rows: set[str] | None = None, scroll: bool = False, decimals_by_col: dict[str, int] | None = None,
           max_rows: int | None = None, units: list[str] | dict[str, str] | None = None,
-          col_units: dict[str, str] | None = None) -> None:
+          col_units: dict[str, str] | None = None, roles: list[str] | dict[str, str] | None = None,
+          granularity: str = "monthly") -> None:
     """Brand table: navy header, white rows, right-aligned tabular numerals, RO formats.
 
     units: the unit of every row (list aligned with the rows, or dict by row label) - shown in a Unit column after
     the label so every number in the table carries its unit of measurement (G5 request 2). A row whose unit is "%"
-    is formatted as a percentage. col_units: the unit of every column, shown in the header as "Column (unit)".
+    is formatted as a percentage, and the decimals of every row follow its unit and the table's granularity
+    (UNIT_DECIMALS - the output-workbook catalogue; `decimals` is the fallback for units outside it).
+    col_units: the unit of every column, shown in the header as "Column (unit)". roles: the role of every row
+    (total, subtotal, memo, check, section, data) - rows stay white; a role changes weight, rule and tone only.
     """
     pct_rows = set(pct_rows or set())
     total_rows = total_rows or set()
@@ -281,6 +297,13 @@ def table(df: pd.DataFrame, decimals: int = 2, index_label: str = "", pct_rows: 
         unit_list = [str(u) for u in list(units)[: len(d)]]
     else:
         unit_list = None
+    if isinstance(roles, dict):
+        role_list = [roles.get(str(i), "data") for i in d.index]
+    elif roles is not None:
+        role_list = [str(x) for x in list(roles)[: len(d)]]
+    else:
+        role_list = None
+    unit_dec = UNIT_DECIMALS.get(granularity, UNIT_DECIMALS["monthly"])
     if unit_list is not None:
         pct_rows |= {str(i) for i, u in zip(d.index, unit_list, strict=False) if u == "%"}
     text_cols = {c for c in d.columns if not pd.api.types.is_numeric_dtype(d[c]) and not pd.api.types.is_datetime64_any_dtype(d[c])
@@ -297,8 +320,10 @@ def table(df: pd.DataFrame, decimals: int = 2, index_label: str = "", pct_rows: 
     for n, (idx, rec) in enumerate(d.iterrows()):
         key = str(idx)
         is_pct = key in pct_rows or key.endswith("_pct") or key.endswith(" %")
-        cells = "".join(f"<td{left if c in text_cols else ''}>{_fmt_cell(v, decimals_by_col.get(str(c), decimals), is_pct)}</td>" for c, v in rec.items())
-        cls = ' class="total"' if key in total_rows else ""
+        row_dec = unit_dec.get(unit_list[n], decimals) if unit_list is not None and n < len(unit_list) else decimals
+        cells = "".join(f"<td{left if c in text_cols else ''}>{_fmt_cell(v, decimals_by_col.get(str(c), row_dec), is_pct)}</td>" for c, v in rec.items())
+        role = role_list[n] if role_list is not None and n < len(role_list) else ("total" if key in total_rows else "")
+        cls = f' class="{role}"' if role in ROLE_CLASSES else ""
         ucell = f'<td class="unit">{unit_list[n] if n < len(unit_list) else ""}</td>' if unit_list is not None else ""
         rows.append(f"<tr{cls}><td>{key}</td>{ucell}{cells}</tr>")
     html = f'<table class="esb"><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table>'

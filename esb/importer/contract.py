@@ -9,7 +9,7 @@ Workbook layout produced by esb.importer.template and read by esb.importer.reade
 
 * `Instructions`  - text for the person filling the file
 * `Std_Control`   - key / value block (see CONTROL_KEYS)
-* `Series_Registry` - one row per slot E01..E40 (numeric) and C01..C10 (categorical)
+* `Series_Registry` - one row per slot E01.. (numeric) and C01.. (categorical); any width of the number (E01, E001, E0001)
 * `RAW_EET_QH`    - row 1 headers `Date_EET | Start_EET | End_EET | E01 | ... | C01 | ...`;
                     data from row 2; values only, no formulas
 * `Recon_Check`   - convenience gate for the person filling the file (counts); the binding
@@ -20,7 +20,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-TEMPLATE_VERSION = "ESB-STD-QH 1.0"
+TEMPLATE_VERSION = "ESB-STD-QH 1.1"  # written into new templates
+TEMPLATE_VERSIONS = ("ESB-STD-QH 1.0", "ESB-STD-QH 1.1")
+# 1.1 (D112, 16.09.2026): optional registry columns scenario_name (wholesale: several scenario blocks per file,
+# series keyed by scenario_name + name) and entity_name (reference only, never read into the engine); a declared
+# slot whose RAW column is entirely blank counts as NOT DELIVERED (listed in provenance), not as a gap.
 
 # ---- vocabulary --------------------------------------------------------------------------
 CLASSES = ("Extensive", "Intensive", "Categorical")
@@ -67,15 +71,16 @@ REGISTRY_COLUMNS = (
     "required",
     "notes",
 )
+OPTIONAL_REGISTRY_COLUMNS = ("scenario_name", "entity_name")
 
 RAW_FIXED_COLUMNS = ("Date_EET", "Start_EET", "End_EET")
-MAX_E_SLOTS = 40
+MAX_E_SLOTS = 40  # of the 1.0 template; 1.1 files declare as many slots as they carry (D112)
 MAX_C_SLOTS = 10
 
 
 @dataclass
 class SlotSpec:
-    slot: str  # E01..E40 or C01..C10
+    slot: str  # E01.. or C01.. (any digit width)
     name: str
     unit: str
     cls: str  # Extensive | Intensive | Categorical
@@ -84,6 +89,8 @@ class SlotSpec:
     paired_volume_slot: str | None = None
     k: int | None = None
     basis: str | None = None
+    scenario_name: str | None = None  # 1.1: wholesale scenario block this slot belongs to
+    entity_name: str | None = None  # 1.1: reference only (names never enter the engine or the repository)
     entity_code: str | None = None
     required: bool = True
     notes: str = ""
@@ -91,6 +98,11 @@ class SlotSpec:
     @property
     def is_volume(self) -> bool:
         return self.unit in VOLUME_UNITS and self.basis in ("metered", "notified", "forecast", "nomination")
+
+    @property
+    def frame_name(self) -> str:
+        """Column name in the standardised frame: the series name, prefixed by the scenario block (1.1)."""
+        return f"{self.scenario_name}__{self.name}" if self.scenario_name else self.name
 
     def validate(self) -> list[str]:
         errs: list[str] = []
@@ -141,9 +153,13 @@ class Control:
             errs.append("intervals_per_day must be 96")
         if int(self.offset_eet_cet_h) != 1:
             errs.append("offset_eet_cet_h must be 1")
-        if not str(self.template_version).startswith("ESB-STD-QH"):
-            errs.append(f"template_version '{self.template_version}' not recognised")
+        if str(self.template_version).strip() not in TEMPLATE_VERSIONS:
+            errs.append(f"template_version '{self.template_version}' not in {TEMPLATE_VERSIONS}")
         return errs
+
+    @property
+    def contract_11(self) -> bool:
+        return str(self.template_version).strip() == "ESB-STD-QH 1.1"
 
 
 @dataclass
@@ -161,9 +177,10 @@ class Registry:
             if s.slot in seen:
                 errs.append(f"{s.slot}: declared twice")
             seen.add(s.slot)
-            if s.name in names:
-                errs.append(f"{s.slot}: name '{s.name}' used twice")
-            names.add(s.name)
+            key = (s.scenario_name or "", s.name)
+            if key in names:
+                errs.append(f"{s.slot}: name '{s.name}' used twice" + (f" in scenario '{s.scenario_name}'" if s.scenario_name else ""))
+            names.add(key)
             errs.extend(s.validate())
         by = self.by_slot()
         for s in self.slots:
@@ -177,6 +194,10 @@ class Registry:
 
 
 # ---- presets per input class ----------------------------------------------------------------
+def _c(i: int, width: int = 2) -> str:
+    return f"C{i:0{width}d}"
+
+
 def _e(i: int) -> str:
     return f"E{i:02d}"
 
@@ -274,29 +295,27 @@ def baseload_nomination_registry(entity_codes: list[str]) -> Registry:
     return Registry(slots)
 
 
-def wholesale_prices_registry() -> Registry:
-    return Registry(
-        [
-            SlotSpec(_e(1), "DAM_price_EUR_MWh", "EUR/MWh", "Intensive", "interpolate", "mean", basis="price"),
-            SlotSpec(_e(2), "IDCT_VWAP15_price_EUR_MWh", "EUR/MWh", "Intensive", "interpolate", "mean", basis="price"),
-            SlotSpec(_e(3), "Surplus_imbalance_price_EUR_MWh", "EUR/MWh", "Intensive", "interpolate", "mean", basis="price"),
-            SlotSpec(_e(4), "Deficit_imbalance_price_EUR_MWh", "EUR/MWh", "Intensive", "interpolate", "mean", basis="price"),
-            SlotSpec(
-                "C01",
-                "System_imbalance_direction",
-                "flag",
-                "Categorical",
-                "carry_forward",
-                "first",
-                basis="flag",
-                required=False,
-                notes="'Positive (Long)' | 'Negative (Short)' | 'Balanced'",
-            ),
+def wholesale_prices_registry(scenarios: list[str] | None = None) -> Registry:
+    """One block of five series per scenario (1.1, D112): DAM, IDCT VWAP15, surplus and deficit imbalance prices and the
+    system direction flag. Without scenarios: the single unnamed block of contract 1.0."""
+    blocks = scenarios or [None]
+    slots: list[SlotSpec] = []
+    e = c = 1
+    for sc in blocks:
+        slots += [
+            SlotSpec(_e(e), "DAM_price_EUR_MWh", "EUR/MWh", "Intensive", "interpolate", "mean", basis="price", scenario_name=sc),
+            SlotSpec(_e(e + 1), "IDCT_VWAP15_price_EUR_MWh", "EUR/MWh", "Intensive", "interpolate", "mean", basis="price", scenario_name=sc),
+            SlotSpec(_e(e + 2), "Surplus_imbalance_price_EUR_MWh", "EUR/MWh", "Intensive", "interpolate", "mean", basis="price", scenario_name=sc),
+            SlotSpec(_e(e + 3), "Deficit_imbalance_price_EUR_MWh", "EUR/MWh", "Intensive", "interpolate", "mean", basis="price", scenario_name=sc),
+            SlotSpec(_c(c), "System_imbalance_direction", "flag", "Categorical", "carry_forward", "first", basis="flag", required=False,
+                     scenario_name=sc, notes="'Positive (Long)' | 'Negative (Short)' | 'Balanced'"),
         ]
-    )
+        e += 4
+        c += 1
+    return Registry(slots)
 
 
-def preset_registry(input_class: str, entity_codes: list[str] | None = None) -> Registry:
+def preset_registry(input_class: str, entity_codes: list[str] | None = None, scenarios: list[str] | None = None) -> Registry:
     codes = entity_codes or ["OT1", "OT2", "OT3", "OT4"]
     if input_class == "offtaker_load":
         return offtaker_load_registry(codes)
@@ -305,5 +324,5 @@ def preset_registry(input_class: str, entity_codes: list[str] | None = None) -> 
     if input_class == "baseload_nomination":
         return baseload_nomination_registry(codes)
     if input_class == "wholesale_prices":
-        return wholesale_prices_registry()
+        return wholesale_prices_registry(scenarios)
     raise ValueError(f"unknown input_class {input_class}")

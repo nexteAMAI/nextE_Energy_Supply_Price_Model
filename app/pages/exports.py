@@ -8,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from app import auth
 from app import brand as B
 from app import state as S
 from esb.bundle import CaseBundle, compare_summary, read_bundle
@@ -33,7 +34,8 @@ def render() -> None:
         if st.button("Build the Excel workbook", type="primary"):
             with st.spinner("Writing the workbook"):
                 data = build_workbook(r, include_qh=include_qh, scenario_name=f"{state.scenario.name} v{state.scenario.version}",
-                                      provenance=state.series.sources if state.series else None)
+                                      provenance=state.series.sources if state.series else None,
+                                      requested_by=str(st.session_state.get(auth.USER, "")))
             st.session_state["xlsx_export"] = (stamp, data)
             state.add_log("export", f"Excel workbook built ({len(data):,} bytes)".replace(",", "."))
         x = st.session_state.get("xlsx_export")

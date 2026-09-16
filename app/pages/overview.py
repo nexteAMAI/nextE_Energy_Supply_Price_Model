@@ -9,6 +9,7 @@ from app import brand as B
 from app import state as S
 from esb import __version__
 from esb.labels import RESELL, RETAIL, TOTAL, label, tagged, unit_of
+from esb.layout import roles_for
 
 OVERVIEW_ORDER = [
     "notified", "metered", "pv_buy_notified", "bl_buy_notified", "spot_buy_notified", "share_pv_bl", "price_pv", "price_bl", "price_spot",
@@ -62,7 +63,8 @@ def render() -> None:
     ov = ov.rename(columns=ren)
     ov.index = [label(k) for k in ov.index]
     B.table(ov, decimals=2, index_label="Line", pct_rows={label(k) for k in keep if k.endswith("_pct")},
-            total_rows={label("total_gm2"), label("nm")}, scroll=True, units=[unit_of(k) for k in keep])
+            total_rows={label("total_gm2"), label("nm")}, scroll=True, units=[unit_of(k, "overview") for k in keep],
+            roles=[roles_for("Portf Overview", "overview").get(k, "data") for k in keep])
     B.caption(f"Source: engine v{__version__} on the loaded series; delta = forecast - budget; percentages of revenue")
 
     c1, c2 = st.columns(2)

@@ -68,7 +68,7 @@ ABBREVIATIONS = {
     "gm1": "GM1", "gm2": "GM2", "nm": "NM", "pv": "PV", "bl": "Baseload", "rs": "Resell", "cit": "CIT", "vat": "VAT", "bgl": "BGL",
     "imb": "imbalance", "pct": "%", "mw": "MW", "mwh": "MWh", "cf": "cash flow", "acc": "accrual", "in": "receipts", "out": "payments",
     "key": "settlement key", "t": "total", "f": "forecast", "spec": "specific", "fx": "FX", "gc": "GC", "opex": "OPEX", "qh": "QH",
-    "eur": "EUR", "dam": "DAM", "idct": "IDCT", "tso": "TSO", "dso": "DSO", "brp": "BRP",
+    "eur": "EUR", "dam": "DAM", "idct": "IDCT", "idm": "IDM", "tso": "TSO", "dso": "DSO", "brp": "BRP",
 }
 
 
@@ -82,7 +82,7 @@ _LEG_TOKENS = frozenset({"rs", "resell", "retail", "t", "total"})
 # portfolio-level lines that sit between Total GM2 and the net margin: deducted at Total level
 _TOTAL_KEYS = frozenset({
     "opex", "variable_opex", "market_bgl_fees", "market_bgl", "guarantees_outstanding", "guarantees", "interest", "interest_cumulative",
-    "unallocated", "cit", "tax_paid_cumulative", "budget_minus_forecast",
+    "unallocated", "cit", "tax_paid_cumulative", "budget_minus_forecast", "nm",
 })
 _RETAIL_KEYS = frozenset({
     "reserve", "reserve_balance", "reserve_release", "reserve_release_budget", "reserve_release_forecast", "passthrough", "passthrough_revenue",
@@ -164,7 +164,8 @@ _UNIT_EXPLICIT: dict[str, str] = {
     "surplus_price": EURMWH, "deficit_price": EURMWH, "dam_monthly": EURMWH, "idm_monthly": EURMWH, "direction": "sign",
     "pv_ratio": "ratio", "bl_ratio": "ratio", "ratio": "ratio", "peak": "flag", "seq": "#", "interval": "#", "month": "#", "days_in_month": "days",
     "premium_deviation": EURMWH, "budget_minus_forecast": EUR, "budget_minus_forecast_price": EURMWH, "budget_minus_forecast_cost": EUR,
-    "days_to_settle": "days", "spot_buy_mwh": MWH, "strip_price_tripwire": "#", "label_self_check": "", "peak_dam_price": EURMWH,
+    "days_to_settle": "days", "spot_buy_mwh": MWH, "label_self_check": "check", "peak_dam_price": EURMWH,
+    "passthrough": EUR, "retail_spot_settlement": MWH, "spot_settlement": MWH, "premium_volume": EURMWH,
     "peak_retail_buy_mw": MW, "peak_daily_spot_buy_mwh": MWH, "cumulative_s": "s", "net_imbalance_volume": MWH, "date": "",
     "vat_cash_year": EUR, "vat_collected": EUR, "vat_paid": EUR, "vat_input": EUR, "strip_notified": MWH,
 }
@@ -174,15 +175,25 @@ _PRICE_TOKENS = ("price", "specific", "purchase_price", "imbalance_cost", "physi
                  "forecast_premium", "passthrough", "tariff", "premium", "vat")
 
 
-def unit_of(key: str) -> str:
-    """The unit of an engine key: EUR unless the key names a volume (MWh), a rate (EUR/MWh), a share (%) or a special case."""
+CHECK = "check"  # house convention (CEO standard 15.09.2026): reconciliation rows carry the unit "check", 6 decimals
+_CTX_UNITS = {  # the same key means a different quantity in different blocks
+    "pricing": {"passthrough": EURMWH, "vat": EURMWH},
+    "overview": {"passthrough": EUR, "premium": EUR, "reserve": EUR, "market_ref": EURMWH},
+}
+
+
+def unit_of(key: str, ctx: str | None = None) -> str:
+    """The unit of an engine key: EUR unless the key names a volume (MWh), a rate (EUR/MWh), a share (%), a check
+    or a special case. ctx names the block for the few keys whose quantity depends on it (pricing / overview)."""
     k = key
+    if ctx and k in _CTX_UNITS.get(ctx, {}):
+        return _CTX_UNITS[ctx][k]
     if k.startswith("OT") and "_" in k and k[2 : k.index("_")].isdigit():
         k = k[k.index("_") + 1 :]
     if k in _UNIT_EXPLICIT:
         return _UNIT_EXPLICIT[k]
-    if k.startswith("check") or k.endswith("_check") or k.endswith("_checks"):
-        return EUR
+    if k.startswith("check") or k.endswith("_check") or k.endswith("_checks") or k == "strip_price_tripwire":
+        return CHECK
     if k.endswith("_pct") or k.startswith("share_") or k.endswith("_share"):
         return PCT
     if k.endswith("_mw") or k.startswith("strip_"):

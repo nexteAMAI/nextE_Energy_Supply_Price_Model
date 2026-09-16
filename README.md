@@ -24,12 +24,13 @@ register is coded; names live in scenario files outside it).
 | Folder | Purpose | Phase |
 |---|---|---|
 | `config/` | Parameter register (YAML, Reference Case values) and its schema | 3 (done) |
-| `esb/` | Engine: grid and importer (Phase 2); imbalance rule book, scenarios, sources, merit order, monthly layer, P&L, guarantees, cash flow, pricing, reporting, engine, parity (Phase 3); assembly of uploads, scenario file, case bundle, exports, labels (Phase 5) | 2-5 (done) |
+| `esb/` | Engine: grid and importer (Phase 2); imbalance rule book, scenarios, sources, merit order, monthly layer, P&L, guarantees, cash flow, pricing, reporting, engine, parity (Phase 3); assembly of uploads, scenario file, case bundle, exports, labels (Phase 5); canonical output layout and the Romanian calendar (Phase 7) | 2-5 (done) |
 | `tests/` | Unit, edge, parity and application suites | 3-5 |
 | `data/reference/` | Reference Case input series and expected output cells (parquet, coded) | 2-3 (done) |
+| `data/layout/` | Layout specification of the canonical output workbook (`run_export.json`, extracted from the CEO's formatted template by `tools/extract_layout.py`; D113) | 7 |
 | `docs/` | Methodology, parameters, data contract, user guide, deployment, decisions, open items | 3-6 (done) |
 | `app/` + `app.py` | Streamlit application: sign-in gate, brand layer, session model, twelve pages | 5-6 (done) |
-| `tools/` | Build scripts (fixture extraction, parity report) | 2-3 |
+| `tools/` | Build scripts (fixture extraction, parity report, layout extraction) | 2-3, 7 |
 | `extractors/` | Market data connectors (reviewed from the `legacy` branch) | 7 |
 
 ## Governance
@@ -46,6 +47,7 @@ register is coded; names live in scenario files outside it).
 pip install -e ".[dev,app]"
 pytest                                   # engine, parity and application suites
 python tools/parity_report.py out/       # PARITY_REPORT_<ddmmyyyy>.md + parity.json
+python tools/extract_layout.py <TPL_output_run_export_ESB.xlsx>   # refresh data/layout/run_export.json after a template change
 streamlit run app.py                     # the application (or Start_ESB_App.cmd on the desk machine)
 ```
 

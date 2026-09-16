@@ -22,11 +22,14 @@ CLASS_HELP = {
 }
 
 
-@st.cache_data(show_spinner=False)
-def _template_bytes(input_class: str, year: int, codes: tuple[str, ...]) -> bytes:
+@st.cache_data(show_spinner="Building the template in the canonical styling (about 20 seconds per file, once per register)")
+def _template_bytes(input_class: str, year: int, codes: tuple[str, ...], scenarios: tuple[str, ...]) -> bytes:
+    """Contract 1.1 template sized to the register (D112 / D113): off-taker codes for load and nominations, the PV plant, the
+    scenario blocks for wholesale prices; the CEO's canonical styling."""
     with tempfile.TemporaryDirectory() as tmp:
         p = Path(tmp) / f"TPL_{input_class}_QH_{year}.xlsx"
-        build_template(input_class, year, p, entity_codes=list(codes) if input_class in ("offtaker_load", "baseload_nomination") else None)
+        build_template(input_class, year, p, entity_codes=list(codes) if input_class in ("offtaker_load", "baseload_nomination") else None,
+                       scenarios=list(scenarios) if input_class == "wholesale_prices" else None)
         return p.read_bytes()
 
 
@@ -120,7 +123,8 @@ def render() -> None:
 
     st.markdown("## Template downloads")
     B.note("Templates carry Instructions, Std_Control, Series_Registry (slots pre-declared and locked), the RAW_EET_QH paste surface and the "
-           "Recon_Check gate. Contract: docs/DATA_CONTRACT.md (ESB-STD-QH 1.0).")
+           "Recon_Check gate. Contract: docs/DATA_CONTRACT.md (ESB-STD-QH 1.1: scenario blocks in one wholesale file, entity names for reference, "
+           "an entirely blank declared column counts as not delivered). Templates are sized to the register and carry the canonical styling (D113).")
     year = p.spine_year
     codes = tuple(o.code for o in p.offtakers)
     cols = st.columns(len(INPUT_CLASSES))
@@ -128,6 +132,6 @@ def render() -> None:
         with col:
             st.markdown(f"**{cls}**")
             B.caption(CLASS_HELP.get(cls, ""))
-            st.download_button(f"Download TPL_{cls}_QH_{year}.xlsx", data=_template_bytes(cls, year, codes),
+            st.download_button(f"Download TPL_{cls}_QH_{year}.xlsx", data=_template_bytes(cls, year, codes, tuple(p.scenario_names)),
                                file_name=f"TPL_{cls}_QH_{year}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                                key=f"tpl_{cls}")

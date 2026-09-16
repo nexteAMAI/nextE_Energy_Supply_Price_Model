@@ -113,7 +113,16 @@ def _sections_frame(run: RunResult) -> dict[str, pd.DataFrame]:
     return {run.params.offtaker(code).label: T.frame() for code, T in run.pnl.sections.items()}
 
 
-def build_workbook(run: RunResult, include_qh: bool = False, scenario_name: str = "", provenance: list[dict] | None = None) -> bytes:
+def build_workbook(run: RunResult, include_qh: bool = False, scenario_name: str = "", provenance: list[dict] | None = None,
+                   requested_by: str = "") -> bytes:
+    """The canonical export (D113): rendered by esb.layout from data/layout/run_export.json."""
+    from esb.layout import build_workbook as _canonical
+
+    return _canonical(run, include_qh=include_qh, scenario_name=scenario_name, provenance=provenance, requested_by=requested_by)
+
+
+def build_workbook_legacy(run: RunResult, include_qh: bool = False, scenario_name: str = "", provenance: list[dict] | None = None) -> bytes:
+    """The pre-D113 export (kept for the parity test of the renderer's values; not offered in the application)."""
     wb = Workbook()
     wb.remove(wb.active)
     P = run.params

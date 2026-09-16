@@ -142,7 +142,7 @@ def standardise(labelled: pd.DataFrame, control: Control, registry: Registry) ->
         cat = spec.cls == "Categorical"
         a = aligned(first, spec.slot, cat)
         if not local:
-            out[spec.name] = a.values
+            out[spec.frame_name] = a.values
             continue
         b = aligned(second, spec.slot, cat)
         if spec.cls == "Extensive":
@@ -176,5 +176,5 @@ def standardise(labelled: pd.DataFrame, control: Control, registry: Registry) ->
                 for i in inj_idx:
                     a.iat[int(i)] = prev
             # merged: first occurrence already in `a`
-        out[spec.name] = a.values
+        out[spec.frame_name] = a.values
     return out
