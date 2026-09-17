@@ -235,8 +235,12 @@ market_guarantees:                          # Input section E - regulatory formu
     buffer_days: 4                          # C111
     # peak daily notified spot buy (C112) and peak DAM price (C113) are derived by the engine
   brp:
-    rate_ron_per_mw: 9000.0                 # C116 - "Transelectrica BRP rule"; source_status: unverified
+    method: rate_per_mw                     # rate_per_mw = the workbook rule (parity); pre_delegated = D119 (balancing responsibility delegated to a PRE)
+    rate_ron_per_mw: 9000.0                 # C116 - "Transelectrica BRP rule"; source_status: contradicted (BRP-GF) - no such rule; kept for parity
     generation_mw_in_brp: 160.0             # C117
+    pre_initial_ron: 100000.0               # D119: initial guarantee of the PRE service contract (art. 9.8 of the CINTA template contract, 100.000 lei)
+    pre_months_of_imbalance: 2.0            # D119: 1..3 average monthly imbalance values (CINTA PRE procedure pct. 5.2.5); 2 = house assumption
+    pre_vat_inclusive: true                 # D119: the imbalance value basis carries VAT (assumption - the procedure does not say)
     # consumption peak MW (C118) derived by the engine
   tso:
     vtm_multiplier: 2.0                     # C121 - "Transelectrica PO 01.13"; source_status: unverified

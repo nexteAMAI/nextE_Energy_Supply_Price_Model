@@ -190,18 +190,22 @@ def test_added_inactive_offtaker_without_series_runs(series, params):
 
 
 def test_grid_tariff_table_reproduces_the_reference_set_and_cascades(params):
-    """D109: DEER at MV DSO is the Reference Case set; the distribution tariffs cascade; an operator without rows is refused."""
-    from config.schema import TARIFF_KEYS, VOLTAGE_LEVELS
+    """D109 / D119: the shipped table is the ANRE 2026 table (specific tariffs); the distribution tariffs cascade and sum to the
+    applied tariff; the TSO level carries no distribution tariff; an unknown level is refused."""
+    from config.schema import VOLTAGE_LEVELS
 
+    fx = params.general.fx_ron_per_eur
     deer = params.tariffs_by_grid("Distributie Energie Electrica Romania", "MV (6-20 kV) DSO")
-    for k in TARIFF_KEYS:
-        assert deer[k] == pytest.approx(params.tariff_components[k], abs=1e-9), k
+    assert (deer["T_HV"] + deer["T_MV"]) * fx == pytest.approx(115.32) and deer["T_LV"] == 0.0
+    assert deer["TL"] * fx == pytest.approx(36.45) and deer["TG"] * fx == pytest.approx(3.63) and deer["SS"] * fx == pytest.approx(14.70)
     hv_tso = params.tariffs_by_grid("Delgaz Grid", VOLTAGE_LEVELS[0])
     assert hv_tso["T_HV"] == 0.0 and hv_tso["T_MV"] == 0.0 and hv_tso["T_LV"] == 0.0 and hv_tso["TL"] > 0
     lv = params.tariffs_by_grid("Delgaz Grid", "LV (0,4 kV) DSO")
-    assert lv["T_HV"] > 0 and lv["T_MV"] > 0 and lv["T_LV"] == pytest.approx(317.39 / params.general.fx_ron_per_eur)
+    assert lv["T_HV"] > 0 and lv["T_MV"] > 0 and (lv["T_HV"] + lv["T_MV"] + lv["T_LV"]) * fx == pytest.approx(387.91)
+    rer = params.tariffs_by_grid("Retele Electrice Romania", "MV (6-20 kV) DSO")
+    assert (rer["T_HV"] + rer["T_MV"]) * fx == pytest.approx(92.19)
     with pytest.raises(ValueError):
-        params.tariffs_by_grid("Retele Electrice Romania", "MV (6-20 kV) DSO")
+        params.tariffs_by_grid("No Such Operator", "MV (6-20 kV) DSO")
     with pytest.raises(ValueError):
         params.tariffs_by_grid("Delgaz Grid", "kV")
     # the off-taker fields round-trip through the register dict and validation refuses a half selection

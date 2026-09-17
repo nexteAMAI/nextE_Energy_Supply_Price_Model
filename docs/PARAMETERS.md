@@ -19,10 +19,10 @@ never appear in the repository (ruling G0-F035).
 | `premium_standard` | `Input` section B | reference premium components and target GM 11; the engine prices with the per-off-taker components |
 | `green_certificates` | `Cons_P&L!B6:B11` | GC quota per MWh 0,499387, reference price 148,2201 RON/GC, spot share 0,5; `Parameters.gc_unit_cost` = quota x price / FX |
 | `tariff_components_eur_per_mwh` | `Input!C54:F63` | TL, TG, SS, T_HV, T_MV, T_LV, cogeneration, CfD, excise (EUR/MWh at FX 5,5; DEER MV set, T_LV = 0); identical for all four off-takers in the Reference Case (X-03), overridable per off-taker (`Offtaker.tariff_components`) |
-| `grid_tariffs` | `config/tariffs_ro.yaml` (v1.1 template sheet `Grid_Taxes_RO`, validity 2026) | RON/MWh rows by charge owner (TSO, ANRE, ANAF, each DSO) and component with applicability flags per voltage level; an off-taker with `dso` and `voltage_level` set takes its EUR/MWh components from here by the cascading rule (D109); `source_status: unverified` |
+| `grid_tariffs` | `config/tariffs_ro.yaml` (ANRE Ordinele nr. 73-78/2025, validity 2026, `basis: specific`; D119) | RON/MWh rows by charge owner (TSO, ANRE, ANAF, each DSO) and component with applicability flags per voltage level; the distribution rows are the specific tariffs of the orders and the cascade sums them to the applied tariff of the connection level (D109); an off-taker with `dso` and `voltage_level` set takes its EUR/MWh components from here; the superseded v1.1 table is `config/tariffs_ro_v11_template_superseded.yaml` |
 | `offtakers[]` | `Input` section C, B2 rows 97-105, `FW_Purch_Sell_Price`, strip tables | per off-taker: code, `name` (display name, empty in the repository - D95), active, contract window, contract and PV prices, premium components, target GM, strips (BL24 / Peak / OffPeak MW by month), budget and forecast product prices by month, own guarantee, optional tariff set or `dso` + `voltage_level` (D109) |
 | `counterparties` | `Input` section D | pv, baseload, spot, brp, tso, dso: active, payment terms (30 / 15 / 0 / 15 / 15 / 15 days), advance (baseload 50 %), guarantee (type, direction, sizing, amount, fee, window), `k` sign convention, baseload deviation percentages |
-| `market_guarantees` | `Input` section E | regulatory formula inputs: spot buffer days 4; BRP 9.000 RON/MW and 160 MW generation in the BRP; TSO Vtm 2; DSO Vdm 1 and overdue add-on 0 |
+| `market_guarantees` | `Input` section E | regulatory formula inputs: spot buffer days 4; BRP `method` (`rate_per_mw` = the workbook's 9.000 RON/MW x (160 MW generation + peak retail MW), Reference Case; `pre_delegated` = D119: max(`pre_initial_ron` 100.000, `pre_months_of_imbalance` 2 x average monthly imbalance value x (1 + VAT if `pre_vat_inclusive`))); TSO Vtm 2; DSO Vdm 1 and overdue add-on 0 |
 
 ## 2. Guarantee record
 
@@ -51,15 +51,15 @@ from the workbook, not covered by the pass), `to_verify`, `not_published`, `assu
 | Tax payment day | 25 | art. 41 alin. (1) for CIT (checked); VAT art. 326 not checked | open | to_verify |
 | GC quota | 0,499387 GC/MWh | ANRE Ordinul nr. 81/16.12.2025 art. 1 (M. Of. nr. 1176/18.12.2025); final 2025 quota 0,49983 (Ordinul nr. 3/2026) | 2026 (estimate) | verified - GC-2027 |
 | GC reference price | 148,2201 RON/GC | minimum trading value 2026, Legea nr. 220/2008 art. 11 (29,4 EUR at BNR 2025 average 5,0415; maximum 176,4525), OPCOM notice 08.01.2026 | 2026 | verified - GC-2027 |
-| BRP guarantee rate | 9.000 RON/MW | no such rule: Transelectrica PO cod TEL 00.45 ed. I rev. 3 (28.11.2025) - minimum 1.000.000 lei per PRE, then 2 x average monthly net imbalance obligation incl. VAT | PO in force | **contradicted - BRP-GF** |
+| BRP guarantee rate | 9.000 RON/MW | no such rule: Transelectrica PO cod TEL 00.45 ed. I rev. 3 (28.11.2025) applies to a PRE facing the TSO - nextE delegates to a PRE service provider (D119); the delegated rule: initial 100.000 RON (CINTA template contract art. 9.8), then 1-3 average monthly imbalance values (CINTA PRE procedure pct. 5.2.5) | contract term | contradicted for the workbook rule (Reference Case parity); `pre_delegated` for bid scenarios |
 | TSO guarantee multiplier Vtm | 2 | Transelectrica PO TEL 01.13 ed. I rev. 0 (TEL nr. 52004/25.11.2021, aviz ANRE nr. 22/2021) pct. 8.2.1: GF = 2 x Vtm (6-month average monthly transmission + system services value) | in force | verified |
 | DSO guarantee multiplier Vdm | 1 (+ overdue add-on) | ANRE Ordinul nr. 129/2015 (M. Of. nr. 628/18.08.2015) art. 8: GF = 1 x Vdm + max(V1, V2) | in force | verified |
 | Spot collateral buffer | 4 days | OPCOM practice - not covered | - | unverified |
 | TG (injection) | 3,63 RON/MWh | ANRE Ordinul nr. 74/2025 (M. Of. nr. 1173/18.12.2025) | 2026 | verified |
-| TL (extraction) | 36,54 RON/MWh | ANRE Ordinul nr. 74/2025: **36,45** | 2026 | **contradicted - TAR-2026** |
+| TL (extraction) | 36,54 RON/MWh | ANRE Ordinul nr. 74/2025: **36,45** | 2026 | contradicted (Reference Case parity); the shipped grid table carries 36,45 (TAR-2026 (a)) |
 | SS | 14,70 RON/MWh | ANRE Ordinul nr. 73/2025 (Ordinele nr. 12/2026 and 53/2026 not read) | 2026 | verified |
 | T_HV / T_MV (DEER MV set) | 39,37 / 122,80 RON/MWh, summed | the applied 2026 tariffs of Distributie Oltenia (Ordinul nr. 75/2025), not DEER's; DEER at MV = 31,96 + 83,36 = 115,32 (Ordinul nr. 77/2025); the cascade double-counts HV | 2026 | **contradicted - TAR-2026** |
-| Grid tariff table (`config/tariffs_ro.yaml`) | v1.1 sheet | distribution rows are the applied tariffs under operator names shifted by one row; TL 36,54; Delgaz MT 125,17 for 125,71. Verified specific tariffs: `config/tariffs_ro_2026_anre.yaml` (not loaded) | 2026 | **contradicted - TAR-2026** |
+| Grid tariff table (`config/tariffs_ro.yaml`) | ANRE 2026 specific tariffs | ANRE Ordinele nr. 73-78/2025 (M. Of. nr. 1173/18.12.2025); Retele Electrice rows from secondary copies. The v1.1 table (applied tariffs under shifted operator names, TL 36,54, Delgaz MT 125,17) is superseded | 2026 | verified (RER rows verified_secondary) - TAR-2026 (a) |
 | Cogeneration, CfD, excise | 13,60 / 0,14 / 3,84 RON/MWh | not covered by the pass | 2026 | unverified |
 | Public holidays | Codul muncii art. 139 alin. (1) | list matches the consolidated text; 6-7 January by Legea nr. 52/2023 (M. Of. nr. 186/06.03.2023) - secondary copies | in force | verified_secondary |
 | FX RON/EUR | 5,5 | workbook D54, Forecast Q3 2026 | - | assumption |
@@ -68,8 +68,11 @@ from the workbook, not covered by the pass), `to_verify`, `not_published`, `assu
 No regulatory constant is hard-coded in the engine; a change of any value above is a change
 of the register (or, in the application, of the user's scenario), never of the code. The
 contradicted values stay in the Reference Case register because the parity gate ties that
-register to the frozen workbook; bid scenarios adopt the corrections once the CEO rules
-(TAR-2026, BRP-GF, RC-2027 in `docs/OPEN_ITEMS.md`).
+register to the frozen workbook; bid scenarios adopt the corrections through
+`Parameters.apply_bid_defaults()` (D119: reverse charge off after 2026, delegated-PRE BRP
+guarantee, shipped ANRE grid table), offered as one button on the Parameters page, and the
+page shows non-blocking `regulatory_warnings()` while a scenario still contradicts the verified
+state.
 
 ## 4. Loading
 

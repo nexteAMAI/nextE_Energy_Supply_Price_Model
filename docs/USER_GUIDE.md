@@ -1,6 +1,6 @@
 # USER GUIDE - nextE Energy Supply Bid Management Tool
 
-Application v0.7.2 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
+Application v0.7.3 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
 supply portfolio, not for a developer. Every capability of the Excel model
 `Energy_Supply_Portfolio_Tracking_v03` is reachable through the twelve pages described here;
 nothing requires a command line.
@@ -148,6 +148,15 @@ Reference Case keeps the workbook value (the parity gate depends on it) and the 
 the open item awaiting the CEO's ruling (TAR-2026 for the regulated tariff set, BRP-GF for the
 BRP guarantee rule, RC-2027 for the reverse charge that ends on 31.12.2026). Values whose
 validity ends before the case year are the ones to refresh before a bid.
+
+### Bid-scenario defaults (since 0.7.3)
+The Reference Case register reproduces the frozen workbook and keeps its settings for the parity
+gate. A bid scenario starts from it and then takes the rulings of 17.09.2026 with one button on
+the Parameters page, "Apply the bid-scenario defaults (D119)": the reverse charge on source
+purchases off for a case year after 2026 (the measure ends 31.12.2026), the BRP guarantee by the
+delegated-PRE rule (initial guarantee of the PRE service contract, then months of average
+imbalance value), and the shipped ANRE 2026 grid tariff table. While a scenario still contradicts
+the verified state the page says so in a note; nothing is blocked.
 
 ## 4. Working sequence
 

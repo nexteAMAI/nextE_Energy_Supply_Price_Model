@@ -176,6 +176,11 @@ def render() -> None:
             state.scenario = reference_case()
             state.mark_dirty("parameters reset to the Reference Case register")
             st.rerun()
+        if st.button("Apply the bid-scenario defaults (D119)", help="reverse charge off after 2026, delegated-PRE BRP guarantee, shipped ANRE grid table - not for the frozen Reference Case"):
+            done = p.apply_bid_defaults()
+            if done:
+                state.mark_dirty("bid-scenario defaults applied: " + "; ".join(done))
+            st.rerun()
         if state.scenario.history:
             hist = pd.DataFrame(state.scenario.history).set_index("version")
             hist["md5"] = hist["md5"].str[:12]
@@ -200,7 +205,7 @@ def render() -> None:
                 vat = B.num_input("VAT rate (0,21 = 21 %)", value=float(g.vat_rate), help="Codul fiscal art. 291 alin. (1), 21 % from 01.08.2025 (Legea nr. 141/2025); verified 17.09.2026", decimals=4)
                 cit = B.num_input("CIT rate (0,16 = 16 %)", value=float(g.cit_rate), help="Legea nr. 227/2015 art. 41 per workbook label; unverified", decimals=4)
                 tax_day = st.number_input("Tax payment day of month", value=int(g.tax_payment_day), min_value=1, max_value=28, step=1)
-                rc = st.toggle("Reverse charge VAT on source purchases", value=bool(g.reverse_charge_vat_on_sources), help="art. 331 alin. (2) lit. e) Codul fiscal per workbook; adviser confirmation outstanding")
+                rc = st.toggle("Reverse charge VAT on source purchases", value=bool(g.reverse_charge_vat_on_sources), help="Codul fiscal art. 331 alin. (2) lit. e), verified 17.09.2026 - the measure ends 31.12.2026 (alin. (6)); off for bid scenarios after 2026 unless the adviser confirms an extension (RC-2027)")
                 opening = B.num_input("Opening cash (EUR)", value=float(g.opening_cash_eur), decimals=2)
             with c3:
                 opex = B.num_input("Portfolio OPEX (EUR per metered MWh)", value=float(g.portfolio_opex_eur_per_mwh_metered), decimals=4)
@@ -312,16 +317,26 @@ def render() -> None:
     with tabs[4]:
         mg = p.market_guarantees
         B.note("Regulatory sizing formulas, verified 17.09.2026 (docs/PARAMETERS.md section 3): Vtm = 2 per Transelectrica PO TEL 01.13 pct. 8.2.1; "
-               "Vdm = 1 plus the overdue add-on per ANRE Ordinul nr. 129/2015 art. 8. The BRP rate of 9.000 RON/MW has no counterpart in the "
-               "Transelectrica balancing-market guarantee procedure (cod TEL 00.45 rev. 3: minimum 1.000.000 lei, then 2 x the average monthly "
-               "net imbalance obligation) - kept for parity until the CEO rules (open item BRP-GF).")
+               "Vdm = 1 plus the overdue add-on per ANRE Ordinul nr. 129/2015 art. 8. BRP / imbalance guarantee (D119): the workbook rule "
+               "(rate per MW - no counterpart in any procedure, kept for the Reference Case parity) or the delegated-PRE rule - the balancing "
+               "responsibility transferred to a PRE service provider: initial guarantee of the service contract (100.000 RON in the CINTA "
+               "template, art. 9.8), then 1 to 3 average monthly imbalance values (CINTA PRE procedure pct. 5.2.5), sized on the engine's own "
+               "imbalance ledger. Bid scenarios use the delegated-PRE rule.")
         with st.form("form_mg"):
             c1, c2, c3, c4 = st.columns(4)
             with c1:
                 buf = B.num_input("Spot buffer days", value=float(mg["spot"]["buffer_days"]), help="Input!C111", decimals=0)
             with c2:
-                rate = B.num_input("BRP rate (RON per MW)", value=float(mg["brp"]["rate_ron_per_mw"]), help="Input!C116 - unverified", decimals=2)
-                gen = B.num_input("Generation MW in the BRP", value=float(mg["brp"]["generation_mw_in_brp"]), help="Input!C117", decimals=2)
+                methods = ["rate_per_mw", "pre_delegated"]
+                cur = str(mg["brp"].get("method", "rate_per_mw"))
+                method = st.selectbox("BRP guarantee method", methods, index=methods.index(cur) if cur in methods else 0,
+                                      format_func=lambda m: {"rate_per_mw": "Workbook rule - rate per MW", "pre_delegated": "Delegated PRE - months of imbalance"}[m],
+                                      help="D119; the Reference Case keeps the workbook rule for parity")
+                rate = B.num_input("BRP rate (RON per MW)", value=float(mg["brp"]["rate_ron_per_mw"]), help="Input!C116 - contradicted (BRP-GF), workbook rule only", decimals=2)
+                gen = B.num_input("Generation MW in the BRP", value=float(mg["brp"]["generation_mw_in_brp"]), help="Input!C117 - workbook rule only", decimals=2)
+                pre_init = B.num_input("PRE initial guarantee (RON)", value=float(mg["brp"].get("pre_initial_ron", 100000.0)), help="service contract art. 9.8 (CINTA template: 100.000 lei)", decimals=0)
+                pre_m = B.num_input("PRE months of imbalance (1 to 3)", value=float(mg["brp"].get("pre_months_of_imbalance", 2.0)), help="CINTA PRE procedure pct. 5.2.5 - 1 to 3 average monthly imbalance values by payment record", decimals=2)
+                pre_vat = st.checkbox("PRE basis VAT-inclusive", value=bool(mg["brp"].get("pre_vat_inclusive", True)), help="assumption - the procedure does not state the basis")
             with c3:
                 vtm = B.num_input("TSO multiplier Vtm", value=float(mg["tso"]["vtm_multiplier"]), help="Input!C121 - unverified", decimals=2)
             with c4:
@@ -330,6 +345,8 @@ def render() -> None:
             if st.form_submit_button("Apply changes", type="primary"):
                 mg["spot"]["buffer_days"] = float(buf)
                 mg["brp"]["rate_ron_per_mw"], mg["brp"]["generation_mw_in_brp"] = float(rate), float(gen)
+                mg["brp"]["method"], mg["brp"]["pre_initial_ron"] = str(method), float(pre_init)
+                mg["brp"]["pre_months_of_imbalance"], mg["brp"]["pre_vat_inclusive"] = float(pre_m), bool(pre_vat)
                 mg["tso"]["vtm_multiplier"], mg["dso"]["vdm_multiplier"], mg["dso"]["overdue_addon_eur"] = float(vtm), float(vdm), float(addon)
                 state.mark_dirty("section E (market guarantees) applied")
                 st.rerun()
@@ -358,12 +375,18 @@ def render() -> None:
                 st.rerun()
         st.markdown("## Grid tariff table · RON/MWh")
         cfg = load_grid_tariffs()
-        B.note(f"Source: {cfg['meta'].get('source', '')} · validity {cfg['meta'].get('validity', '')} · source_status: <b>{cfg['meta'].get('source_status', '')}</b>. "
-               "Rows by regulatory charge owner and component; distribution rows by operator. An off-taker that names its DSO and voltage level "
-               "takes its components from here (D109). Retele Electrice Romania has no distribution rows in the source sheet. "
-               "The pass of 17.09.2026 found the distribution rows to carry the applied (cumulated) tariffs under shifted operator names, "
-               "TL 36,54 for 36,45 and Delgaz MT 125,17 for 125,71 (open item TAR-2026); the verified specific tariffs of ANRE Ordinele nr. "
-               "74-78/2025 sit in config/tariffs_ro_2026_anre.yaml and are not loaded until the CEO rules.")
+        B.note(f"Source: {cfg['meta'].get('source', '')} · validity {cfg['meta'].get('validity', '')} · source_status: <b>{cfg['meta'].get('source_status', '')}</b>"
+               f" · checked {cfg['meta'].get('checked', '')}. Rows by regulatory charge owner and component; distribution rows are the SPECIFIC "
+               "tariffs of each ANRE order and the cascade sums them to the applied tariff of the connection level (D109, D119). An off-taker "
+               "that names its DSO and voltage level takes its components from here. Cogeneration, CfD and excise rows remain unverified.")
+        shipped = load_grid_tariffs()["tariffs"]
+        if [(r["owner"], r["component"], float(r["ron_per_mwh"])) for r in p.grid_tariffs] != [(r["owner"], r["component"], float(r["ron_per_mwh"])) for r in shipped]:
+            B.note("This scenario carries its own grid tariff table (saved before the table of 17.09.2026 or edited). "
+                   "Reset it to the shipped ANRE 2026 table to re-base the scenario (TAR-2026).")
+            if st.button("Reset the grid tariff table to the shipped ANRE 2026 table"):
+                p.grid_tariffs = [dict(r) for r in shipped]
+                state.mark_dirty("grid tariff table reset to the shipped ANRE 2026 table")
+                st.rerun()
         with st.form("form_grid_tariffs"):
             rows = pd.DataFrame(p.grid_tariffs)
             grid = pd.DataFrame({"RON/MWh": rows["ron_per_mwh"].astype(float).values},
@@ -386,5 +409,7 @@ def render() -> None:
     errs = p.validate()
     if errs:
         B.refusal("Register problems: " + "; ".join(errs))
+    for w in p.regulatory_warnings():
+        B.note(w)
     if isinstance(p.general.case_start, date) and p.general.case_start.year != p.spine_year:
         B.refusal(f"Case start {B.dmy(p.general.case_start)} is outside the spine year {p.spine_year}.")

@@ -1,49 +1,60 @@
-# Regulated tariff and charge components, RON/MWh, by regulatory charge owner and voltage level.
-# Source: sheet Grid_Taxes_RO of the v1.1 template ([Template_v1.1_09062026]_nextE_Energy_Supply_Pricing,
-# md5 190a1230), rows 4-22, validity 2026, read 15.09.2026 (C2 in the authority chain, D109).
-# source_status: unverified against the ANRE orders that set these values (X-05 class) - the CEO or an
-# adviser confirms them before a bid relies on them. EUR values are derived at the register FX.
+# Regulated tariff components 2026, RON/MWh, as set by the ANRE orders - the verified table of the pass of 17.09.2026
+# (T12.7), adopted as the application's grid tariff table by CEO ruling TAR-2026 (a), D119. The application's cascade
+# (T_HV from HV DSO down, T_MV from MV DSO down, T_LV at LV DSO only) SUMS the rows it selects, so this table carries
+# the SPECIFIC tariffs of each order: the sum at a level equals the applied (cumulated) tariff the suppliers publish -
+# e.g. DEER at MV DSO 31,96 + 83,36 = 115,32 lei/MWh. The superseded v1.1 template table (applied tariffs under
+# shifted operator names, summed again by the cascade) is kept as config/tariffs_ro_v11_template_superseded.yaml.
+# The frozen Reference Case register does not read this table (its off-takers carry explicit tariff components), so
+# the parity gate is unaffected; scenarios saved before 0.7.3 keep their own table until reset on the Parameters page.
 #
-# Applicability (v1.1 Dashboard_Input rows 304-313): every non-distribution component applies at every
-# voltage level per its flags below; the distribution tariffs cascade - T_HV applies at HV DSO, MV DSO and
-# LV DSO; T_MV at MV DSO and LV DSO; T_LV at LV DSO only; none at HV TSO. The v1.1 sheet labels the low
-# voltage level "LV (6÷20kV) DSO" - an evident typo; the application shows "LV (0,4 kV) DSO".
+# Sources (all M. Of. Partea I nr. 1173/18.12.2025, in force 01.01.2026, excl. VAT):
+#   ANRE Ordinul nr. 74/16.12.2025 - transmission: TG (introducere) 3,63; TL (extragere) 36,45; reactive 0,1821 lei/kVArh
+#   ANRE Ordinul nr. 73/2025      - system services 14,70 (12,79 from 01.09.2025); Ordinele nr. 12/2026 and 53/2026 not read
+#   ANRE Ordinul nr. 77/2025      - Distributie Energie Electrica Romania: IT 31,96 / MT 83,36 / JT 240,02 (reactive 0,2023)
+#   ANRE Ordinul nr. 76/2025      - Delgaz Grid: IT 40,46 / MT 85,25 / JT 262,20
+#   ANRE Ordinul nr. 75/2025      - Distributie Oltenia: IT 39,37 / MT 83,43 / JT 210,45
+#   ANRE Ordinul nr. 78/2025      - Retele Electrice Romania: IT 23,83 / MT 68,36 / JT 225,20 (secondary copies; the
+#                                   applied tariffs 23,83 / 92,19 / 317,39 agree across suppliers' sheets)
+# Cogeneration contribution, CfD contribution and excise: NOT covered by the pass - carried from the v1.1 table, unverified.
+# 2027 tariffs: not approved as of 17.09.2026 (ANRE order portal up to Ordinul nr. 57/03.09.2026).
 meta:
   currency: RON
   unit: RON/MWh
   validity: 2026
-  source: "v1.1 template, sheet Grid_Taxes_RO"
-  source_status: unverified
+  source: "ANRE Ordinele nr. 73, 74, 75, 76, 77, 78/2025 (M. Of. Partea I nr. 1173/18.12.2025)"
+  source_status: verified
+  checked: "17.09.2026"
+  basis: specific   # distribution rows are the specific tariffs of the orders; the cascade sums them to the applied tariff
 voltage_levels: ["HV (>=110 kV) TSO", "HV (110 kV) DSO", "MV (6-20 kV) DSO", "LV (0,4 kV) DSO"]
-distribution_operators: ["CNTEE Transelectrica SA", "Distributie Energie Electrica Romania", "Distributie Energie Oltenia", "Delgaz Grid", "Retele Electrice Romania"]
-components:                       # key: label (EN) / label (RO)
+distribution_operators: ["Distributie Energie Electrica Romania", "Distributie Energie Oltenia", "Delgaz Grid", "Retele Electrice Romania"]
+components:
   TL: {en: "Transport grid extraction tariff (TL)", ro: "Tarif de extragere energie electrica din retea (TL)"}
   TG: {en: "Transport grid injection tariff (TG)", ro: "Tarif de introducere energie electrica in retea (TG)"}
   SS: {en: "System services tariff (SS)", ro: "Tarif pentru servicii sistem (SS)"}
-  T_HV: {en: "Distribution grid high voltage tariff (T_HV)", ro: "Tarif de distributie inalta tensiune (D_IT)"}
-  T_MV: {en: "Distribution grid medium voltage tariff (T_MV)", ro: "Tarif de distributie medie tensiune (D_MT)"}
-  T_LV: {en: "Distribution grid low voltage tariff (T_LV)", ro: "Tarif de distributie joasa tensiune (D_JT)"}
+  T_HV: {en: "Distribution grid high voltage tariff (T_HV)", ro: "Tarif specific de distributie inalta tensiune (IT)"}
+  T_MV: {en: "Distribution grid medium voltage tariff (T_MV)", ro: "Tarif specific de distributie medie tensiune (MT)"}
+  T_LV: {en: "Distribution grid low voltage tariff (T_LV)", ro: "Tarif specific de distributie joasa tensiune (JT)"}
   cogeneration: {en: "Cogeneration contribution", ro: "Contributie pentru cogenerare"}
   cfd: {en: "CfD contribution", ro: "Contributie pentru contracte pentru diferenta (CfD)"}
   excise: {en: "Excise duty (non-RES supply)", ro: "Acciza comerciala (exclusiv energie din surse regenerabile)"}
-tariffs:                          # owner "TSO"/"ANRE"/"ANAF" rows apply per flags; DSO rows by operator and cascade
-  - {owner: "TSO", component: TL, ron_per_mwh: 36.54, validity: 2026, applies: [true, true, true, true]}
-  - {owner: "TSO", component: TG, ron_per_mwh: 3.63, validity: 2026, applies: [true, true, true, true]}
-  - {owner: "TSO", component: SS, ron_per_mwh: 14.70, validity: 2026, applies: [true, true, true, true]}
-  - {owner: "Delgaz Grid", component: T_HV, ron_per_mwh: 23.83, validity: 2026}
-  - {owner: "Delgaz Grid", component: T_MV, ron_per_mwh: 92.19, validity: 2026}
-  - {owner: "Delgaz Grid", component: T_LV, ron_per_mwh: 317.39, validity: 2026}
-  - {owner: "Distributie Energie Electrica Romania", component: T_HV, ron_per_mwh: 39.37, validity: 2026}
-  - {owner: "Distributie Energie Electrica Romania", component: T_MV, ron_per_mwh: 122.80, validity: 2026}
-  - {owner: "Distributie Energie Electrica Romania", component: T_LV, ron_per_mwh: 333.25, validity: 2026}
-  - {owner: "CNTEE Transelectrica SA", component: T_HV, ron_per_mwh: 31.96, validity: 2026}
-  - {owner: "CNTEE Transelectrica SA", component: T_MV, ron_per_mwh: 115.32, validity: 2026}
-  - {owner: "CNTEE Transelectrica SA", component: T_LV, ron_per_mwh: 355.34, validity: 2026}
-  - {owner: "Distributie Energie Oltenia", component: T_HV, ron_per_mwh: 40.46, validity: 2026}
-  - {owner: "Distributie Energie Oltenia", component: T_MV, ron_per_mwh: 125.17, validity: 2026}
-  - {owner: "Distributie Energie Oltenia", component: T_LV, ron_per_mwh: 387.91, validity: 2026}
-  - {owner: "ANRE", component: cogeneration, ron_per_mwh: 13.60, validity: 2026, applies: [true, true, true, true]}
-  - {owner: "ANRE", component: cfd, ron_per_mwh: 0.14, validity: 2026, applies: [true, true, true, true]}
-  - {owner: "ANAF", component: excise, ron_per_mwh: 3.84, validity: 2026, applies: [true, true, true, true]}
-  # Retele Electrice Romania: no distribution tariff rows in the v1.1 sheet (a selection is refused until rows are added)
-  # GC unit cost: not a table row - derived from the register's GC quota x reference price / FX (Cons_P&L!B6:B11)
+tariffs:
+  - {owner: "TSO", component: TL, ron_per_mwh: 36.45, validity: 2026, applies: [true, true, true, true], source: "ANRE Ordinul nr. 74/2025", source_status: verified}
+  - {owner: "TSO", component: TG, ron_per_mwh: 3.63, validity: 2026, applies: [true, true, true, true], source: "ANRE Ordinul nr. 74/2025", source_status: verified}
+  - {owner: "TSO", component: SS, ron_per_mwh: 14.70, validity: 2026, applies: [true, true, true, true], source: "ANRE Ordinul nr. 73/2025", source_status: verified}
+  - {owner: "Distributie Energie Electrica Romania", component: T_HV, ron_per_mwh: 31.96, validity: 2026, source: "ANRE Ordinul nr. 77/2025", source_status: verified}
+  - {owner: "Distributie Energie Electrica Romania", component: T_MV, ron_per_mwh: 83.36, validity: 2026, source: "ANRE Ordinul nr. 77/2025", source_status: verified}
+  - {owner: "Distributie Energie Electrica Romania", component: T_LV, ron_per_mwh: 240.02, validity: 2026, source: "ANRE Ordinul nr. 77/2025", source_status: verified}
+  - {owner: "Distributie Energie Oltenia", component: T_HV, ron_per_mwh: 39.37, validity: 2026, source: "ANRE Ordinul nr. 75/2025", source_status: verified}
+  - {owner: "Distributie Energie Oltenia", component: T_MV, ron_per_mwh: 83.43, validity: 2026, source: "ANRE Ordinul nr. 75/2025", source_status: verified}
+  - {owner: "Distributie Energie Oltenia", component: T_LV, ron_per_mwh: 210.45, validity: 2026, source: "ANRE Ordinul nr. 75/2025", source_status: verified}
+  - {owner: "Delgaz Grid", component: T_HV, ron_per_mwh: 40.46, validity: 2026, source: "ANRE Ordinul nr. 76/2025", source_status: verified}
+  - {owner: "Delgaz Grid", component: T_MV, ron_per_mwh: 85.25, validity: 2026, source: "ANRE Ordinul nr. 76/2025", source_status: verified}
+  - {owner: "Delgaz Grid", component: T_LV, ron_per_mwh: 262.20, validity: 2026, source: "ANRE Ordinul nr. 76/2025", source_status: verified}
+  - {owner: "Retele Electrice Romania", component: T_HV, ron_per_mwh: 23.83, validity: 2026, source: "ANRE Ordinul nr. 78/2025", source_status: verified_secondary}
+  - {owner: "Retele Electrice Romania", component: T_MV, ron_per_mwh: 68.36, validity: 2026, source: "ANRE Ordinul nr. 78/2025", source_status: verified_secondary}
+  - {owner: "Retele Electrice Romania", component: T_LV, ron_per_mwh: 225.20, validity: 2026, source: "ANRE Ordinul nr. 78/2025", source_status: verified_secondary}
+  - {owner: "ANRE", component: cogeneration, ron_per_mwh: 13.60, validity: 2026, applies: [true, true, true, true], source: "v1.1 template", source_status: unverified}
+  - {owner: "ANRE", component: cfd, ron_per_mwh: 0.14, validity: 2026, applies: [true, true, true, true], source: "v1.1 template", source_status: unverified}
+  - {owner: "ANAF", component: excise, ron_per_mwh: 3.84, validity: 2026, applies: [true, true, true, true], source: "v1.1 template", source_status: unverified}
+# Applied (cumulated) distribution tariffs 2026 the sums above reproduce, lei/MWh (IT / MT / JT):
+#   DEER 31,96 / 115,32 / 355,34 · Oltenia 39,37 / 122,80 / 333,25 · Delgaz 40,46 / 125,71 / 387,91 · Retele Electrice 23,83 / 92,19 / 317,39

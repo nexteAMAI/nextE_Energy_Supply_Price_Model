@@ -53,6 +53,7 @@ rules:
   - {leaf: target_gross_margin, unit: EUR/MWh}
   - {leaf: target_gm_budget, unit: EUR/MWh}
   - {leaf: target_gm_forecast, unit: EUR/MWh}
+  - {leaf: pre_months_of_imbalance, unit: months}
   - {leaf: BL24, unit: MW}
   - {leaf: Peak, unit: MW}
   - {leaf: OffPeak, unit: MW}
@@ -121,6 +122,22 @@ entries:
     validity: "PO rev. 3 in force from 28.11.2025"
     checked: "17.09.2026"
     note: "BRP-GF: the workbook rule 9.000 RON/MW x MW in the BRP is kept for parity; the CEO rules whether the engine adopts the PO formula (docs/OPEN_ITEMS.md)"
+  - path: "market_guarantees\\.brp\\.pre_initial_ron"
+    unit: RON
+    standard: "100.000"
+    source: "PRE service contract, art. 9.8 of the CINTA template contract (initial financial guarantee, bank guarantee letter or cash, valid 3 months beyond termination; adjustable after the first settlement month by the imbalance value)"
+    source_status: verified
+    validity: "contract term"
+    checked: "17.09.2026"
+    note: "D119: read on the signed nextE Asset - CINTA contract of 29-30.01.2026; the supply entity's own contract may set another amount"
+  - path: "market_guarantees\\.brp\\.pre_months_of_imbalance"
+    unit: months
+    standard: "2 (band 1 to 3)"
+    source: "CINTA PRE procedure 'Modul de derulare a activitatii PRE' pct. 5.2.5: the guarantee varies between 1 and 3 average monthly imbalance values by payment record"
+    source_status: assumption
+    validity: "procedure in force (2025 edition)"
+    checked: "17.09.2026"
+    note: "D119: 2 is the house mid-band assumption; the VAT-inclusive basis is an assumption too (pre_vat_inclusive)"
   - path: "market_guarantees\\.tso\\.vtm_multiplier"
     unit: x
     standard: "2"

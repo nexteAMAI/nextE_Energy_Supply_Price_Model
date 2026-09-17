@@ -29,6 +29,11 @@ BGL fee (Cons_P&L!211..216 / 381), only for type "Bank Guarantee Letter":
 Regulatory formulas (Input section E):
     OPCOM spot      = buffer days x max daily notified spot buy x max DAM (active scenario, uncurtailed)
     BRP / imbalance = rate RON/MW x (generation MW in BRP + max quarter-hour notified retail buy MW) / FX
+                      (method "rate_per_mw", the workbook rule) or, with method "pre_delegated" (D119, the
+                      balancing responsibility delegated to a PRE service provider):
+                      max(initial guarantee RON / FX, months x average monthly imbalance value x (1 + VAT if
+                      the basis is VAT-inclusive)) where the monthly imbalance value is |source + off-taker +
+                      resell imbalance| of the engine's own ledger at the imbalance prices
     TSO             = Vtm x sum_offtakers (TL + SS) x active x metered year volume / 12
     DSO             = Vdm x sum_offtakers (T_HV + T_MV + T_LV) x active x metered year volume / 12 + add-on
 Each x 1 if the counterparty is Active else 0.
@@ -64,6 +69,7 @@ class RegulatoryInputs:
     peak_dam_price: float  # Input!C113 = MAX(Whol_Sport_Imb_Fcst!AJ)
     peak_retail_buy_mw: float  # Input!C118 = MAX(QH_P&L!AJ)
     metered_year_by_offtaker: dict[str, float]  # Cons_P&L section "Metered Volume", year
+    imbalance_value_monthly: np.ndarray | None = None  # EUR per month, |source + off-taker + resell imbalance| (D119)
 
 
 @dataclass
@@ -84,7 +90,7 @@ def regulatory_amounts(params: Parameters, inp: RegulatoryInputs) -> RegulatoryA
     cp = params.counterparties
     on = {k: (1.0 if cp[k].active else 0.0) for k in ("spot", "brp", "tso", "dso")}
     spot = float(mg["spot"]["buffer_days"]) * inp.peak_daily_spot_buy_mwh * inp.peak_dam_price * on["spot"]
-    brp = float(mg["brp"]["rate_ron_per_mw"]) * (float(mg["brp"]["generation_mw_in_brp"]) + inp.peak_retail_buy_mw) / params.general.fx_ron_per_eur * on["brp"]
+    brp = brp_required(params, inp) * on["brp"]
     tso_val = 0.0
     dso_val = 0.0
     for o in params.offtakers:
@@ -95,6 +101,19 @@ def regulatory_amounts(params: Parameters, inp: RegulatoryInputs) -> RegulatoryA
     tso = float(mg["tso"]["vtm_multiplier"]) * tso_val / 12.0 * on["tso"]
     dso = (float(mg["dso"]["vdm_multiplier"]) * dso_val / 12.0 + float(mg["dso"]["overdue_addon_eur"])) * on["dso"]
     return RegulatoryAmounts(spot=spot, brp=brp, tso=tso, dso=dso, tso_annual_value=tso_val, dso_annual_value=dso_val)
+
+
+def brp_required(params: Parameters, inp: RegulatoryInputs) -> float:
+    """The BRP / imbalance guarantee before the activity switch: the workbook rule (rate per MW) or the
+    delegated-PRE rule of D119 (initial amount, then months x average monthly imbalance value)."""
+    mg = params.market_guarantees["brp"]
+    fx = float(params.general.fx_ron_per_eur)
+    if str(mg.get("method", "rate_per_mw")) != "pre_delegated":
+        return float(mg["rate_ron_per_mw"]) * (float(mg["generation_mw_in_brp"]) + inp.peak_retail_buy_mw) / fx
+    values = np.abs(np.asarray(inp.imbalance_value_monthly if inp.imbalance_value_monthly is not None else [], dtype=float))
+    avg = float(values.mean()) if values.size else 0.0
+    vat = 1.0 + float(params.general.vat_rate) if bool(mg.get("pre_vat_inclusive", True)) else 1.0
+    return max(float(mg.get("pre_initial_ron", 0.0)) / fx, float(mg.get("pre_months_of_imbalance", 0.0)) * avg * vat)
 
 
 def _window(g: Guarantee, starts: list[date]) -> np.ndarray:

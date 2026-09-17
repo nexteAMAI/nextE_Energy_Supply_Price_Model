@@ -42,7 +42,7 @@ def test_catalogue_statuses_and_pass_fields():
 
 
 def test_verified_2026_table_sums_to_the_applied_tariffs():
-    cfg = load_grid_tariffs("config/tariffs_ro_2026_anre.yaml")
+    cfg = load_grid_tariffs()  # the shipped table is the ANRE 2026 table since 0.7.3 (TAR-2026 (a), D119)
     assert cfg["meta"]["source_status"] == "verified" and cfg["meta"]["basis"] == "specific"
     rows = {(r["owner"], r["component"]): r["ron_per_mwh"] for r in cfg["tariffs"]}
     for dso, (it, mt, jt) in APPLIED_2026.items():
@@ -52,19 +52,47 @@ def test_verified_2026_table_sums_to_the_applied_tariffs():
 
 
 def test_tar_2026_finding_deer_mv():
-    """The v1.1 table (loaded) yields the Reference Case set for DEER at MV DSO: 39,37 + 122,80 lei/MWh - Oltenia's
-    applied tariffs under DEER's name, HV counted twice. The verified table yields DEER's applied MV tariff 115,32."""
+    """The superseded v1.1 table yielded the Reference Case set for DEER at MV DSO: 39,37 + 122,80 lei/MWh - Oltenia's
+    applied tariffs under DEER's name, HV counted twice. The shipped ANRE table yields DEER's applied MV tariff 115,32.
+    The frozen Reference Case register keeps its explicit components (parity)."""
     p = load_parameters()
     o = copy.deepcopy(p.offtaker("OT1"))
     fx = p.general.fx_ron_per_eur
     o.dso, o.voltage_level = "Distributie Energie Electrica Romania", "MV (6-20 kV) DSO"
-    v11 = p.tariffs_by_grid(o.dso, o.voltage_level)
+    q = copy.deepcopy(p)
+    q.grid_tariffs = load_grid_tariffs("config/tariffs_ro_v11_template_superseded.yaml")["tariffs"]
+    v11 = q.tariffs_by_grid(o.dso, o.voltage_level)
     assert (v11["T_HV"] + v11["T_MV"]) * fx == pytest.approx(39.37 + 122.80, abs=1e-6)
     assert v11["T_HV"] * fx == pytest.approx(p.tariff_components["T_HV"] * fx, abs=1e-6)  # the Reference Case set (D109)
-    q = copy.deepcopy(p)
-    q.grid_tariffs = load_grid_tariffs("config/tariffs_ro_2026_anre.yaml")["tariffs"]
-    anre = q.tariffs_by_grid(o.dso, o.voltage_level)
+    anre = p.tariffs_by_grid(o.dso, o.voltage_level)
     assert (anre["T_HV"] + anre["T_MV"]) * fx == pytest.approx(115.32, abs=1e-6)
     assert anre["T_LV"] == 0.0 and anre["TL"] * fx == pytest.approx(36.45, abs=1e-6)
     # the finding in EUR/MWh at the register FX: what the Reference Case adds on top of DEER's applied MV tariff
     assert ((39.37 + 122.80) - 115.32) / fx == pytest.approx(8.5182, abs=1e-3)
+    assert p.tariff_components["TL"] * fx == pytest.approx(36.54, abs=1e-6)  # the frozen register is untouched
+
+
+def test_d119_bid_defaults_and_delegated_pre_guarantee():
+    """RC-2027, BRP-GF, TAR-2026 (a): the bid defaults change a copy, never the Reference Case; the delegated-PRE
+    guarantee is max(initial, months x average monthly imbalance value x (1 + VAT))."""
+    import numpy as np
+
+    from esb import guarantees as gr
+
+    p = load_parameters()
+    assert p.general.reverse_charge_vat_on_sources and p.market_guarantees["brp"]["method"] == "rate_per_mw"
+    assert any(w.startswith("RC-2027") for w in p.regulatory_warnings()) and any(w.startswith("BRP-GF") for w in p.regulatory_warnings())
+    q = copy.deepcopy(p)
+    done = q.apply_bid_defaults()
+    assert len(done) == 2 and not q.general.reverse_charge_vat_on_sources and q.market_guarantees["brp"]["method"] == "pre_delegated"
+    assert q.apply_bid_defaults() == [] and q.regulatory_warnings() == []
+    assert p.general.reverse_charge_vat_on_sources  # the source register is untouched
+    inp = gr.RegulatoryInputs(peak_daily_spot_buy_mwh=0.0, peak_dam_price=0.0, peak_retail_buy_mw=40.0, metered_year_by_offtaker={},
+                              imbalance_value_monthly=np.array([-30000.0, 20000.0, -10000.0] + [0.0] * 9))
+    fx, vat = p.general.fx_ron_per_eur, p.general.vat_rate
+    assert gr.brp_required(p, inp) == pytest.approx(9000.0 * (160.0 + 40.0) / fx)
+    avg = 60000.0 / 12
+    assert gr.brp_required(q, inp) == pytest.approx(max(100000.0 / fx, 2.0 * avg * (1 + vat)))
+    q.market_guarantees["brp"]["pre_months_of_imbalance"] = 1.0
+    q.market_guarantees["brp"]["pre_vat_inclusive"] = False
+    assert gr.brp_required(q, inp) == pytest.approx(100000.0 / fx)  # the initial amount floors it

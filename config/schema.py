@@ -375,6 +375,36 @@ class Parameters:
                 errs.append(f"grid tariff table: {r.get('owner')} {r.get('component')} has no value (blank is not zero)")
         return errs
 
+    # ---- D119: bid-scenario defaults and regulatory warnings -----------------------------------------------------
+    def apply_bid_defaults(self) -> list[str]:
+        """The rulings of 17.09.2026 for bid scenarios (not for the frozen Reference Case): reverse charge off for a
+        spine year after 2026 (RC-2027), BRP guarantee by the delegated-PRE rule (BRP-GF), the shipped ANRE grid
+        tariff table (TAR-2026). Returns the changes made."""
+        done: list[str] = []
+        if self.spine_year > 2026 and self.general.reverse_charge_vat_on_sources:
+            self.general.reverse_charge_vat_on_sources = False
+            done.append("reverse charge on source purchases switched off (measure ends 31.12.2026)")
+        if str(self.market_guarantees["brp"].get("method", "rate_per_mw")) != "pre_delegated":
+            self.market_guarantees["brp"]["method"] = "pre_delegated"
+            done.append("BRP guarantee by the delegated-PRE rule")
+        shipped = load_grid_tariffs()["tariffs"]
+        key = lambda rows: [(r["owner"], r["component"], float(r["ron_per_mwh"])) for r in rows]  # noqa: E731
+        if key(self.grid_tariffs) != key(shipped):
+            self.grid_tariffs = [dict(r) for r in shipped]
+            done.append("grid tariff table reset to the shipped ANRE 2026 table")
+        return done
+
+    def regulatory_warnings(self) -> list[str]:
+        """Non-blocking: settings that contradict the verified regulatory state (docs/PARAMETERS.md section 3)."""
+        warns: list[str] = []
+        if self.spine_year > 2026 and self.general.reverse_charge_vat_on_sources:
+            warns.append("RC-2027: the reverse charge on electricity purchases ends 31.12.2026 (Codul fiscal art. 331 alin. (6)); "
+                         f"the spine year {self.spine_year} applies it - keep only with the adviser's confirmation of an extension")
+        if str(self.market_guarantees["brp"].get("method", "rate_per_mw")) == "rate_per_mw":
+            warns.append("BRP-GF: the BRP guarantee uses the workbook rate-per-MW rule, which no procedure supports; bid scenarios "
+                         "use the delegated-PRE rule")
+        return warns
+
 
 def load_parameters(path: str | Path | None = None) -> Parameters:
     path = Path(path) if path else Path(__file__).with_name("parameters.yaml")

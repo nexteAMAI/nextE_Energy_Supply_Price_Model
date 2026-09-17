@@ -376,6 +376,7 @@ def build_pnl(qh: QHResult, params: Parameters) -> PnLResult:
         peak_dam_price=float(np.nanmax(q["dam"].to_numpy())),
         peak_retail_buy_mw=float(q["retail_buy_notified_mw"].max()),
         metered_year_by_offtaker={c: S[c].y("metered") for c in codes},
+        imbalance_value_monthly=P.m("source_imb") + P.m("offtaker_imb") + P.m("rs_source_imb"),
     )
     reg = gr.regulatory_amounts(params, reg_inp)
     cp = params.counterparties
