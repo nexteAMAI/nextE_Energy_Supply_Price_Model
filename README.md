@@ -23,7 +23,7 @@ register is coded; names live in scenario files outside it).
 
 | Folder | Purpose | Phase |
 |---|---|---|
-| `config/` | Parameter register (YAML, Reference Case values) and its schema | 3 (done) |
+| `config/` | Parameter register (YAML, Reference Case values), its schema, the grid tariff table, the Romanian calendar rules and the parameter catalogue (unit / standard / source per path) | 3-7 |
 | `esb/` | Engine: grid and importer (Phase 2); imbalance rule book, scenarios, sources, merit order, monthly layer, P&L, guarantees, cash flow, pricing, reporting, engine, parity (Phase 3); assembly of uploads, scenario file, case bundle, exports, labels (Phase 5); canonical output layout and the Romanian calendar (Phase 7) | 2-5 (done) |
 | `tests/` | Unit, edge, parity and application suites | 3-5 |
 | `data/reference/` | Reference Case input series and expected output cells (parquet, coded) | 2-3 (done) |

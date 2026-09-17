@@ -135,10 +135,19 @@ def render() -> None:
             cu = {_col_label(c): _qh_unit(c) for c in show.columns if c != "interval"}
             show.columns = [_col_label(c) for c in show.columns]
             B.table(show, index_label="Date", decimals=4, scroll=True, decimals_by_col={"Interval": 0}, col_units=cu)
-            from esb.export import csv_bytes
+            from esb.export import csv_columns
+            from esb.layout import qh_csv_frame
 
-            st.download_button("Download QH frame (CSV, ';' separated, decimal comma)", data=csv_bytes(full, index=False),
-                               file_name=f"QH_frame_{p.spine_year}.csv", mime="text/csv")
+            if st.button("Prepare the QH frame CSV (35.040 rows, one column order with the workbook - D-G)"):
+                frame = qh_csv_frame(r, full=True)
+                st.session_state["qh_csv"] = (p.spine_year, csv_columns(frame, {c: unit_of(c) for c in frame.columns}, "qh"))
+                state.add_log("export", f"QH frame CSV prepared ({len(frame):,} rows, {len(frame.columns)} columns)".replace(",", "."))
+            qc = st.session_state.get("qh_csv")
+            if qc and qc[0] == p.spine_year:
+                st.download_button("Download QH frame (CSV, ';' separated, decimal comma)", data=qc[1],
+                                   file_name=f"QH_frame_{p.spine_year}.csv", mime="text/csv")
+            B.caption("Column order = the QH sheets of the workbook: calendar block, sequence, then the engine keys by block (ruling D-G); "
+                      "header = engine keys, dates dd.mm.yyyy, times hh:mm, decimals by unit")
 
 
 def _qh_unit(c: str) -> str:

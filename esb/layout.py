@@ -173,14 +173,17 @@ class Sheet:
                     out.append(None)
                     continue
                 value, f, bg, nf, al, border = sc
-                cell = WriteOnlyCell(ws, value=value)
+                cell = WriteOnlyCell(ws)
                 cell.font = f
                 if bg:
                     cell.fill = fill(bg)
                 if nf:
                     cell.number_format = nf
+                elif isinstance(value, (datetime, date)):
+                    cell.number_format = NUMBER_FORMATS["date"]["*"]
                 cell.alignment = al
                 cell.border = BORDER if border else NO_BORDER
+                cell.value = value
                 out.append(cell)
             ws.append(out)
 
@@ -706,8 +709,43 @@ def _qh_frames(run: RunResult) -> tuple[pd.DataFrame, pd.DataFrame]:
     return full.copy(), daily.copy()
 
 
+def qh_csv_frame(run: RunResult, full: bool = True) -> pd.DataFrame:
+    """The quarter-hour (or daily) frame in the one column order of the workbook (D-G): the calendar block, the
+    sequence, then the engine keys by block - no spacers. This is the CSV download of the Engine page."""
+    q_full, q_daily = _qh_frames(run)
+    frame = q_full if full else q_daily
+    plan = _grid_columns(frame)
+    cols = [p["key"] for p in plan if p["kind"] != "spacer"]
+    return frame[cols]
+
+
+QH_CSV_KEYS_NOTE = "calendar block, sequence, then the engine keys in the order of the workbook's QH sheets (D-G)"
+
+
 # ---- parameters and provenance -----------------------------------------------------------------------
+PARAM_FORMATS = {"EUR/MWh": '#,##0.00\\ "€/MWh";\\(#,##0.00\\ "€/MWh"\\);"-"', "EUR": _nf(0, "€"), "RON": _nf(0, "RON"), "%": "0.0%", "% p.a.": '0.00%',
+                 "days": "0", "day of month": "0", "months": "0", "MW": '#,##0.0\\ "MW"', "RON/MW": '#,##0\\ "RON/MW"', "RON/MWh": '#,##0.00\\ "RON/MWh"',
+                 "RON/EUR": NUMBER_FORMATS["RON/EUR"]["*"], "RON/GC": NUMBER_FORMATS["RON/GC"]["*"], "GC/MWh": NUMBER_FORMATS["GC/MWh"]["*"],
+                 "x": "0.00", "date": NUMBER_FORMATS["date"]["*"], "year": "0", "sign": "0", "#": "0"}
+
+
+def _param_value(v, unit: str):
+    """The register value as the cell should carry it: dates as dates, numbers as numbers, lists and text as text."""
+    if isinstance(v, str) and unit == "date":
+        try:
+            return date.fromisoformat(v)
+        except ValueError:
+            return v
+    if isinstance(v, bool) or v is None:
+        return "" if v is None else ("yes" if v else "no")
+    if isinstance(v, (int, float)):
+        return v
+    return str(v)
+
+
 def _parameters(wb: Workbook, run: RunResult, stamp: str, scenario_name: str) -> None:
+    from esb.catalogue import catalogue_for
+
     sp = spec()["sheets"]["Parameters"]
     ws = Sheet("Parameters")
     _band(ws, sp["band"]["A2"], f"Scenario file: {scenario_name or '(unsaved)'}", stamp, 5)
@@ -716,32 +754,28 @@ def _parameters(wb: Workbook, run: RunResult, stamp: str, scenario_name: str) ->
         _put(ws, 6, j, t, f=hf, bg=NAVY, al=LEFT if j in (1, 4, 5) else CENTER)
     ws.height(6)
     flat = _flatten(run.params.to_dict())
-    catalogue = _parameter_catalogue(run)
+    catalogue = catalogue_for(flat.keys())
+    src, status = holiday_source()
     r = 7
     for k, v in flat.items():
-        meta = catalogue.get(k, {})
+        meta = catalogue[k]
+        val = _param_value(v, meta.unit)
+        nf = PARAM_FORMATS.get(meta.unit, "General") if not isinstance(val, str) else "@"
         _put(ws, r, 1, k, f=font(10), al=LEFT)
-        val = v if isinstance(v, (int, float, str, bool)) or v is None else str(v)
-        _put(ws, r, 2, val, f=font(10), bg=DATA_FILL, nf="@" if isinstance(val, str) else "General")
-        _put(ws, r, 3, meta.get("unit", ""), f=font(10), bg=DATA_FILL)
-        _put(ws, r, 4, meta.get("standard", ""), f=font(10), bg=DATA_FILL, al=LEFT)
-        _put(ws, r, 5, meta.get("source", ""), f=font(10), bg=DATA_FILL, al=LEFT)
+        _put(ws, r, 2, val, f=font(10), bg=DATA_FILL, nf=nf)
+        _put(ws, r, 3, meta.unit, f=font(10), bg=DATA_FILL)
+        _put(ws, r, 4, meta.standard, f=font(10), bg=DATA_FILL, al=LEFT)
+        _put(ws, r, 5, meta.source_text, f=font(10), bg=DATA_FILL, al=LEFT)
         ws.height(r)
         r += 1
+    _put(ws, r, 1, "calendar.public_holidays", f=font(10), al=LEFT)
+    _put(ws, r, 2, "rules in config/calendar_ro.yaml", f=font(10), bg=DATA_FILL, nf="@")
+    _put(ws, r, 3, "", f=font(10), bg=DATA_FILL)
+    _put(ws, r, 4, "Codul muncii art. 139 alin. (1)", f=font(10), bg=DATA_FILL, al=LEFT)
+    _put(ws, r, 5, f"{src} [{status}]", f=font(10), bg=DATA_FILL, al=LEFT)
+    ws.height(r)
     _finish(ws, sp["widths"], "B7")
     ws.flush(wb)
-
-
-def _parameter_catalogue(run: RunResult) -> dict[str, dict]:
-    """Unit / standard / source per parameter path, from the register's own provenance where it carries one (D-I:
-    the full catalogue is a T12.7 item; until then the tariff rows and the calendar carry their sources)."""
-    out: dict[str, dict] = {}
-    src, status = holiday_source()
-    out["calendar.public_holidays"] = {"unit": "", "standard": "Codul muncii art. 139", "source": f"{src} [{status}]"}
-    for row in getattr(run.params, "grid_tariffs", []) or []:
-        if isinstance(row, dict) and row.get("key"):
-            out[f"grid_tariffs.{row['key']}"] = {"unit": row.get("unit", "RON/MWh"), "standard": row.get("standard", ""), "source": row.get("source", "")}
-    return out
 
 
 def _provenance(wb: Workbook, run: RunResult, stamp: str, provenance: list[dict] | None, requested_by: str) -> None:

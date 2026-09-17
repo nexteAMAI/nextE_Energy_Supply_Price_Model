@@ -223,3 +223,16 @@ def test_roles_for_and_ui_decimals():
     assert roles["check_demand"] == "check" and roles["t_revenue"] == "total"
     assert layout.roles_for("Pricing_<code>")["metered"] == "total"
     assert brand.UNIT_DECIMALS["monthly"]["check"] == 6 and brand.UNIT_DECIMALS["qh"]["MWh"] == 4 and brand.UNIT_DECIMALS["daily"]["MWh"] == 3
+
+
+def test_overview_nm_row_is_the_total_and_no_name_in_the_spec():
+    """v0.7.0 defect (compliance check 17.09.2026, W-6): the template label 'NM' resolved to the resell leg; the
+    corrected template (D-D) says 'NM · Total' and the extractor prefers the Total leg for an untagged measure.
+    W-1: no counterparty name anywhere in the layout specification (F-035)."""
+    rows = {r["r"]: r for r in layout.spec()["sheets"]["Portf Overview"]["rows"] if r.get("kind") == "line"}
+    assert rows[81]["key"] == "nm" and rows[81]["label"] == "NM · Total"
+    text = layout.SPEC_PATH.read_text(encoding="utf-8")
+    for name in ("off-taker", "off-taker", "the supply-contract counterparty", "the supply-contract counterparty"):
+        assert name not in text
+    q = {c["key"]: c for c in layout.spec()["sheets"]["QH_full"]["columns"] if c.get("key")}
+    assert q["retail_spot_settlement"]["unit_template"] == "MWh"

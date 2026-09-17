@@ -14,6 +14,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+from esb.export import UNIT_DECIMALS  # one catalogue for the workbook, the CSVs and the app (D113)
+
 NAVY = "#1F3E66"
 NAVY_DEEP = "#14304F"
 NAVY_SOFT = "#2E5386"
@@ -264,11 +266,6 @@ def _fmt_cell(v, decimals: int, pct_row: bool) -> str:
     return num(v, decimals)
 
 
-UNIT_DECIMALS = {  # decimals by unit and granularity - the number-format catalogue of the output workbook (D113)
-    "monthly": {"EUR": 0, "MWh": 0, "MW": 1, "EUR/MWh": 2, "%": 1, "check": 6, "ratio": 4, "GC": 0, "GC/MWh": 3, "RON/GC": 4, "RON/EUR": 4, "EUR/GC": 2, "days": 0, "#": 0},
-    "daily": {"EUR": 0, "MWh": 3, "MW": 1, "EUR/MWh": 2, "%": 1, "check": 6, "ratio": 4, "days": 0, "#": 0},
-    "qh": {"EUR": 2, "MWh": 4, "MW": 3, "EUR/MWh": 2, "%": 1, "check": 6, "ratio": 4, "#": 0},
-}
 ROLE_CLASSES = ("total", "subtotal", "memo", "check", "section")
 
 

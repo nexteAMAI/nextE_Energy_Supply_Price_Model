@@ -1,0 +1,75 @@
+# Parameter catalogue (ruling D-I, 17.09.2026): unit, standard / default and source per register path.
+# Read by esb.catalogue: the Parameters sheet of every export and the Parameters page show these columns.
+#
+# rules   - unit by the last segment of the path (leaf name); an explicit entry below overrides a rule.
+# entries - explicit unit / standard / source / source_status per path (regular expression on the full path,
+#           entity codes in brackets such as offtakers[OT1] match ".*").
+# Sources are stated as the register cites them; `source_status` says whether a primary source was checked:
+#   verified   - checked against the primary source named (with date)
+#   unverified - quoted from the Reference Case workbook; the verification pass (T12.7, CW-EMK-01) is owed
+#   assumption - a house assumption, no external source claimed
+#   to_verify  - a source is named but not yet checked
+version: 1
+rules:
+  - {contains: _pct_, unit: "%"}
+  - {prefix: pct_, unit: "%"}
+  - {suffix: _eur_per_mwh, unit: EUR/MWh}
+  - {suffix: eur_per_mwh_metered, unit: EUR/MWh}
+  - {suffix: _eur, unit: EUR}
+  - {suffix: _ron, unit: RON}
+  - {suffix: _pct, unit: "%"}
+  - {suffix: _rate, unit: "%"}
+  - {suffix: _pa, unit: "% p.a."}
+  - {suffix: _days, unit: days}
+  - {suffix: _day, unit: day of month}
+  - {suffix: _months, unit: months}
+  - {suffix: _mw, unit: MW}
+  - {suffix: _mw_in_brp, unit: MW}
+  - {suffix: ron_per_mw, unit: RON/MW}
+  - {suffix: ron_per_mwh, unit: RON/MWh}
+  - {suffix: ron_per_eur, unit: RON/EUR}
+  - {suffix: ron_per_gc, unit: RON/GC}
+  - {suffix: gc_per_mwh, unit: GC/MWh}
+  - {suffix: _multiplier, unit: x}
+  - {suffix: _factor_vs_dam_curtailed, unit: x}
+  - {suffix: _start, unit: date}
+  - {suffix: _end, unit: date}
+  - {suffix: _year, unit: year}
+  - {leaf: start, unit: date}
+  - {leaf: end, unit: date}
+  - {leaf: validity, unit: year}
+  - {leaf: share, unit: "%"}
+  - {leaf: spot_share, unit: "%"}
+  - {leaf: k, unit: sign}
+  - {leaf: fixed_amount, unit: EUR}
+  - {leaf: position, unit: "#"}
+  - {leaf: target_gross_margin, unit: EUR/MWh}
+  - {leaf: target_gm_budget, unit: EUR/MWh}
+  - {leaf: target_gm_forecast, unit: EUR/MWh}
+  - {leaf: BL24, unit: MW}
+  - {leaf: Peak, unit: MW}
+  - {leaf: OffPeak, unit: MW}
+entries:
+  - {path: "premium_standard\\.(volume|price|profile|credit|regulatory|fx|collateral)", unit: EUR/MWh, standard: "house premium components", source: "Reference Case workbook Input block", source_status: assumption}
+  - {path: "offtakers\\[.*\\]\\.premium_(budget|forecast)\\..*", unit: EUR/MWh, standard: "house premium components", source: "Reference Case workbook Input block", source_status: assumption}
+  - {path: "offtakers\\[.*\\]\\.product_price_(budget|forecast)\\..*", unit: EUR/MWh, standard: "", source: "Reference Case workbook FW_Purch_Sell_Price", source_status: assumption}
+  - {path: "general\\.vat_rate", unit: "%", standard: "21 %", source: "Legea nr. 227/2015 (Codul fiscal) per workbook", source_status: unverified}
+  - {path: "general\\.cit_rate", unit: "%", standard: "16 %", source: "Legea nr. 227/2015, art. 41 per workbook label", source_status: unverified}
+  - {path: "general\\.reverse_charge_vat_on_sources", unit: "", standard: "applied", source: "art. 331 alin. (2) lit. e) Codul fiscal per workbook; adviser confirmation outstanding", source_status: unverified}
+  - {path: "general\\.fx_ron_per_eur", unit: RON/EUR, standard: "5,5", source: "workbook D54, Forecast Q3 2026", source_status: assumption}
+  - {path: "general\\.tax_payment_day", unit: day of month, standard: "25", source: "Codul fiscal payment deadline per workbook", source_status: unverified}
+  - {path: "green_certificates\\.quota_gc_per_mwh", unit: GC/MWh, standard: "0,499387", source: "current regulation, 2026 basis (workbook D85)", source_status: unverified}
+  - {path: "green_certificates\\.reference_price_ron_per_gc", unit: RON/GC, standard: "148,2201", source: "workbook Cons_P&L!B7", source_status: unverified}
+  - {path: "green_certificates\\.spot_share", unit: "%", standard: "50 %", source: "house assumption", source_status: assumption}
+  - {path: "market_guarantees\\.brp\\.rate_ron_per_mw", unit: RON/MW, standard: "9.000", source: "Transelectrica BRP rule per workbook", source_status: unverified}
+  - {path: "market_guarantees\\.tso\\.vtm_multiplier", unit: x, standard: "2", source: "Transelectrica PO 01.13 per workbook", source_status: unverified}
+  - {path: "market_guarantees\\.dso\\.vdm_multiplier", unit: x, standard: "1", source: "ANRE Order 129/2015 per workbook", source_status: unverified}
+  - {path: "market_guarantees\\.spot\\.buffer_days", unit: days, standard: "4", source: "OPCOM collateral practice per workbook", source_status: unverified}
+  - {path: "tariff_components_eur_per_mwh\\..*", unit: EUR/MWh, standard: "DEER MV DSO set, 2026", source: "workbook Input!C54:F63, Forecast Q3 2026 basis (D55 / D60)", source_status: unverified}
+  - {path: "grid_tariffs\\[.*\\]\\.ron_per_mwh", unit: RON/MWh, standard: "", source: "v1.1 template sheet Grid_Taxes_RO, validity 2026 (D109)", source_status: unverified}
+  - {path: "calendar\\.public_holidays", unit: "", standard: "Codul muncii art. 139 alin. (1)", source: "config/calendar_ro.yaml", source_status: to_verify}
+  - {path: "meta\\.kpi_retail_nm_target_eur_per_mwh", unit: EUR/MWh, standard: "3,00", source: "house benchmark (D101)", source_status: assumption}
+  - {path: "general\\.shareholder_loan_rate_pa", unit: "% p.a.", standard: "7 %", source: "house assumption", source_status: assumption}
+  - {path: "general\\.debt_facility\\..*_pa", unit: "% p.a.", standard: "", source: "house assumption", source_status: assumption}
+  - {path: "resell\\..*_factor_vs_dam_curtailed", unit: x, standard: "", source: "Reference Case workbook", source_status: assumption}
+  - {path: "counterparties\\..*\\.k", unit: sign, standard: "-1 source / +1 BRP", source: "docs/DATA_CONTRACT.md §6", source_status: verified}

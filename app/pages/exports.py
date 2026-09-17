@@ -12,7 +12,8 @@ from app import auth
 from app import brand as B
 from app import state as S
 from esb.bundle import CaseBundle, compare_summary, read_bundle
-from esb.export import build_workbook, csv_bytes
+from esb.export import build_workbook, csv_columns, csv_rows
+from esb.labels import RETAIL, TOTAL, label, unit_of
 
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
@@ -47,19 +48,25 @@ def render() -> None:
         with c1:
             pf = r.pnl.portfolio.frame()
             pf.columns = [*B.MONTH_EN, "Year"]
-            st.download_button("P&L portfolio (CSV)", data=csv_bytes(pf), file_name=f"pnl_portfolio_{stamp}.csv", mime="text/csv")
+            st.download_button("P&L portfolio (CSV)", data=csv_rows(pf, {k: unit_of(k) for k in pf.index}, {k: label(k) for k in pf.index}),
+                               file_name=f"pnl_portfolio_{stamp}.csv", mime="text/csv")
         with c2:
             cf = r.cashflow.frame()
             cf.columns = [*B.MONTH_EN, "Beyond Dec", "Year"]
-            st.download_button("Cash flow monthly (CSV)", data=csv_bytes(cf), file_name=f"cashflow_monthly_{stamp}.csv", mime="text/csv")
+            st.download_button("Cash flow monthly (CSV)", data=csv_rows(cf, {k: unit_of(k) for k in cf.index}, {k: label(k, fallback=TOTAL) for k in cf.index}),
+                               file_name=f"cashflow_monthly_{stamp}.csv", mime="text/csv")
         with c3:
             if r.cashflow.daily is not None:
-                st.download_button("Daily ledger (CSV)", data=csv_bytes(r.cashflow.daily, index=False), file_name=f"cashflow_daily_{stamp}.csv", mime="text/csv")
+                d = r.cashflow.daily
+                st.download_button("Daily ledger (CSV)", data=csv_columns(d, {c: unit_of(c) for c in d.columns}, "daily"),
+                                   file_name=f"cashflow_daily_{stamp}.csv", mime="text/csv")
         with c4:
             pr = r.pricing[r.selected_offtaker]
             df = pd.DataFrame({k: [v, *(list(pr.months[k]) if k in pr.months else [float("nan")] * 12)] for k, v in pr.year.items()}, index=["Year", *B.MONTH_EN]).T
-            st.download_button(f"Pricing {r.selected_offtaker} (CSV)", data=csv_bytes(df), file_name=f"pricing_{r.selected_offtaker}_{stamp}.csv", mime="text/csv")
-        B.caption("Semicolon-separated, decimal comma, UTF-8 with BOM - opens directly in a Romanian Excel")
+            st.download_button(f"Pricing {r.selected_offtaker} (CSV)", data=csv_rows(df, {k: unit_of(k, "pricing") for k in df.index}, {k: label(k, leg=RETAIL) for k in df.index}),
+                               file_name=f"pricing_{r.selected_offtaker}_{stamp}.csv", mime="text/csv")
+        B.caption("Semicolon-separated, decimal comma, UTF-8 with BOM, dd.mm.yyyy; line tables carry key, label and unit, decimals by unit; "
+                  "the daily ledger keeps the engine keys as header (a column's identity)")
 
     st.markdown("## Case bundle")
     B.note("A case bundle holds the scenario file, every accepted upload byte-identical, their provenance and the headline results. Re-uploading it "

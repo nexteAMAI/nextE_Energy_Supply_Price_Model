@@ -1,9 +1,11 @@
 {
  "source": {
   "file": "TPL_output_run_export_ESB.xlsx",
-  "md5": "e2d1bc0c56c2c5c2bd6c8cd81c2c4468",
-  "extracted": "15.09.2026",
-  "standard": "nexte-output-workbook-formatting.md"
+  "md5": "e274bbde31c5783c531e0b2ee2297bc5",
+  "content_signature": "e438279e0ccbc862b8fd2906414d5e7c",
+  "extracted": "17.09.2026",
+  "standard": "nexte-output-workbook-formatting.md",
+  "note": "corrected copy of the CEO's template (ruling D-D, 17.09.2026); originals in 00_Spec/02_superseded/templates_originals_16092026/"
  },
  "sheets": {
   "Portf Overview": {
@@ -221,7 +223,7 @@
      "label": "Market ref",
      "key": "market_ref",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -746,8 +748,8 @@
      "r": 81,
      "kind": "line",
      "block": "overview",
-     "label": "NM",
-     "key": "resell_nm",
+     "label": "NM · Total",
+     "key": "nm",
      "role": "total",
      "unit_template": "€",
      "unit": "EUR",
@@ -1177,7 +1179,7 @@
      "label": "Origin layering check",
      "key": "origin_layering_check",
      "role": "check",
-     "unit_template": "€",
+     "unit_template": "check",
      "unit": "check",
      "values": null
     },
@@ -1218,7 +1220,7 @@
     "AC": 20.71,
     "AD": 20.71
    },
-   "freeze": "C50",
+   "freeze": "C7",
    "row_heights": {
     "1": 20.25,
     "2": 27.0,
@@ -1498,7 +1500,7 @@
      "label": "Spot settlement · Retail",
      "key": "spot_settlement",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -1859,7 +1861,7 @@
      "label": "Premium deviation · Retail",
      "key": "premium_deviation",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -2082,7 +2084,7 @@
      "label": "Green certificates · Retail",
      "key": "gc_count",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -2093,7 +2095,7 @@
      "label": "GC spot · Retail",
      "key": "gc_spot",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -2104,7 +2106,7 @@
      "label": "GC bilateral · Retail",
      "key": "gc_bilateral",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -2126,7 +2128,7 @@
      "label": "GC unit cost · Retail",
      "key": "gc_unit",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -2141,7 +2143,7 @@
      "label": "PV available · Wholesale spot resell",
      "key": "rs_pv_available",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -2163,7 +2165,7 @@
      "label": "PV delivered · Wholesale spot resell",
      "key": "rs_pv_delivered",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -2211,7 +2213,7 @@
      "label": "Baseload available · Wholesale spot resell",
      "key": "rs_bl_available",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -2233,7 +2235,7 @@
      "label": "Baseload delivered · Wholesale spot resell",
      "key": "rs_bl_delivered",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -2691,7 +2693,7 @@
      "label": "Bought (metered) · Total",
      "key": "t_buy_metered",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -3837,7 +3839,7 @@
      "label": "Spot settlement · Retail",
      "key": "spot_settlement",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -4184,7 +4186,7 @@
      "label": "Premium deviation · Retail",
      "key": "premium_deviation",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -4199,7 +4201,7 @@
      "label": "Premium budget input · Retail",
      "key": "premium_budget_input",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -4210,7 +4212,7 @@
      "label": "Premium forecast input · Retail",
      "key": "premium_forecast_input",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -4221,7 +4223,7 @@
      "label": "Premium forecast derived · Retail",
      "key": "premium_forecast_derived",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -4470,7 +4472,7 @@
      "label": "Green certificates · Retail",
      "key": "gc_count",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -4481,7 +4483,7 @@
      "label": "GC spot · Retail",
      "key": "gc_spot",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -4492,7 +4494,7 @@
      "label": "GC bilateral · Retail",
      "key": "gc_bilateral",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -4514,7 +4516,7 @@
      "label": "GC unit cost · Retail",
      "key": "gc_unit",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -4529,7 +4531,7 @@
      "label": "PV remaining · Retail",
      "key": "pv_remaining",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -4551,7 +4553,7 @@
      "label": "Baseload remaining · Retail",
      "key": "bl_remaining",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -4984,7 +4986,7 @@
      "label": "Spot settlement · Retail",
      "key": "spot_settlement",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -5331,7 +5333,7 @@
      "label": "Premium deviation · Retail",
      "key": "premium_deviation",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -5346,7 +5348,7 @@
      "label": "Premium budget input · Retail",
      "key": "premium_budget_input",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -5357,7 +5359,7 @@
      "label": "Premium forecast input · Retail",
      "key": "premium_forecast_input",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -5368,7 +5370,7 @@
      "label": "Premium forecast derived · Retail",
      "key": "premium_forecast_derived",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -5617,7 +5619,7 @@
      "label": "Green certificates · Retail",
      "key": "gc_count",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -5628,7 +5630,7 @@
      "label": "GC spot · Retail",
      "key": "gc_spot",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -5639,7 +5641,7 @@
      "label": "GC bilateral · Retail",
      "key": "gc_bilateral",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -5661,7 +5663,7 @@
      "label": "GC unit cost · Retail",
      "key": "gc_unit",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -5676,7 +5678,7 @@
      "label": "PV remaining · Retail",
      "key": "pv_remaining",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -5698,7 +5700,7 @@
      "label": "Baseload remaining · Retail",
      "key": "bl_remaining",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -6131,7 +6133,7 @@
      "label": "Spot settlement · Retail",
      "key": "spot_settlement",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -6478,7 +6480,7 @@
      "label": "Premium deviation · Retail",
      "key": "premium_deviation",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -6493,7 +6495,7 @@
      "label": "Premium budget input · Retail",
      "key": "premium_budget_input",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -6504,7 +6506,7 @@
      "label": "Premium forecast input · Retail",
      "key": "premium_forecast_input",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -6515,7 +6517,7 @@
      "label": "Premium forecast derived · Retail",
      "key": "premium_forecast_derived",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -6764,7 +6766,7 @@
      "label": "Green certificates · Retail",
      "key": "gc_count",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -6775,7 +6777,7 @@
      "label": "GC spot · Retail",
      "key": "gc_spot",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -6786,7 +6788,7 @@
      "label": "GC bilateral · Retail",
      "key": "gc_bilateral",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -6808,7 +6810,7 @@
      "label": "GC unit cost · Retail",
      "key": "gc_unit",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -6823,7 +6825,7 @@
      "label": "PV remaining · Retail",
      "key": "pv_remaining",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -6845,7 +6847,7 @@
      "label": "Baseload remaining · Retail",
      "key": "bl_remaining",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -7278,7 +7280,7 @@
      "label": "Spot settlement · Retail",
      "key": "spot_settlement",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -7625,7 +7627,7 @@
      "label": "Premium deviation · Retail",
      "key": "premium_deviation",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -7640,7 +7642,7 @@
      "label": "Premium budget input · Retail",
      "key": "premium_budget_input",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -7651,7 +7653,7 @@
      "label": "Premium forecast input · Retail",
      "key": "premium_forecast_input",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -7662,7 +7664,7 @@
      "label": "Premium forecast derived · Retail",
      "key": "premium_forecast_derived",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -7911,7 +7913,7 @@
      "label": "Green certificates · Retail",
      "key": "gc_count",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -7922,7 +7924,7 @@
      "label": "GC spot · Retail",
      "key": "gc_spot",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -7933,7 +7935,7 @@
      "label": "GC bilateral · Retail",
      "key": "gc_bilateral",
      "role": "subtotal",
-     "unit_template": "€",
+     "unit_template": "GC",
      "unit": "GC",
      "values": null
     },
@@ -7955,7 +7957,7 @@
      "label": "GC unit cost · Retail",
      "key": "gc_unit",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -7970,7 +7972,7 @@
      "label": "PV remaining · Retail",
      "key": "pv_remaining",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -7992,7 +7994,7 @@
      "label": "Baseload remaining · Retail",
      "key": "bl_remaining",
      "role": "data",
-     "unit_template": "€",
+     "unit_template": "MWh",
      "unit": "MWh",
      "values": null
     },
@@ -9045,7 +9047,7 @@
     "AC": 25.71,
     "AD": 25.71
    },
-   "freeze": "C40",
+   "freeze": "C7",
    "row_heights": {}
   },
   "CF_Daily_Ledger": {
@@ -9352,7 +9354,7 @@
     "AD": 25.71,
     "AE": 25.71
    },
-   "freeze": "R361"
+   "freeze": "D7"
   },
   "Pricing_<code>": {
    "family": "label",
@@ -9475,7 +9477,7 @@
      "label": "Premium volume · Retail",
      "key": "premium_volume",
      "role": "data",
-     "unit_template": "MWh",
+     "unit_template": "€/MWh",
      "unit": "EUR/MWh",
      "values": null
     },
@@ -9750,7 +9752,7 @@
      "label": "Reserve release budgeted · Retail",
      "key": "reserve_release_budget",
      "role": "data",
-     "unit_template": "€/MWh",
+     "unit_template": "€",
      "unit": "EUR",
      "values": null
     },
@@ -9761,7 +9763,7 @@
      "label": "Reserve release forecasted · Retail",
      "key": "reserve_release_forecast",
      "role": "data",
-     "unit_template": "€/MWh",
+     "unit_template": "€",
      "unit": "EUR",
      "values": null
     },
@@ -12408,8 +12410,8 @@
      "col": "KA",
      "kind": "engine",
      "key": "retail_spot_settlement",
-     "label": "Retail_Spot_Settlement_EUR",
-     "unit_template": "EUR",
+     "label": "Retail_Spot_Settlement_MWh",
+     "unit_template": "MWh",
      "unit": "MWh"
     },
     {
@@ -12957,7 +12959,7 @@
     "LE": 60.71,
     "LF": 60.71
    },
-   "freeze": "V15",
+   "freeze": "A15",
    "merged_titles": false
   },
   "Parameters": {
@@ -15505,7 +15507,7 @@
     "E": 38.14,
     "F": 9.14
    },
-   "freeze": "B352"
+   "freeze": "B7"
   },
   "Provenance": {
    "family": "provenance",

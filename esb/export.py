@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import io
 import json
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, time
 
 import numpy as np
 import pandas as pd
@@ -261,6 +261,61 @@ def _flatten(d: dict, prefix: str = "") -> dict[str, object]:
     return out
 
 
+UNIT_DECIMALS = {  # decimals by unit and granularity - the catalogue of the output workbook (D113), shared with the app
+    "monthly": {"EUR": 0, "MWh": 0, "MW": 1, "EUR/MWh": 2, "%": 1, "check": 6, "ratio": 4, "GC": 0, "GC/MWh": 3, "RON/GC": 4, "RON/EUR": 4, "EUR/GC": 2, "days": 0, "#": 0},
+    "daily": {"EUR": 0, "MWh": 3, "MW": 1, "EUR/MWh": 2, "%": 1, "check": 6, "ratio": 4, "days": 0, "#": 0},
+    "qh": {"EUR": 2, "MWh": 4, "MW": 3, "EUR/MWh": 2, "%": 1, "check": 6, "ratio": 4, "#": 0},
+}
+
+
+def _ro(v, decimals: int) -> str:
+    """Romanian number text for a CSV cell: decimal comma, no thousands separator, negative zero normalised."""
+    if v is None or (isinstance(v, float) and (v != v)):
+        return ""
+    if isinstance(v, (date, datetime, pd.Timestamp)):
+        return pd.Timestamp(v).strftime("%d.%m.%Y")
+    if isinstance(v, str):
+        return v
+    x = float(v)
+    if abs(x) < 0.5 * 10 ** (-decimals):
+        x = 0.0
+    return f"{x:.{decimals}f}".replace(".", ",")
+
+
+def csv_rows(df: pd.DataFrame, units: dict[str, str], labels: dict[str, str] | None = None, granularity: str = "monthly",
+             fallback_decimals: int = 6) -> bytes:
+    """Row-oriented CSV (index = engine keys): key;label;unit;<value columns>, decimals by unit role, Romanian
+    conventions (semicolon, decimal comma, UTF-8 with BOM, dd.mm.yyyy)."""
+    labels = labels or {}
+    lines = [";".join(["key", "label", "unit", *map(str, df.columns)])]
+    for k, rec in df.iterrows():
+        u = units.get(str(k), "")
+        d = UNIT_DECIMALS.get(granularity, {}).get(u, fallback_decimals)
+        lines.append(";".join([str(k), labels.get(str(k), label(str(k))), u, *(_ro(v, d) for v in rec.values)]))
+    return ("\n".join(lines) + "\n").encode("utf-8-sig")
+
+
+def csv_columns(df: pd.DataFrame, units: dict[str, str], granularity: str = "daily", fallback_decimals: int = 6) -> bytes:
+    """Column-oriented CSV (one row per date / quarter-hour): header = engine keys (the column's identity, D-G),
+    dates dd.mm.yyyy, times hh:mm, decimals by unit role, Romanian conventions."""
+    cols = list(df.columns)
+    decs = [UNIT_DECIMALS.get(granularity, {}).get(units.get(str(c), ""), fallback_decimals) for c in cols]
+    lines = [";".join(map(str, cols))]
+    arrs = [df[c].to_numpy() for c in cols]
+    for i in range(len(df)):
+        cells = []
+        for a, d in zip(arrs, decs, strict=True):
+            v = a[i]
+            if isinstance(v, time):
+                cells.append(v.strftime("%H:%M"))
+            elif isinstance(v, (np.integer, int)) and not isinstance(v, bool):
+                cells.append(str(int(v)))
+            else:
+                cells.append(_ro(v.item() if isinstance(v, np.generic) else v, d))
+        lines.append(";".join(cells))
+    return ("\n".join(lines) + "\n").encode("utf-8-sig")
+
+
 def csv_bytes(df: pd.DataFrame, index: bool = True) -> bytes:
-    """CSV with Romanian conventions: semicolon separator, decimal comma."""
+    """Plain CSV with Romanian conventions (semicolon, decimal comma); kept for tables without a unit map."""
     return df.to_csv(sep=";", decimal=",", index=index, float_format="%.6f").encode("utf-8-sig")

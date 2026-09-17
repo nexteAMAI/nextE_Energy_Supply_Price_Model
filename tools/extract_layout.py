@@ -179,10 +179,22 @@ def measure(text: str) -> str:
 
 
 def resolve(text: str, table: dict[str, str]) -> str | None:
+    """Exact label first; otherwise the measure part, preferring the Total leg or an untagged label over any other
+    leg (a template label without a leg means the total line, never a leg picked by dictionary order)."""
     if text in table:
         return table[text]
-    by_measure = {measure(k): v for k, v in table.items()}
-    return by_measure.get(measure(text))
+    m = measure(text)
+    candidates = [(k, v) for k, v in table.items() if measure(k) == m]
+    if not candidates:
+        return None
+    for pref in (m, f"{m} · Total"):
+        for k, v in candidates:
+            if k == pref:
+                return v
+    if len(candidates) > 1:
+        print(f"  ambiguous label '{text}': {[k for k, _ in candidates]} - taking none")
+        return None
+    return candidates[0][1]
 
 
 def role_of(cell, key: str | None, unit_of) -> str:

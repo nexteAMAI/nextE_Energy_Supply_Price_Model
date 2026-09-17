@@ -54,6 +54,12 @@ recorded here with the primary source.
 No regulatory constant is hard-coded in the engine; a change of any value above is a change
 of the register (or, in the application, of the user's scenario), never of the code.
 
+Since 0.7.1 the unit, the standard / default value, the source and the verification status of
+every register path live in `config/parameter_catalogue.yaml` (ruling D-I): units by rule on the
+path's leaf name, explicit entries for the constants above. The catalogue is rendered on the
+`Parameters` sheet of every export and on the Audit page; the regulatory verification pass
+(T12.7) turns `unverified` into `verified` with the primary source and date.
+
 ## 4. Loading
 
 ```

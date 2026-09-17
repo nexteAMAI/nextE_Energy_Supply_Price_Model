@@ -59,15 +59,19 @@ def render() -> None:
         hist["saved_at_utc"] = [B.dmy_hm(v) for v in hist["saved_at_utc"]]
         hist = hist.rename(columns={"saved_at_utc": "Saved (UTC)", "note": "Note"})
         B.table(hist, index_label="Version", decimals=0, scroll=True)
-    B.eyebrow("Register verification status")
-    rows = [("VAT rate", B.pct(p.general.vat_rate, 0), "Legea nr. 227/2015 (workbook)", "unverified"),
-            ("CIT rate", B.pct(p.general.cit_rate, 0), "Legea nr. 227/2015 art. 41 (workbook)", "unverified"),
-            ("Reverse charge on sources", "applied" if p.general.reverse_charge_vat_on_sources else "not applied", "art. 331 alin. (2) lit. e) (workbook)", "unverified; adviser confirmation outstanding"),
-            ("GC quota / reference price", f"{B.num(p.gc_quota, 6)} / {B.num(p.gc_reference_price_ron, 4)} RON", "workbook D85", "unverified"),
-            ("BRP rate", B.num(p.market_guarantees['brp']['rate_ron_per_mw'], 0, "RON/MW"), "Transelectrica BRP rule (workbook)", "unverified"),
-            ("Vtm / Vdm", f"{B.num(p.market_guarantees['tso']['vtm_multiplier'], 1)} / {B.num(p.market_guarantees['dso']['vdm_multiplier'], 1)}", "PO 01.13 / ANRE Order 129/2015 (workbook)", "unverified"),
-            ("Tariff components", B.num(p.tariff_total, 4, "EUR/MWh"), "Input!C54:F63, Forecast Q3 2026 basis", "unverified; single DEER MV set (X-03)")]
-    B.table(pd.DataFrame(rows, columns=["Parameter", "Value", "Origin", "Status"]).set_index("Parameter"), index_label="Parameter")
+    B.eyebrow("Register verification status - the parameter catalogue (config/parameter_catalogue.yaml, ruling D-I)")
+    from esb.catalogue import catalogue_for
+    from esb.export import _flatten
+
+    flat = _flatten(p.to_dict())
+    cat = catalogue_for(flat.keys())
+    rows = [(k, B.num(v, 4) if isinstance(v, float) else str(v), e.unit, e.standard, e.source, e.source_status)
+            for k, v in flat.items() if (e := cat[k]).source_status]
+    df = pd.DataFrame(rows, columns=["Parameter", "Value", "Unit", "Standard / default", "Source / vintage", "Status"]).set_index("Parameter")
+    B.table(df, index_label="Parameter", scroll=len(df) > 16)
+    B.caption("Status: verified = checked against the primary source; unverified = quoted from the Reference Case workbook, the verification pass "
+              "(T12.7, CW-EMK-01) is owed; assumption = house assumption; to_verify = source named, not yet checked. Every export's Parameters "
+              "sheet carries the same columns")
 
     st.markdown("## Registers")
     t1, t2, t3 = st.tabs(["Decisions", "Open items", "Methodology"])
