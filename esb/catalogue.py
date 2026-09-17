@@ -14,16 +14,28 @@ import yaml
 CATALOGUE_YAML = Path(__file__).resolve().parents[1] / "config" / "parameter_catalogue.yaml"
 
 
+STATUSES = ("verified", "verified_secondary", "contradicted", "unverified", "to_verify", "not_published", "assumption")
+
+
 @dataclass(frozen=True)
 class Entry:
     unit: str = ""
     standard: str = ""
     source: str = ""
     source_status: str = ""
+    validity: str = ""      # the period the source gives the value for
+    checked: str = ""       # date of the verification pass that read the source
+    note: str = ""          # open item or correction pending a ruling
 
     @property
     def source_text(self) -> str:
-        return f"{self.source} [{self.source_status}]" if self.source and self.source_status else self.source
+        """Source with its status, validity and check date in brackets - the Parameters sheet column."""
+        if not self.source:
+            return ""
+        tags = [t for t in (self.source_status, f"validity {self.validity}" if self.validity else "",
+                            f"checked {self.checked}" if self.checked else "") if t]
+        text = f"{self.source} [{'; '.join(tags)}]" if tags else self.source
+        return f"{text} - {self.note}" if self.note else text
 
 
 @cache
@@ -32,6 +44,9 @@ def _load() -> tuple[list[dict], list[tuple[re.Pattern, dict]]]:
         d = yaml.safe_load(f) or {}
     rules = d.get("rules", []) or []
     entries = [(re.compile("^" + e["path"] + "$"), e) for e in d.get("entries", []) or []]
+    bad = [e["path"] for _, e in entries if e.get("source_status") and e["source_status"] not in STATUSES]
+    if bad:
+        raise ValueError(f"unknown source_status in {CATALOGUE_YAML.name}: {bad}")
     return rules, entries
 
 
@@ -63,7 +78,9 @@ def entry_for(path: str) -> Entry:
     for pat, e in entries:
         if pat.match(path):
             return Entry(unit=str(e.get("unit") or unit_by_rule(path)), standard=str(e.get("standard", "") or ""),
-                         source=str(e.get("source", "") or ""), source_status=str(e.get("source_status", "") or ""))
+                         source=str(e.get("source", "") or ""), source_status=str(e.get("source_status", "") or ""),
+                         validity=str(e.get("validity", "") or ""), checked=str(e.get("checked", "") or ""),
+                         note=str(e.get("note", "") or ""))
     return Entry(unit=unit_by_rule(path))
 
 

@@ -225,14 +225,29 @@ def test_roles_for_and_ui_decimals():
     assert brand.UNIT_DECIMALS["monthly"]["check"] == 6 and brand.UNIT_DECIMALS["qh"]["MWh"] == 4 and brand.UNIT_DECIMALS["daily"]["MWh"] == 3
 
 
-def test_overview_nm_row_is_the_total_and_no_name_in_the_spec():
+def test_overview_nm_row_is_the_total_and_the_qh_label_is_neutral():
     """v0.7.0 defect (compliance check 17.09.2026, W-6): the template label 'NM' resolved to the resell leg; the
     corrected template (D-D) says 'NM · Total' and the extractor prefers the Total leg for an untagged measure.
-    W-1: no counterparty name anywhere in the layout specification (F-035)."""
+    W-1: the QH check label names the off-taker generically (F-035)."""
     rows = {r["r"]: r for r in layout.spec()["sheets"]["Portf Overview"]["rows"] if r.get("kind") == "line"}
     assert rows[81]["key"] == "nm" and rows[81]["label"] == "NM · Total"
-    text = layout.SPEC_PATH.read_text(encoding="utf-8")
-    for name in ("off-taker", "off-taker", "the supply-contract counterparty", "the supply-contract counterparty"):
-        assert name not in text
+    labels = [c.get("label", "") for c in layout.spec()["sheets"]["QH_full"]["columns"]]
+    assert any(lb.endswith("_+_off-taker_attribution_within_strip)_must_be_0") for lb in labels)
     q = {c["key"]: c for c in layout.spec()["sheets"]["QH_full"]["columns"] if c.get("key")}
     assert q["retail_spot_settlement"]["unit_template"] == "MWh"
+
+
+def test_no_counterparty_name_in_the_repository_texts():
+    """F-035: counterparty names never enter the repository. The names themselves cannot be written here, so the
+    check reads them from the git-ignored file .nexte/forbidden_names.txt (one per line) and is skipped where
+    that file is absent (CI); on the CEO's machine it runs against the layout spec, the docs and the tests."""
+    names_file = layout.SPEC_PATH.parents[2] / ".nexte" / "forbidden_names.txt"
+    if not names_file.exists():
+        pytest.skip("no .nexte/forbidden_names.txt on this machine")
+    names = [n.strip() for n in names_file.read_text(encoding="utf-8").splitlines() if n.strip()]
+    root = layout.SPEC_PATH.parents[2]
+    files = [layout.SPEC_PATH, *root.glob("docs/*.md"), *root.glob("tests/**/*.py"), *root.glob("esb/**/*.py"),
+             *root.glob("app/**/*.py"), *root.glob("config/*.yaml"), root / "README.md"]
+    hits = [(f.relative_to(root).as_posix(), n) for f in files for n in names if n.lower() in f.read_text(encoding="utf-8").lower()]
+    assert not hits, hits
+

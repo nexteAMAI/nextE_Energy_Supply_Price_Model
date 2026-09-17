@@ -65,13 +65,15 @@ def render() -> None:
 
     flat = _flatten(p.to_dict())
     cat = catalogue_for(flat.keys())
-    rows = [(k, B.num(v, 4) if isinstance(v, float) else str(v), e.unit, e.standard, e.source, e.source_status)
+    rows = [(k, B.num(v, 4) if isinstance(v, float) else str(v), e.unit, e.standard, e.source, e.source_status, e.validity, e.checked, e.note)
             for k, v in flat.items() if (e := cat[k]).source_status]
-    df = pd.DataFrame(rows, columns=["Parameter", "Value", "Unit", "Standard / default", "Source / vintage", "Status"]).set_index("Parameter")
+    df = pd.DataFrame(rows, columns=["Parameter", "Value", "Unit", "Standard / default", "Source", "Status", "Validity", "Checked", "Note"]).set_index("Parameter")
     B.table(df, index_label="Parameter", scroll=len(df) > 16)
-    B.caption("Status: verified = checked against the primary source; unverified = quoted from the Reference Case workbook, the verification pass "
-              "(T12.7, CW-EMK-01) is owed; assumption = house assumption; to_verify = source named, not yet checked. Every export's Parameters "
-              "sheet carries the same columns")
+    B.caption("Status: verified = read on the primary source; verified_secondary = consistent secondary copies, primary text not reachable; "
+              "contradicted = the primary source says otherwise, the register value is kept for parity until the CEO rules (see Note and the "
+              "open items); unverified = quoted from the Reference Case workbook, not covered by the pass of 17.09.2026; to_verify = source "
+              "named, not fully checked; not_published = no value for the period yet; assumption = house assumption. Every export's "
+              "Parameters sheet carries the same source text")
 
     st.markdown("## Registers")
     t1, t2, t3 = st.tabs(["Decisions", "Open items", "Methodology"])

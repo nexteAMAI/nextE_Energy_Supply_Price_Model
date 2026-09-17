@@ -1,6 +1,6 @@
 # USER GUIDE - nextE Energy Supply Bid Management Tool
 
-Application v0.7.1 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
+Application v0.7.2 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
 supply portfolio, not for a developer. Every capability of the Excel model
 `Energy_Supply_Portfolio_Tracking_v03` is reachable through the twelve pages described here;
 nothing requires a command line.
@@ -140,6 +140,14 @@ The session's run log (uploads, refusals, parameter changes, runs, exports), the
 of the current series with the assembled frame's md5, the calculation-order trace, the
 scenario file history, the verification status of the regulatory constants, and the
 registers (decisions, open items, methodology) as shipped with this version.
+
+The verification table (since 0.7.2) shows, for every regulatory constant of the register, the
+primary source, its status, the validity period, the date it was checked and a note. A status
+`contradicted` means the primary source gives another value or rule than the workbook: the
+Reference Case keeps the workbook value (the parity gate depends on it) and the note names
+the open item awaiting the CEO's ruling (TAR-2026 for the regulated tariff set, BRP-GF for the
+BRP guarantee rule, RC-2027 for the reverse charge that ends on 31.12.2026). Values whose
+validity ends before the case year are the ones to refresh before a bid.
 
 ## 4. Working sequence
 

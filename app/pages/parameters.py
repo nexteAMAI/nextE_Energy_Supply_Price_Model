@@ -197,7 +197,7 @@ def render() -> None:
                 ce = st.date_input("Case end", g.case_end, format="DD.MM.YYYY")
                 fx = B.num_input("FX RON per EUR", value=float(g.fx_ron_per_eur), help="Input!C16 - Forecast Q3 2026 basis (D54)", decimals=4)
             with c2:
-                vat = B.num_input("VAT rate (0,21 = 21 %)", value=float(g.vat_rate), help="Legea nr. 227/2015 per workbook; source_status: unverified", decimals=4)
+                vat = B.num_input("VAT rate (0,21 = 21 %)", value=float(g.vat_rate), help="Codul fiscal art. 291 alin. (1), 21 % from 01.08.2025 (Legea nr. 141/2025); verified 17.09.2026", decimals=4)
                 cit = B.num_input("CIT rate (0,16 = 16 %)", value=float(g.cit_rate), help="Legea nr. 227/2015 art. 41 per workbook label; unverified", decimals=4)
                 tax_day = st.number_input("Tax payment day of month", value=int(g.tax_payment_day), min_value=1, max_value=28, step=1)
                 rc = st.toggle("Reverse charge VAT on source purchases", value=bool(g.reverse_charge_vat_on_sources), help="art. 331 alin. (2) lit. e) Codul fiscal per workbook; adviser confirmation outstanding")
@@ -311,8 +311,10 @@ def render() -> None:
     # ---- E market guarantees -----------------------------------------------------------------
     with tabs[4]:
         mg = p.market_guarantees
-        B.note("Regulatory sizing formulas. The citations quoted in the workbook (Transelectrica PO 01.13, ANRE Order 129/2015, BRP rule) are "
-               "carried with source_status: unverified until checked against the primary source (docs/PARAMETERS.md section 3).")
+        B.note("Regulatory sizing formulas, verified 17.09.2026 (docs/PARAMETERS.md section 3): Vtm = 2 per Transelectrica PO TEL 01.13 pct. 8.2.1; "
+               "Vdm = 1 plus the overdue add-on per ANRE Ordinul nr. 129/2015 art. 8. The BRP rate of 9.000 RON/MW has no counterpart in the "
+               "Transelectrica balancing-market guarantee procedure (cod TEL 00.45 rev. 3: minimum 1.000.000 lei, then 2 x the average monthly "
+               "net imbalance obligation) - kept for parity until the CEO rules (open item BRP-GF).")
         with st.form("form_mg"):
             c1, c2, c3, c4 = st.columns(4)
             with c1:
@@ -358,7 +360,10 @@ def render() -> None:
         cfg = load_grid_tariffs()
         B.note(f"Source: {cfg['meta'].get('source', '')} · validity {cfg['meta'].get('validity', '')} · source_status: <b>{cfg['meta'].get('source_status', '')}</b>. "
                "Rows by regulatory charge owner and component; distribution rows by operator. An off-taker that names its DSO and voltage level "
-               "takes its components from here (D109). Retele Electrice Romania has no distribution rows in the source sheet.")
+               "takes its components from here (D109). Retele Electrice Romania has no distribution rows in the source sheet. "
+               "The pass of 17.09.2026 found the distribution rows to carry the applied (cumulated) tariffs under shifted operator names, "
+               "TL 36,54 for 36,45 and Delgaz MT 125,17 for 125,71 (open item TAR-2026); the verified specific tariffs of ANRE Ordinele nr. "
+               "74-78/2025 sit in config/tariffs_ro_2026_anre.yaml and are not loaded until the CEO rules.")
         with st.form("form_grid_tariffs"):
             rows = pd.DataFrame(p.grid_tariffs)
             grid = pd.DataFrame({"RON/MWh": rows["ron_per_mwh"].astype(float).values},

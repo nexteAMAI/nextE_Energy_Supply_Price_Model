@@ -20,7 +20,7 @@ def test_catalogue_units_and_entries():
     assert unit_by_rule("offtakers[OT1].contract_start") == "date"
     assert unit_by_rule("meta.currency") == ""  # no rule, no guess
     e = entry_for("general.vat_rate")
-    assert e.unit == "%" and e.source_status == "unverified" and "227/2015" in e.source
+    assert e.unit == "%" and e.source_status == "verified" and "art. 291" in e.source and e.checked == "17.09.2026"
     e = entry_for("offtakers[OT3].premium_budget.volume")
     assert e.unit == "EUR/MWh" and e.source_status == "assumption"
     flat = _flatten(load_parameters().to_dict())

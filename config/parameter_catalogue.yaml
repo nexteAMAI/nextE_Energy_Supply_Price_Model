@@ -1,15 +1,22 @@
 # Parameter catalogue (ruling D-I, 17.09.2026): unit, standard / default and source per register path.
-# Read by esb.catalogue: the Parameters sheet of every export and the Parameters page show these columns.
+# Read by esb.catalogue: the Parameters sheet of every export and the Audit page show these columns.
 #
 # rules   - unit by the last segment of the path (leaf name); an explicit entry below overrides a rule.
-# entries - explicit unit / standard / source / source_status per path (regular expression on the full path,
-#           entity codes in brackets such as offtakers[OT1] match ".*").
-# Sources are stated as the register cites them; `source_status` says whether a primary source was checked:
-#   verified   - checked against the primary source named (with date)
-#   unverified - quoted from the Reference Case workbook; the verification pass (T12.7, CW-EMK-01) is owed
-#   assumption - a house assumption, no external source claimed
-#   to_verify  - a source is named but not yet checked
-version: 1
+# entries - explicit unit / standard / source / source_status / validity / checked / note per path (regular
+#           expression on the full path, entity codes in brackets such as offtakers[OT1] match ".*").
+# Sources are stated as the primary source names them; `source_status` says what the verification pass of
+# 17.09.2026 (T12.7, consuming CW-EMK-01 and the primary sources on line) established:
+#   verified            - read on the primary source named (Monitorul Oficial copy, ANRE order PDF, TSO procedure)
+#   verified_secondary  - the value and citation agree across secondary copies; the primary text was not reachable
+#   contradicted        - the primary source says otherwise; the register value is KEPT (parity with the frozen
+#                         workbook) until the CEO rules on the correction named in `note` (docs/OPEN_ITEMS.md)
+#   unverified          - quoted from the Reference Case workbook; not covered by the pass
+#   to_verify           - a source is named but not fully checked
+#   not_published       - the value for the period does not exist yet (the register carries the latest one)
+#   assumption          - a house assumption, no external source claimed
+# `validity` is the period the source gives the value for; `checked` the date of the pass. The spine year of the
+# Reference Case is 2027: values whose validity ends in 2026 are flagged in `note`.
+version: 2
 rules:
   - {contains: _pct_, unit: "%"}
   - {prefix: pct_, unit: "%"}
@@ -53,23 +60,140 @@ entries:
   - {path: "premium_standard\\.(volume|price|profile|credit|regulatory|fx|collateral)", unit: EUR/MWh, standard: "house premium components", source: "Reference Case workbook Input block", source_status: assumption}
   - {path: "offtakers\\[.*\\]\\.premium_(budget|forecast)\\..*", unit: EUR/MWh, standard: "house premium components", source: "Reference Case workbook Input block", source_status: assumption}
   - {path: "offtakers\\[.*\\]\\.product_price_(budget|forecast)\\..*", unit: EUR/MWh, standard: "", source: "Reference Case workbook FW_Purch_Sell_Price", source_status: assumption}
-  - {path: "general\\.vat_rate", unit: "%", standard: "21 %", source: "Legea nr. 227/2015 (Codul fiscal) per workbook", source_status: unverified}
-  - {path: "general\\.cit_rate", unit: "%", standard: "16 %", source: "Legea nr. 227/2015, art. 41 per workbook label", source_status: unverified}
-  - {path: "general\\.reverse_charge_vat_on_sources", unit: "", standard: "applied", source: "art. 331 alin. (2) lit. e) Codul fiscal per workbook; adviser confirmation outstanding", source_status: unverified}
+
+  # ---- fiscal -------------------------------------------------------------------------------------------------
+  - path: "general\\.vat_rate"
+    unit: "%"
+    standard: "21 %"
+    source: "Legea nr. 227/2015 (Codul fiscal) art. 291 alin. (1), as amended by Legea nr. 141/2025 art. II pct. 42 (M. Of. Partea I nr. 699/25.07.2025), in force 01.08.2025 (art. VII alin. (1)); 19 % before"
+    source_status: verified
+    validity: "from 01.08.2025, no end date"
+    checked: "17.09.2026"
+  - path: "general\\.cit_rate"
+    unit: "%"
+    standard: "16 %"
+    source: "Codul fiscal art. 17 (cota de impozitare); the workbook label cites art. 41, which is the declaration and payment article, not the rate"
+    source_status: verified
+    validity: "in force, no end date"
+    checked: "17.09.2026"
+    note: "citation corrected from art. 41 to art. 17 (docs/PARAMETERS.md section 3)"
+  - path: "general\\.reverse_charge_vat_on_sources"
+    unit: ""
+    standard: "applied"
+    source: "Codul fiscal art. 331 alin. (2) lit. e) with alin. (1) (both parties VAT-registered under art. 316); measure limited by art. 331 alin. (6) to 31.12.2026 inclusive (Council Directive (EU) 2022/890 extending art. 199a of Directive 2006/112/EC; transposed by OUG nr. 85/2022 - secondary confirmation only)"
+    source_status: verified
+    validity: "until 31.12.2026 inclusive"
+    checked: "17.09.2026"
+    note: "RC-2027: the spine year 2027 lies outside the validity of the measure; no extension published as of 17.09.2026 - the VAT cash-flow of source purchases in 2027 is exposed (docs/OPEN_ITEMS.md)"
+  - path: "general\\.tax_payment_day"
+    unit: day of month
+    standard: "25"
+    source: "Codul fiscal art. 41 alin. (1) (CIT: the 25th of the first month after the quarter, checked); the VAT deadline article (art. 326) was not checked in this pass"
+    source_status: to_verify
+    checked: "17.09.2026"
   - {path: "general\\.fx_ron_per_eur", unit: RON/EUR, standard: "5,5", source: "workbook D54, Forecast Q3 2026", source_status: assumption}
-  - {path: "general\\.tax_payment_day", unit: day of month, standard: "25", source: "Codul fiscal payment deadline per workbook", source_status: unverified}
-  - {path: "green_certificates\\.quota_gc_per_mwh", unit: GC/MWh, standard: "0,499387", source: "current regulation, 2026 basis (workbook D85)", source_status: unverified}
-  - {path: "green_certificates\\.reference_price_ron_per_gc", unit: RON/GC, standard: "148,2201", source: "workbook Cons_P&L!B7", source_status: unverified}
+
+  # ---- green certificates -------------------------------------------------------------------------------------
+  - path: "green_certificates\\.quota_gc_per_mwh"
+    unit: GC/MWh
+    standard: "0,499387"
+    source: "ANRE Ordinul nr. 81/16.12.2025 art. 1 (cota obligatorie estimata 2026), M. Of. Partea I nr. 1176/18.12.2025, in force 01.01.2026; final 2025 quota 0,49983 per ANRE Ordinul nr. 3/20.02.2026 (M. Of. nr. 142/24.02.2026)"
+    source_status: verified
+    validity: "2026 (estimated quota)"
+    checked: "17.09.2026"
+    note: "GC-2027: the 2027 quota is not published (ANRE issues it in December; the 30.06.2026 ANRE letter keeps the 2027 impact at 14,5 EUR/MWh) - the spine year 2027 runs on the 2026 estimate"
+  - path: "green_certificates\\.reference_price_ron_per_gc"
+    unit: RON/GC
+    standard: "148,2201"
+    source: "minimum trading value of a GC for 2026 per Legea nr. 220/2008 art. 11 (29,4 EUR at the BNR 2025 average rate 5,0415 RON/EUR); maximum 176,4525 RON/GC (35 EUR); OPCOM notice of 08.01.2026"
+    source_status: verified
+    validity: "calendar year 2026"
+    checked: "17.09.2026"
+    note: "GC-2027: the 2027 bounds are set in January 2027 from the BNR 2026 average rate; the register uses the 2026 minimum for the spine year 2027"
   - {path: "green_certificates\\.spot_share", unit: "%", standard: "50 %", source: "house assumption", source_status: assumption}
-  - {path: "market_guarantees\\.brp\\.rate_ron_per_mw", unit: RON/MW, standard: "9.000", source: "Transelectrica BRP rule per workbook", source_status: unverified}
-  - {path: "market_guarantees\\.tso\\.vtm_multiplier", unit: x, standard: "2", source: "Transelectrica PO 01.13 per workbook", source_status: unverified}
-  - {path: "market_guarantees\\.dso\\.vdm_multiplier", unit: x, standard: "1", source: "ANRE Order 129/2015 per workbook", source_status: unverified}
-  - {path: "market_guarantees\\.spot\\.buffer_days", unit: days, standard: "4", source: "OPCOM collateral practice per workbook", source_status: unverified}
-  - {path: "tariff_components_eur_per_mwh\\..*", unit: EUR/MWh, standard: "DEER MV DSO set, 2026", source: "workbook Input!C54:F63, Forecast Q3 2026 basis (D55 / D60)", source_status: unverified}
-  - {path: "grid_tariffs\\[.*\\]\\.ron_per_mwh", unit: RON/MWh, standard: "", source: "v1.1 template sheet Grid_Taxes_RO, validity 2026 (D109)", source_status: unverified}
-  - {path: "calendar\\.public_holidays", unit: "", standard: "Codul muncii art. 139 alin. (1)", source: "config/calendar_ro.yaml", source_status: to_verify}
+
+  # ---- market guarantees --------------------------------------------------------------------------------------
+  - path: "market_guarantees\\.brp\\.rate_ron_per_mw"
+    unit: RON/MW
+    standard: "9.000"
+    source: "no lei/MW rule exists: Transelectrica PO 'Constituirea, actualizarea si utilizarea garantiilor financiare pe Piata de Echilibrare', cod TEL 00.45, ed. I rev. 3 (approved by Transelectrica 28.11.2025; listed among procedures not requiring an ANRE opinion; legal basis Regulamentul PRE, ANRE Ordinul nr. 127/2021, M. Of. nr. 1196/17.12.2021) - pct. 7.1.1.4 minimum GF 1.000.000 lei per PRE; pct. 8.1.6 / 8.2.1 GF = 2 x VMLG (average of the last 12 monthly net imbalance obligations incl. VAT) after any month above 1.000.000 lei; 3 x VMLG after two late payments (pct. 8.2.4.4)"
+    source_status: contradicted
+    validity: "PO rev. 3 in force from 28.11.2025"
+    checked: "17.09.2026"
+    note: "BRP-GF: the workbook rule 9.000 RON/MW x MW in the BRP is kept for parity; the CEO rules whether the engine adopts the PO formula (docs/OPEN_ITEMS.md)"
+  - path: "market_guarantees\\.tso\\.vtm_multiplier"
+    unit: x
+    standard: "2"
+    source: "Transelectrica PO TEL 01.13 'Instituirea garantiilor financiare in contractele-cadru pentru prestarea serviciului de transport si a serviciului de sistem', ed. I rev. 0 (TEL nr. 52004/25.11.2021, aviz ANRE nr. 22/24.11.2021), pct. 8.2.1: GF = 2 x Vtm, Vtm = average monthly value of transmission + system services over 6 months (estimated at signing, pct. 8.2.1; realised, pct. 8.2.3); framework contract per ANRE Ordinul nr. 132/2022"
+    source_status: verified
+    validity: "in force from 25.11.2021"
+    checked: "17.09.2026"
+  - path: "market_guarantees\\.dso\\.vdm_multiplier"
+    unit: x
+    standard: "1"
+    source: "ANRE Ordinul nr. 129/12.08.2015 (procedura privind constituirea garantiilor financiare in cadrul contractului pentru serviciul de distributie), M. Of. Partea I nr. 628/18.08.2015, art. 8: GF = 1 x Vdm + max(V1, V2), Vdm = average monthly distribution value over 12 months (realised or estimated), universal-service customers excluded; max(V1, V2) = the largest late-paid amount of the last 12 months (the register's overdue add-on); art. 4: requested only in the cases of the framework contract (ANRE Ordinul nr. 90/2015); validity at least 24 months"
+    source_status: verified
+    validity: "in force; not abrogated per the ANRE order portal on 17.09.2026"
+    checked: "17.09.2026"
+  - {path: "market_guarantees\\.spot\\.buffer_days", unit: days, standard: "4", source: "OPCOM collateral practice per workbook - not covered by the pass of 17.09.2026", source_status: unverified}
+
+  # ---- regulated tariffs --------------------------------------------------------------------------------------
+  - path: "tariff_components_eur_per_mwh\\.TL"
+    unit: EUR/MWh
+    standard: "36,45 RON/MWh at the register FX"
+    source: "ANRE Ordinul nr. 74/16.12.2025 (tarif de extragere TL 2026), M. Of. Partea I nr. 1173/18.12.2025, in force 01.01.2026; 2025: 33,03"
+    source_status: contradicted
+    validity: "2026"
+    checked: "17.09.2026"
+    note: "TAR-2026: the workbook carries 36,54 RON/MWh (6,6436 EUR/MWh at 5,5) - digits transposed; kept for parity"
+  - path: "tariff_components_eur_per_mwh\\.TG"
+    unit: EUR/MWh
+    standard: "3,63 RON/MWh at the register FX"
+    source: "ANRE Ordinul nr. 74/16.12.2025 (tarif de introducere TG 2026), M. Of. Partea I nr. 1173/18.12.2025; 2025: 3,29"
+    source_status: verified
+    validity: "2026"
+    checked: "17.09.2026"
+  - path: "tariff_components_eur_per_mwh\\.SS"
+    unit: EUR/MWh
+    standard: "14,70 RON/MWh at the register FX"
+    source: "ANRE Ordinul nr. 73/2025 (tarif pentru serviciul de sistem 2026), M. Of. Partea I nr. 1173/18.12.2025; from 01.09.2025: 12,79. ANRE Ordinul nr. 12/19.05.2026 (new system-services tariff methodology) and nr. 53/04.08.2026 were not read - a mid-2026 change is not excluded"
+    source_status: verified
+    validity: "2026 (subject to the two 2026 orders named)"
+    checked: "17.09.2026"
+  - path: "tariff_components_eur_per_mwh\\.T_(HV|MV|LV)"
+    unit: EUR/MWh
+    standard: "DEER MV: applied distribution tariff 115,32 RON/MWh (31,96 + 83,36)"
+    source: "ANRE Ordinul nr. 77/16.12.2025 (DEER specific tariffs 2026: IT 31,96 / MT 83,36 / JT 240,02 lei/MWh; the billed tariff combines the specific tariffs down to the connection level), M. Of. Partea I nr. 1173/18.12.2025"
+    source_status: contradicted
+    validity: "2026"
+    checked: "17.09.2026"
+    note: "TAR-2026: the workbook's T_HV 39,37 and T_MV 122,80 RON/MWh are the applied (cumulated) 2026 tariffs of Distributie Oltenia (Ordinul nr. 75/2025), not DEER's, and the cascade adds them - the HV component is counted twice; kept for parity until the CEO rules"
+  - path: "tariff_components_eur_per_mwh\\.(cogeneration|cfd|excise)"
+    unit: EUR/MWh
+    standard: ""
+    source: "workbook Input!C54:F63 - not covered by the pass of 17.09.2026"
+    source_status: unverified
+  - path: "grid_tariffs\\[.*\\]\\.ron_per_mwh"
+    unit: RON/MWh
+    standard: ""
+    source: "v1.1 template sheet Grid_Taxes_RO, validity 2026 (D109); checked against ANRE Ordinele nr. 74, 75, 76, 77, 78/2025 (M. Of. nr. 1173/18.12.2025)"
+    source_status: contradicted
+    validity: "2026"
+    checked: "17.09.2026"
+    note: "TAR-2026: the distribution rows carry the applied (cumulated) tariffs and the operator names are shifted by one row (the values under 'CNTEE Transelectrica SA' are DEER's, under 'DEER' Oltenia's, under 'Oltenia' Delgaz's, under 'Delgaz' Retele Electrice's); TL 36,54 should read 36,45; Delgaz MT 125,17 should read 125,71. The verified specific tariffs sit in config/tariffs_ro_2026_anre.yaml, not loaded until the CEO rules"
+
+  # ---- calendar -----------------------------------------------------------------------------------------------
+  - path: "calendar\\.public_holidays"
+    unit: ""
+    standard: "Codul muncii art. 139 alin. (1)"
+    source: "Legea nr. 53/2003 - Codul muncii, republicata, art. 139 alin. (1); 6 and 7 January added by Legea nr. 52/2023 (M. Of. Partea I nr. 186/06.03.2023); the list in config/calendar_ro.yaml matches the consolidated text (secondary copies; the M. Of. text was not reachable in the pass)"
+    source_status: verified_secondary
+    validity: "in force"
+    checked: "17.09.2026"
+
+  # ---- house values -------------------------------------------------------------------------------------------
   - {path: "meta\\.kpi_retail_nm_target_eur_per_mwh", unit: EUR/MWh, standard: "3,00", source: "house benchmark (D101)", source_status: assumption}
   - {path: "general\\.shareholder_loan_rate_pa", unit: "% p.a.", standard: "7 %", source: "house assumption", source_status: assumption}
   - {path: "general\\.debt_facility\\..*_pa", unit: "% p.a.", standard: "", source: "house assumption", source_status: assumption}
   - {path: "resell\\..*_factor_vs_dam_curtailed", unit: x, standard: "", source: "Reference Case workbook", source_status: assumption}
-  - {path: "counterparties\\..*\\.k", unit: sign, standard: "-1 source / +1 BRP", source: "docs/DATA_CONTRACT.md §6", source_status: verified}
+  - {path: "counterparties\\..*\\.k", unit: sign, standard: "-1 source / +1 BRP", source: "docs/DATA_CONTRACT.md §6 (house convention, D112)", source_status: verified, checked: "17.09.2026"}
