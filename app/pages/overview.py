@@ -17,7 +17,7 @@ OVERVIEW_ORDER = [
     "resell_cost", "total_cost", "gm1", "gm1_pct", "gm1_specific", "resell_gm1", "resell_gm1_pct", "source_imb", "offtaker_imb",
     "resell_source_imb", "gm2", "gm2_pct", "gm2_specific", "resell_gm2", "resell_gm2_pct", "total_gm2", "total_gm2_pct", "total_gm2_specific",
     "premium", "reserve", "reserve_release", "passthrough", "opex", "variable_opex", "market_bgl", "offtaker_bgl", "guarantees", "interest",
-    "unallocated", "nm", "nm_pct", "nm_specific", "retail_nm", "retail_nm_specific", "resell_nm", "cit", "nm_after_tax", "nm_after_tax_pct",
+    "pre_service_fee", "pre_aggregation_gain", "unallocated", "nm", "nm_pct", "nm_specific", "retail_nm", "retail_nm_specific", "resell_nm", "cit", "nm_after_tax", "nm_after_tax_pct",
     "nm_after_tax_specific", "total_gm1", "total_gm1_pct", "total_gm1_specific",
 ]
 

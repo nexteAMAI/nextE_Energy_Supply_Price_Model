@@ -241,6 +241,9 @@ market_guarantees:                          # Input section E - regulatory formu
     pre_initial_ron: 100000.0               # D119: initial guarantee of the PRE service contract (art. 9.8 of the CINTA template contract, 100.000 lei)
     pre_months_of_imbalance: 2.0            # D119: 1..3 average monthly imbalance values (CINTA PRE procedure pct. 5.2.5); 2 = house assumption
     pre_vat_inclusive: true                 # D119: the imbalance value basis carries VAT (assumption - the procedure does not say)
+    pre_fee_fixed_ron_per_month: 2500.0     # D120: fixed monthly PRE service fee, excl. VAT (contract nr. 570/21.01.2026, Anexa 2 A2.1, Tf)
+    pre_fee_gain_share_pct: 0.05            # D120: variable fee = 5 % of |standalone imbalance cost - in-PRE cost| (Anexa 2 A2.1, Tv)
+    pre_aggregation_gain_pct_of_imbalance: 0.0  # D120: assumed in-PRE gain as a share of |imbalance value|; 0 = not modelled (conservative)
     # consumption peak MW (C118) derived by the engine
   tso:
     vtm_multiplier: 2.0                     # C121 - "Transelectrica PO 01.13"; source_status: unverified

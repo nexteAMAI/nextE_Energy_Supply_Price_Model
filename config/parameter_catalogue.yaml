@@ -54,6 +54,8 @@ rules:
   - {leaf: target_gm_budget, unit: EUR/MWh}
   - {leaf: target_gm_forecast, unit: EUR/MWh}
   - {leaf: pre_months_of_imbalance, unit: months}
+  - {suffix: _ron_per_month, unit: RON/month}
+  - {suffix: _pct_of_imbalance, unit: "%"}
   - {leaf: BL24, unit: MW}
   - {leaf: Peak, unit: MW}
   - {leaf: OffPeak, unit: MW}
@@ -138,6 +140,29 @@ entries:
     validity: "procedure in force (2025 edition)"
     checked: "17.09.2026"
     note: "D119: 2 is the house mid-band assumption; the VAT-inclusive basis is an assumption too (pre_vat_inclusive)"
+  - path: "market_guarantees\\.brp\\.pre_fee_fixed_ron_per_month"
+    unit: RON/month
+    standard: "2.500 (excl. VAT)"
+    source: "PRE service contract nr. 570/21.01.2026 (nextE Asset Management - CINTA), Anexa 2 A2.1: tarif lunar fix Tf = 2.500 lei fara TVA; invoiced on the last day of the service month (art. 8.7), paid within 4 working days of receipt (art. 9.3)"
+    source_status: verified
+    validity: "contract term 24 months from 23.01.2026, auto-renewing (art. 3)"
+    checked: "17.09.2026"
+    note: "D120: the supply entity is to sign the same template - the CEO confirmed the terms 17.09.2026"
+  - path: "market_guarantees\\.brp\\.pre_fee_gain_share_pct"
+    unit: "%"
+    standard: "5 %"
+    source: "contract nr. 570/21.01.2026, Anexa 2 A2.1: Tv = 5 % x |C standalone - C in-PRE| (the variable fee is not charged while the member has no final consumers)"
+    source_status: verified
+    validity: "contract term"
+    checked: "17.09.2026"
+    note: "D120: applies to the modelled aggregation gain only; a supply portfolio has final consumers, so the fee applies"
+  - path: "market_guarantees\\.brp\\.pre_aggregation_gain_pct_of_imbalance"
+    unit: "%"
+    standard: "0 (not modelled)"
+    source: "house assumption; the D017 measurement on the asset portfolio (Jan-Jun 2026) found a gain of 4 % to 74 % of the standalone imbalance value, month by month, and advised against a single percentage"
+    source_status: assumption
+    checked: "17.09.2026"
+    note: "D120: 0 keeps the imbalance cost standalone (conservative); any value entered reduces the imbalance cost and charges the 5 % fee on it"
   - path: "market_guarantees\\.tso\\.vtm_multiplier"
     unit: x
     standard: "2"

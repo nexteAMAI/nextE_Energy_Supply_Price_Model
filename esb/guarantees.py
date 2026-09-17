@@ -116,6 +116,20 @@ def brp_required(params: Parameters, inp: RegulatoryInputs) -> float:
     return max(float(mg.get("pre_initial_ron", 0.0)) / fx, float(mg.get("pre_months_of_imbalance", 0.0)) * avg * vat)
 
 
+def pre_service_monthly(params: Parameters, imbalance_value_monthly: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """D120: the delegated-PRE service flows per month (EUR, positive amounts): the aggregation gain the PRE's internal
+    redistribution returns to the member (an assumed share of |imbalance value|; 0 = not modelled) and the service fee
+    = fixed monthly fee (contract Anexa 2, Tf) + gain share x gain (Tv). Both zero under the workbook BRP rule."""
+    mg = params.market_guarantees["brp"]
+    zero = np.zeros(12)
+    if str(mg.get("method", "rate_per_mw")) != "pre_delegated":
+        return zero, zero
+    fx = float(params.general.fx_ron_per_eur)
+    gain = np.abs(np.asarray(imbalance_value_monthly, dtype=float)) * float(mg.get("pre_aggregation_gain_pct_of_imbalance", 0.0))
+    fee = np.full(12, float(mg.get("pre_fee_fixed_ron_per_month", 0.0)) / fx) + gain * float(mg.get("pre_fee_gain_share_pct", 0.0))
+    return gain, fee
+
+
 def _window(g: Guarantee, starts: list[date]) -> np.ndarray:
     lo = date(g.start.year, g.start.month, 1)
     return np.array([1.0 if (lo <= s <= g.end) else 0.0 for s in starts])

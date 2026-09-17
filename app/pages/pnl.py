@@ -27,7 +27,7 @@ GROUPS = {
     "Totals · Total": ["t_buy_notified", "t_buy_metered", "t_cost_budget", "t_cost_forecast", "t_revenue", "t_imb", "t_gm2_budget", "t_gm2_budget_pct",
                "t_gm2_budget_specific", "t_gm2_forecast", "t_gm2_forecast_pct", "t_gm2_forecast_specific"],
     "Cost to serve and financing · Total": ["passthrough_revenue", "passthrough_cost", "reserve", "opex", "variable_opex", "offtaker_bgl_fees",
-                                    "market_bgl_fees", "guarantees_outstanding", "interest", "unallocated", "reserve_release_budget",
+                                    "market_bgl_fees", "pre_service_fee", "pre_aggregation_gain", "guarantees_outstanding", "interest", "unallocated", "reserve_release_budget",
                                     "reserve_release_forecast", "reserve_balance"],
     "Net margin and tax · Total": ["nm_budget", "nm_budget_pct", "nm_budget_specific", "nm_forecast", "nm_forecast_pct", "nm_forecast_specific", "cit_budget",
                            "nm_budget_after_tax", "nm_budget_after_tax_pct", "nm_budget_after_tax_specific", "cit_forecast", "nm_forecast_after_tax",
@@ -88,7 +88,7 @@ def render() -> None:
     p = r.params
     B.kpi_row([
         (tagged("GM2 forecasted", TOTAL), P.y("t_gm2_forecast"), "EUR", f"{B.num(P.y('t_gm2_forecast_specific'), 2)} EUR/MWh bought"),
-        (tagged("Cost to serve", TOTAL), P.y("opex") + P.y("variable_opex") + P.y("offtaker_bgl_fees") + P.y("market_bgl_fees") + P.y("interest"), "EUR",
+        (tagged("Cost to serve", TOTAL), P.y("opex") + P.y("variable_opex") + P.y("offtaker_bgl_fees") + P.y("market_bgl_fees") + P.y("interest") + P.y("pre_service_fee") - P.y("pre_aggregation_gain"), "EUR",
          "OPEX + variable OPEX + BGL fees + interest"),
         (tagged("Net margin pre-tax forecasted", TOTAL), P.y("nm_forecast"), "EUR", f"{B.pct(P.y('nm_forecast_pct'))} of revenue · {B.num(P.y('nm_forecast_specific'), 2)} EUR/MWh"),
         (tagged("CIT forecasted", TOTAL), P.y("cit_forecast"), "EUR", f"Rate {B.pct(p.general.cit_rate, 0)} on cumulative year-to-date NM, floored at 0, quarterly"),

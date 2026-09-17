@@ -16,9 +16,9 @@ from esb.layout import roles_for
 ROWMAP = {v: k for k, v in CF_ROWS.items()}
 GROUPS = {
     "Accruals": ["acc_resell_revenue", "acc_imbalance", "acc_pv_purchases", "acc_bl_purchases", "acc_spot_purchases", "acc_grid_cost", "acc_opex",
-                 "acc_variable_opex", "acc_bgl_fees", "acc_reserve", "acc_cit", "acc_guarantees"],
+                 "acc_variable_opex", "acc_bgl_fees", "acc_pre_service", "acc_reserve", "acc_cit", "acc_guarantees"],
     "Receipts": ["in_resell", "in_imbalance", "in_total"],
-    "Payments": ["out_pv", "out_bl", "out_spot", "out_grid", "out_opex", "out_variable_opex", "out_bgl", "out_cit", "out_total"],
+    "Payments": ["out_pv", "out_bl", "out_spot", "out_grid", "out_opex", "out_variable_opex", "out_bgl", "out_pre_service", "out_cit", "out_total"],
     "VAT": ["vat_output", "vat_input", "vat_net_position", "vat_paid", "vat_credit", "vat_cash"],
     "Financing": ["net_cf_before_tax", "opening", "restricted_reserve", "restricted_collateral", "injection", "closing", "free_cash",
                   "loan_outstanding", "interest", "interest_cumulative", "tax_paid_cumulative", "free_cash_after_tax", "peak_funding"],

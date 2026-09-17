@@ -156,7 +156,11 @@ def test_value_parity_overview_cashflow_ledger(book, result):
             assert got is None if x != x else got == pytest.approx(x), (key, name)
     ws = book["CF_Mth"]
     labels = {ws.cell(r, 1).value: r for r in range(7, ws.max_row + 1) if ws.cell(r, 1).value}
+    engine_only = {"acc_pre_service", "out_pre_service"}  # D120 rows: no line in the CEO's template yet (O-21)
     for key, row in result.cashflow.rows.items():
+        if key in engine_only:
+            assert label(key, fallback=TOTAL) not in labels
+            continue
         r = labels[label(key, fallback=TOTAL)]
         for col, x in ((4, row[13]), (18, row[12])):
             got = ws.cell(r, col).value

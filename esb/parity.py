@@ -150,6 +150,8 @@ def mapped_cells(run: RunResult, pricing_offtaker: str | None = None) -> pd.Data
     ov = run.overview
     tbl = ov.table
     for key, (row, *_r) in OVERVIEW_ROWS.items():
+        if row is None:  # engine-only rows (D120) have no workbook cell
+            continue
         add("Portf Overview", f"D{row}", key, tbl.loc[key, "portfolio_budget"])
         add("Portf Overview", f"E{row}", key, tbl.loc[key, "portfolio_forecast"])
         add("Portf Overview", f"F{row}", key, tbl.loc[key, "delta"])

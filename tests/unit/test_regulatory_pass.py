@@ -96,3 +96,37 @@ def test_d119_bid_defaults_and_delegated_pre_guarantee():
     q.market_guarantees["brp"]["pre_months_of_imbalance"] = 1.0
     q.market_guarantees["brp"]["pre_vat_inclusive"] = False
     assert gr.brp_required(q, inp) == pytest.approx(100000.0 / fx)  # the initial amount floors it
+
+
+def test_d120_pre_service_fee_and_gain():
+    """D120: under the workbook rule the PRE service rows are zero (parity); under the delegated rule the fixed fee of the
+    contract (2.500 RON/month) and, when a gain is assumed, the 5 % variable fee flow into NM and the cash flow."""
+    import pandas as pd
+
+    from esb.engine import run
+
+    series = pd.read_parquet("data/reference/rc_v03_series.parquet")
+    p = load_parameters()
+    base = run(series, p)
+    P = base.pnl.portfolio
+    assert P.y("pre_service_fee") == 0.0 and P.y("pre_aggregation_gain") == 0.0 and base.cashflow.y("out_pre_service") == 0.0
+    q = copy.deepcopy(p)
+    q.market_guarantees["brp"]["method"] = "pre_delegated"  # the method alone (the bid defaults also move the reverse charge, hence interest)
+    r = run(series, q)
+    fx = q.general.fx_ron_per_eur
+    R = r.pnl.portfolio
+    assert R.y("pre_service_fee") == pytest.approx(12 * 2500.0 / fx)
+    delta_other = (P.y("g_fee_brp") - R.y("g_fee_brp")) + (P.y("interest") - R.y("interest"))
+    assert R.y("nm_forecast") == pytest.approx(P.y("nm_forecast") - 12 * 2500.0 / fx + delta_other, rel=1e-9)
+    cf = r.cashflow
+    assert cf.m13("out_pre_service")[0] == 0.0 and cf.m13("out_pre_service")[1] == pytest.approx(-2500.0 / fx)
+    assert cf.m13("out_pre_service")[12] == pytest.approx(-2500.0 / fx)  # December's fee is paid beyond the year
+    q.market_guarantees["brp"]["pre_aggregation_gain_pct_of_imbalance"] = 0.2
+    r2 = run(series, q)
+    gain = 0.2 * float(abs(r2.pnl.portfolio.m("t_imb")).sum())
+    assert r2.pnl.portfolio.y("pre_aggregation_gain") == pytest.approx(gain)
+    assert r2.pnl.portfolio.y("pre_service_fee") == pytest.approx(12 * 2500.0 / fx + 0.05 * gain)
+    d_int = r.pnl.portfolio.y("interest") - r2.pnl.portfolio.y("interest")
+    d_g = r.pnl.portfolio.y("g_fee_brp") - r2.pnl.portfolio.y("g_fee_brp")
+    assert r2.pnl.portfolio.y("nm_forecast") == pytest.approx(r.pnl.portfolio.y("nm_forecast") + 0.95 * gain + d_int + d_g, rel=1e-9)
+

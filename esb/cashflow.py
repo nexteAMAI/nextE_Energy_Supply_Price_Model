@@ -135,6 +135,7 @@ def build_cashflow(pnl: PnLResult, params: Parameters) -> CashflowResult:
     cf.put("acc_opex", P.m("opex"))
     cf.put("acc_variable_opex", P.m("variable_opex"))
     cf.put("acc_bgl_fees", P.m("offtaker_bgl_fees") + P.m("market_bgl_fees"))
+    cf.put("acc_pre_service", P.m("pre_service_fee") - P.m("pre_aggregation_gain"))  # D120: net PRE service, invoiced at month end
     cf.put("acc_reserve", P.m("reserve"))
     cf.put("acc_guarantees", P.m("guarantees_outstanding"), year_rule="max")
 
@@ -173,9 +174,10 @@ def build_cashflow(pnl: PnLResult, params: Parameters) -> CashflowResult:
     vo[BEYOND] = -cf.y("acc_variable_opex")
     cf.put("out_variable_opex", vo)
     cf.put("out_bgl", np.concatenate([-cf.m("acc_bgl_fees"), [0.0]]))
+    cf.put("out_pre_service", np.concatenate([[0.0], -cf.m("acc_pre_service")]))  # paid within 4 working days of the month-end invoice
     cf.put("out_cit", zero13.copy())
     cf.put("out_total", cf.m13("out_pv") + cf.m13("out_bl") + cf.m13("out_spot") + cf.m13("out_grid") + cf.m13("out_opex")
-           + cf.m13("out_variable_opex") + cf.m13("out_bgl") + cf.m13("out_cit"))
+           + cf.m13("out_variable_opex") + cf.m13("out_bgl") + cf.m13("out_pre_service") + cf.m13("out_cit"))
 
     # ---- VAT (rows 72-77) --------------------------------------------------------------------
     vat = g.vat_rate
@@ -183,11 +185,11 @@ def build_cashflow(pnl: PnLResult, params: Parameters) -> CashflowResult:
     retail_receipts = sum(cf.m13(f"{c}_in_energy") + cf.m13(f"{c}_in_passthrough") for c in pnl.codes) if pnl.codes else zero13
     cf.put("vat_output", retail_receipts * vat, year=float((retail_receipts * vat)[:12].sum()))  # O72 = SUM(B:M)
     src_pay = zero13 if rc else (cf.m13("out_pv") + cf.m13("out_bl"))
-    vin = (cf.m13("out_grid") + src_pay) * vat
+    vin = (cf.m13("out_grid") + src_pay + cf.m13("out_pre_service")) * vat  # the PRE service invoices carry VAT (contract art. 8.12, A2.1)
     cf.put("vat_input", vin, year=float(vin[:12].sum()))  # O73 = SUM(B:M)
     retail_acc = sum(cf.m(f"{c}_acc_revenue") + cf.m(f"{c}_acc_passthrough") for c in pnl.codes) if pnl.codes else np.zeros(12)
     src_acc = np.zeros(12) if rc else (cf.m("acc_pv_purchases") + cf.m("acc_bl_purchases"))
-    net_pos = (retail_acc - cf.m("acc_grid_cost") - src_acc) * vat
+    net_pos = (retail_acc - cf.m("acc_grid_cost") - src_acc - cf.m("acc_pre_service")) * vat
     cf.put("vat_net_position", np.concatenate([net_pos, [0.0]]))
     paid = np.zeros(13)
     credit = np.zeros(12)
@@ -248,7 +250,7 @@ def finalize_cashflow(cf: CashflowResult, pnl: PnLResult, params: Parameters) ->
     out_cit[BEYOND] = -cit[11]
     cf.put("out_cit", out_cit)
     cf.put("out_total", cf.m13("out_pv") + cf.m13("out_bl") + cf.m13("out_spot") + cf.m13("out_grid") + cf.m13("out_opex")
-           + cf.m13("out_variable_opex") + cf.m13("out_bgl") + out_cit)
+           + cf.m13("out_variable_opex") + cf.m13("out_bgl") + cf.m13("out_pre_service") + out_cit)
     cf.put("tax_paid_cumulative", np.cumsum(out_cit[:12]), year=float("nan"))
     cf.put("free_cash_after_tax", cf.m("free_cash") + cf.m("tax_paid_cumulative"), year=float("nan"))
     checks = {
@@ -321,12 +323,14 @@ def build_daily_ledger(cf: CashflowResult, pnl: PnLResult, qh: QHResult, params:
     L["pay_grid"] = -on_day(cf.m("acc_grid_cost"), cp["tso"].payment_terms_days, 0.0)
     L["opex"] = np.where(is_eom, -cf.m("acc_opex")[mi], 0.0)
     L["bgl"] = np.where(is_first, -cf.m("acc_bgl_fees")[mi], 0.0)
+    L["pre_service"] = np.where(is_first & (mi > 0), -cf.m("acc_pre_service")[np.maximum(mi - 1, 0)], 0.0)
     L["vat_paid"] = np.where(is_payday, cf.m("vat_paid")[mi], 0.0)
     L["cit_paid"] = np.where(is_payday, cf.m("out_cit")[mi], 0.0)
     L["vat_collected"] = receipts_total * g.vat_rate
     src = 0.0 if g.reverse_charge_vat_on_sources else (L["pay_pv"].to_numpy() + L["pay_bl"].to_numpy())
-    L["vat_input"] = (L["pay_grid"].to_numpy() + src) * g.vat_rate
-    flow_cols = [f"{c}_receipts" for c in cf.codes] + ["receipts_resell", "imbalance", "pay_pv", "pay_bl", "pay_spot", "pay_grid", "opex", "bgl", "vat_paid"]
+    L["vat_input"] = (L["pay_grid"].to_numpy() + src + L["pre_service"].to_numpy()) * g.vat_rate
+    flow_cols = [f"{c}_receipts" for c in cf.codes] + ["receipts_resell", "imbalance", "pay_pv", "pay_bl", "pay_spot", "pay_grid", "opex", "bgl",
+                 "pre_service", "vat_paid"]
     L["net_cf"] = L[flow_cols].sum(axis=1) + L["vat_collected"] + L["vat_input"]
     L["cum_cf"] = g.opening_cash_eur + L["net_cf"].cumsum()
     reserve_bal = P.m("reserve_balance")

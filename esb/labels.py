@@ -28,7 +28,9 @@ EXPLICIT: dict[str, str] = {
     "nm_budget_after_tax": "Net margin after tax budgeted", "nm_forecast_after_tax": "Net margin after tax forecasted",
     "cit_budget": "Corporate income tax budgeted", "cit_forecast": "Corporate income tax forecasted",
     "guarantees_outstanding": "Guarantees outstanding", "interest": "Financing interest", "unallocated": "Unallocated costs",
-    "market_bgl_fees": "Market BGL fees", "opex": "Portfolio OPEX", "variable_opex": "Variable OPEX (sales bonus)",
+    "market_bgl_fees": "Market BGL fees", "pre_service_fee": "PRE service fee (delegated BRP)",
+    "pre_aggregation_gain": "PRE aggregation gain", "acc_pre_service": "PRE service accrued, net of gain",
+    "out_pre_service": "PRE service paid", "pre_service": "PRE service paid", "opex": "Portfolio OPEX", "variable_opex": "Variable OPEX (sales bonus)",
     "reserve": "Risk reserve", "reserve_balance": "Risk reserve balance", "reserve_release_budget": "Reserve release budgeted",
     "reserve_release_forecast": "Reserve release forecasted", "passthrough_revenue": "Pass-through revenue",
     "passthrough_cost": "Pass-through cost", "own_guarantee": "Own guarantee outstanding", "own_bgl_fee": "Own BGL fee",
@@ -82,7 +84,8 @@ _LEG_TOKENS = frozenset({"rs", "resell", "retail", "t", "total"})
 # portfolio-level lines that sit between Total GM2 and the net margin: deducted at Total level
 _TOTAL_KEYS = frozenset({
     "opex", "variable_opex", "market_bgl_fees", "market_bgl", "guarantees_outstanding", "guarantees", "interest", "interest_cumulative",
-    "unallocated", "cit", "tax_paid_cumulative", "budget_minus_forecast", "nm",
+    "unallocated", "cit", "tax_paid_cumulative", "budget_minus_forecast", "nm", "pre_service_fee", "pre_aggregation_gain",
+    "acc_pre_service", "out_pre_service", "pre_service",
 })
 _RETAIL_KEYS = frozenset({
     "reserve", "reserve_balance", "reserve_release", "reserve_release_budget", "reserve_release_forecast", "passthrough", "passthrough_revenue",

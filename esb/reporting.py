@@ -82,6 +82,8 @@ OVERVIEW_ROWS: dict[str, tuple] = {
     "offtaker_bgl": (87, "offtaker_bgl_fees", "offtaker_bgl_fees", "own_bgl_fee", "own_bgl_fee", None),
     "guarantees": (88, "guarantees_outstanding", "guarantees_outstanding", "own_guarantee", "own_guarantee", None),
     "interest": (89, "interest", "interest", "memo_interest_share", "memo_interest_share", None),
+    "pre_service_fee": (None, "pre_service_fee", "pre_service_fee", None, None, None),  # D120 - no workbook row
+    "pre_aggregation_gain": (None, "pre_aggregation_gain", "pre_aggregation_gain", None, None, None),  # D120 - no workbook row
     "nm": (91, "nm_budget", "nm_forecast", None, None, None),
     "nm_pct": (92, "nm_budget_pct", "nm_forecast_pct", None, None, None),
     "nm_specific": (93, "nm_budget_specific", "nm_forecast_specific", None, None, None),

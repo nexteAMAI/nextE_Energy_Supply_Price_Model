@@ -397,6 +397,10 @@ def build_pnl(qh: QHResult, params: Parameters) -> PnLResult:
         total_out = total_out + out
         total_fee = total_fee + fee
     P.put("market_bgl_fees", total_fee)
+    # D120: delegated-PRE service (fee and aggregation gain) - zero under the workbook BRP rule
+    gain, fee = gr.pre_service_monthly(params, P.m("t_imb"))
+    P.put("pre_aggregation_gain", gain)
+    P.put("pre_service_fee", fee)
     own = sum_sections("own_guarantee")[:12]
     P.put("guarantees_outstanding", total_out + own, year_rule="max")
     rel_b = sum_sections("reserve_release_budget")
@@ -423,8 +427,9 @@ def finalize_pnl(pnl: PnLResult, interest_monthly: np.ndarray, params: Parameter
     """Stage 2: interest, net margins, corporate income tax, after-tax rows, legs and checks."""
     P = pnl.portfolio
     P.put("interest", np.asarray(interest_monthly, dtype=float))
-    P.put("unallocated", P.m("market_bgl_fees") + P.m("interest"))
-    cost = P.m("reserve") + P.m("opex") + P.m("variable_opex") + P.m("offtaker_bgl_fees") + P.m("market_bgl_fees") + P.m("interest")
+    P.put("unallocated", P.m("market_bgl_fees") + P.m("interest") + P.m("pre_service_fee") - P.m("pre_aggregation_gain"))
+    cost = (P.m("reserve") + P.m("opex") + P.m("variable_opex") + P.m("offtaker_bgl_fees") + P.m("market_bgl_fees") + P.m("interest")
+            + P.m("pre_service_fee") - P.m("pre_aggregation_gain"))
     P.put("nm_budget", P.m("t_gm2_budget") - cost + P.m("reserve_release_budget"))
     P.put("nm_forecast", P.m("t_gm2_forecast") - cost + P.m("reserve_release_forecast"))
     sold = P["metered"] + P["rs_pv_volume"] + P["rs_bl_volume"]

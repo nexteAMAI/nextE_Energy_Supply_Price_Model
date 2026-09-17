@@ -1,6 +1,6 @@
 # USER GUIDE - nextE Energy Supply Bid Management Tool
 
-Application v0.7.3 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
+Application v0.7.4 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
 supply portfolio, not for a developer. Every capability of the Excel model
 `Energy_Supply_Portfolio_Tracking_v03` is reachable through the twelve pages described here;
 nothing requires a command line.
@@ -155,7 +155,10 @@ gate. A bid scenario starts from it and then takes the rulings of 17.09.2026 wit
 the Parameters page, "Apply the bid-scenario defaults (D119)": the reverse charge on source
 purchases off for a case year after 2026 (the measure ends 31.12.2026), the BRP guarantee by the
 delegated-PRE rule (initial guarantee of the PRE service contract, then months of average
-imbalance value), and the shipped ANRE 2026 grid tariff table. While a scenario still contradicts
+imbalance value), and the shipped ANRE 2026 grid tariff table. Under the delegated rule the
+PRE service fee of the contract (2.500 RON a month plus 5 % of the aggregation gain) appears
+as its own line in the cost-to-serve block and in the cash flow; the aggregation gain itself is
+not modelled unless you enter an assumed share on the Parameters page (section E). While a scenario still contradicts
 the verified state the page says so in a note; nothing is blocked.
 
 ## 4. Working sequence

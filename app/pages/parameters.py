@@ -337,6 +337,9 @@ def render() -> None:
                 pre_init = B.num_input("PRE initial guarantee (RON)", value=float(mg["brp"].get("pre_initial_ron", 100000.0)), help="service contract art. 9.8 (CINTA template: 100.000 lei)", decimals=0)
                 pre_m = B.num_input("PRE months of imbalance (1 to 3)", value=float(mg["brp"].get("pre_months_of_imbalance", 2.0)), help="CINTA PRE procedure pct. 5.2.5 - 1 to 3 average monthly imbalance values by payment record", decimals=2)
                 pre_vat = st.checkbox("PRE basis VAT-inclusive", value=bool(mg["brp"].get("pre_vat_inclusive", True)), help="assumption - the procedure does not state the basis")
+                pre_fee = B.num_input("PRE fixed fee (RON per month, excl. VAT)", value=float(mg["brp"].get("pre_fee_fixed_ron_per_month", 2500.0)), help="contract nr. 570/2026 Anexa 2 A2.1, Tf = 2.500 lei", decimals=0)
+                pre_share = B.num_input("PRE variable fee (share of the gain, 0,05 = 5 %)", value=float(mg["brp"].get("pre_fee_gain_share_pct", 0.05)), help="Anexa 2 A2.1, Tv = 5 % of |standalone - in-PRE| imbalance cost", decimals=4)
+                pre_gain = B.num_input("Assumed aggregation gain (share of |imbalance value|, 0 = not modelled)", value=float(mg["brp"].get("pre_aggregation_gain_pct_of_imbalance", 0.0)), help="house assumption; D017 measured 4 % to 74 % month by month on the asset portfolio", decimals=4)
             with c3:
                 vtm = B.num_input("TSO multiplier Vtm", value=float(mg["tso"]["vtm_multiplier"]), help="Input!C121 - unverified", decimals=2)
             with c4:
@@ -347,6 +350,8 @@ def render() -> None:
                 mg["brp"]["rate_ron_per_mw"], mg["brp"]["generation_mw_in_brp"] = float(rate), float(gen)
                 mg["brp"]["method"], mg["brp"]["pre_initial_ron"] = str(method), float(pre_init)
                 mg["brp"]["pre_months_of_imbalance"], mg["brp"]["pre_vat_inclusive"] = float(pre_m), bool(pre_vat)
+                mg["brp"]["pre_fee_fixed_ron_per_month"], mg["brp"]["pre_fee_gain_share_pct"] = float(pre_fee), float(pre_share)
+                mg["brp"]["pre_aggregation_gain_pct_of_imbalance"] = float(pre_gain)
                 mg["tso"]["vtm_multiplier"], mg["dso"]["vdm_multiplier"], mg["dso"]["overdue_addon_eur"] = float(vtm), float(vdm), float(addon)
                 state.mark_dirty("section E (market guarantees) applied")
                 st.rerun()
