@@ -1,6 +1,6 @@
 # USER GUIDE - nextE Energy Supply Bid Management Tool
 
-Application v0.7.4 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
+Application v0.7.5 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
 supply portfolio, not for a developer. Every capability of the Excel model
 `Energy_Supply_Portfolio_Tracking_v03` is reachable through the twelve pages described here;
 nothing requires a command line.

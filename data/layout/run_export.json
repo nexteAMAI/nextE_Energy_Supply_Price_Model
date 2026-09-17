@@ -1,11 +1,9 @@
 {
  "source": {
   "file": "TPL_output_run_export_ESB.xlsx",
-  "md5": "e274bbde31c5783c531e0b2ee2297bc5",
-  "content_signature": "e438279e0ccbc862b8fd2906414d5e7c",
+  "md5": "a7893d616e385f35e674a0a28071a435",
   "extracted": "17.09.2026",
-  "standard": "nexte-output-workbook-formatting.md",
-  "note": "corrected copy of the CEO's template (ruling D-D, 17.09.2026); originals in 00_Spec/02_superseded/templates_originals_16092026/"
+  "standard": "nexte-output-workbook-formatting.md"
  },
  "sheets": {
   "Portf Overview": {
@@ -742,10 +740,32 @@
     },
     {
      "r": 80,
-     "kind": "blank"
+     "kind": "line",
+     "block": "overview",
+     "label": "PRE service fee (delegated BRP) · Total",
+     "key": "pre_service_fee",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
     },
     {
      "r": 81,
+     "kind": "line",
+     "block": "overview",
+     "label": "PRE aggregation gain · Total",
+     "key": "pre_aggregation_gain",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 82,
+     "kind": "blank"
+    },
+    {
+     "r": 83,
      "kind": "line",
      "block": "overview",
      "label": "NM · Total",
@@ -756,7 +776,7 @@
      "values": null
     },
     {
-     "r": 82,
+     "r": 84,
      "kind": "line",
      "block": "overview",
      "label": "NM % · Total",
@@ -767,7 +787,7 @@
      "values": null
     },
     {
-     "r": 83,
+     "r": 85,
      "kind": "line",
      "block": "overview",
      "label": "NM specific · Total",
@@ -778,7 +798,7 @@
      "values": null
     },
     {
-     "r": 84,
+     "r": 86,
      "kind": "line",
      "block": "overview",
      "label": "NM · Retail",
@@ -789,7 +809,7 @@
      "values": null
     },
     {
-     "r": 85,
+     "r": 87,
      "kind": "line",
      "block": "overview",
      "label": "NM % · Retail",
@@ -800,7 +820,7 @@
      "values": null
     },
     {
-     "r": 86,
+     "r": 88,
      "kind": "line",
      "block": "overview",
      "label": "NM specific · Retail",
@@ -811,7 +831,7 @@
      "values": null
     },
     {
-     "r": 87,
+     "r": 89,
      "kind": "line",
      "block": "overview",
      "label": "NM · Wholesale spot resell",
@@ -822,7 +842,7 @@
      "values": null
     },
     {
-     "r": 88,
+     "r": 90,
      "kind": "line",
      "block": "overview",
      "label": "NM % · Wholesale spot resell",
@@ -833,7 +853,7 @@
      "values": null
     },
     {
-     "r": 89,
+     "r": 91,
      "kind": "line",
      "block": "overview",
      "label": "NM specific · Wholesale spot resell",
@@ -844,7 +864,7 @@
      "values": null
     },
     {
-     "r": 90,
+     "r": 92,
      "kind": "line",
      "block": "overview",
      "label": "Unallocated costs · Total",
@@ -855,11 +875,11 @@
      "values": null
     },
     {
-     "r": 91,
+     "r": 93,
      "kind": "blank"
     },
     {
-     "r": 92,
+     "r": 94,
      "kind": "line",
      "block": "overview",
      "label": "Check legs",
@@ -870,11 +890,11 @@
      "values": null
     },
     {
-     "r": 93,
+     "r": 95,
      "kind": "blank"
     },
     {
-     "r": 94,
+     "r": 96,
      "kind": "line",
      "block": "overview",
      "label": "CIT · Total",
@@ -885,11 +905,11 @@
      "values": null
     },
     {
-     "r": 95,
+     "r": 97,
      "kind": "blank"
     },
     {
-     "r": 96,
+     "r": 98,
      "kind": "line",
      "block": "overview",
      "label": "NM after tax · Total",
@@ -900,7 +920,7 @@
      "values": null
     },
     {
-     "r": 97,
+     "r": 99,
      "kind": "line",
      "block": "overview",
      "label": "NM after tax % · Total",
@@ -911,7 +931,7 @@
      "values": null
     },
     {
-     "r": 98,
+     "r": 100,
      "kind": "line",
      "block": "overview",
      "label": "NM after tax specific · Total",
@@ -922,17 +942,17 @@
      "values": null
     },
     {
-     "r": 99,
+     "r": 101,
      "kind": "blank"
     },
     {
-     "r": 100,
+     "r": 102,
      "kind": "section",
      "text": "Cash flow",
      "block": "overview_cf"
     },
     {
-     "r": 101,
+     "r": 103,
      "kind": "line",
      "block": "overview_cf",
      "label": "Inflows year · Total",
@@ -943,7 +963,7 @@
      "values": null
     },
     {
-     "r": 102,
+     "r": 104,
      "kind": "line",
      "block": "overview_cf",
      "label": "Outflows year · Total",
@@ -954,7 +974,7 @@
      "values": null
     },
     {
-     "r": 103,
+     "r": 105,
      "kind": "line",
      "block": "overview_cf",
      "label": "VAT cash year · Total",
@@ -965,7 +985,7 @@
      "values": null
     },
     {
-     "r": 104,
+     "r": 106,
      "kind": "line",
      "block": "overview_cf",
      "label": "Net cash flow year · Total",
@@ -976,7 +996,7 @@
      "values": null
     },
     {
-     "r": 105,
+     "r": 107,
      "kind": "line",
      "block": "overview_cf",
      "label": "Inflows beyond · Total",
@@ -987,7 +1007,7 @@
      "values": null
     },
     {
-     "r": 106,
+     "r": 108,
      "kind": "line",
      "block": "overview_cf",
      "label": "Outflows beyond · Total",
@@ -998,7 +1018,7 @@
      "values": null
     },
     {
-     "r": 107,
+     "r": 109,
      "kind": "line",
      "block": "overview_cf",
      "label": "Injections year · Total",
@@ -1009,7 +1029,7 @@
      "values": null
     },
     {
-     "r": 108,
+     "r": 110,
      "kind": "line",
      "block": "overview_cf",
      "label": "Peak funding monthly · Total",
@@ -1020,7 +1040,7 @@
      "values": null
     },
     {
-     "r": 109,
+     "r": 111,
      "kind": "line",
      "block": "overview_cf",
      "label": "Peak funding daily · Total",
@@ -1031,7 +1051,7 @@
      "values": null
     },
     {
-     "r": 110,
+     "r": 112,
      "kind": "line",
      "block": "overview_cf",
      "label": "Daily vs monthly · Total",
@@ -1042,7 +1062,7 @@
      "values": null
     },
     {
-     "r": 111,
+     "r": 113,
      "kind": "line",
      "block": "overview_cf",
      "label": "Interest year · Total",
@@ -1053,7 +1073,7 @@
      "values": null
     },
     {
-     "r": 112,
+     "r": 114,
      "kind": "line",
      "block": "overview_cf",
      "label": "Tax paid year · Total",
@@ -1064,7 +1084,7 @@
      "values": null
     },
     {
-     "r": 113,
+     "r": 115,
      "kind": "line",
      "block": "overview_cf",
      "label": "Closing dec · Total",
@@ -1075,7 +1095,7 @@
      "values": null
     },
     {
-     "r": 114,
+     "r": 116,
      "kind": "line",
      "block": "overview_cf",
      "label": "Restricted dec · Total",
@@ -1086,7 +1106,7 @@
      "values": null
     },
     {
-     "r": 115,
+     "r": 117,
      "kind": "line",
      "block": "overview_cf",
      "label": "Free cash after tax dec · Total",
@@ -1097,17 +1117,17 @@
      "values": null
     },
     {
-     "r": 116,
+     "r": 118,
      "kind": "blank"
     },
     {
-     "r": 117,
+     "r": 119,
      "kind": "section",
      "text": "Checks and tripwires",
      "block": "overview_checks"
     },
     {
-     "r": 118,
+     "r": 120,
      "kind": "line",
      "block": "overview_checks",
      "label": "Quarter-hour checks (sum)",
@@ -1118,7 +1138,7 @@
      "values": null
     },
     {
-     "r": 119,
+     "r": 121,
      "kind": "line",
      "block": "overview_checks",
      "label": "P&L checks (sum)",
@@ -1129,7 +1149,7 @@
      "values": null
     },
     {
-     "r": 120,
+     "r": 122,
      "kind": "line",
      "block": "overview_checks",
      "label": "Cash-flow checks (sum)",
@@ -1140,7 +1160,7 @@
      "values": null
     },
     {
-     "r": 121,
+     "r": 123,
      "kind": "line",
      "block": "overview_checks",
      "label": "Daily ledger checks (sum)",
@@ -1151,7 +1171,7 @@
      "values": null
     },
     {
-     "r": 122,
+     "r": 124,
      "kind": "line",
      "block": "overview_checks",
      "label": "Label self-check",
@@ -1162,7 +1182,7 @@
      "values": null
     },
     {
-     "r": 123,
+     "r": 125,
      "kind": "line",
      "block": "overview_checks",
      "label": "Strip price tripwire",
@@ -1173,7 +1193,7 @@
      "values": null
     },
     {
-     "r": 124,
+     "r": 126,
      "kind": "line",
      "block": "overview_checks",
      "label": "Origin layering check",
@@ -1184,7 +1204,7 @@
      "values": null
     },
     {
-     "r": 125,
+     "r": 127,
      "kind": "blank"
     }
    ],
@@ -3381,6 +3401,28 @@
      "r": 228,
      "kind": "line",
      "block": "portfolio",
+     "label": "PRE service fee (delegated BRP) · Total",
+     "key": "pre_service_fee",
+     "role": "subtotal",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 229,
+     "kind": "line",
+     "block": "portfolio",
+     "label": "PRE aggregation gain · Total",
+     "key": "pre_aggregation_gain",
+     "role": "subtotal",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 230,
+     "kind": "line",
+     "block": "portfolio",
      "label": "Unallocated costs · Total",
      "key": "unallocated",
      "role": "subtotal",
@@ -3389,11 +3431,11 @@
      "values": null
     },
     {
-     "r": 229,
+     "r": 231,
      "kind": "blank"
     },
     {
-     "r": 230,
+     "r": 232,
      "kind": "line",
      "block": "portfolio",
      "label": "Net margin pre-tax budgeted · Total",
@@ -3404,26 +3446,11 @@
      "values": null
     },
     {
-     "r": 231,
+     "r": 233,
      "kind": "line",
      "block": "portfolio",
      "label": "Net margin pre-tax forecasted · Total",
      "key": "nm_forecast",
-     "role": "subtotal",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
-     "r": 232,
-     "kind": "blank"
-    },
-    {
-     "r": 233,
-     "kind": "line",
-     "block": "portfolio",
-     "label": "Corporate income tax budgeted · Total",
-     "key": "cit_budget",
      "role": "subtotal",
      "unit_template": "€",
      "unit": "EUR",
@@ -3437,6 +3464,21 @@
      "r": 235,
      "kind": "line",
      "block": "portfolio",
+     "label": "Corporate income tax budgeted · Total",
+     "key": "cit_budget",
+     "role": "subtotal",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 236,
+     "kind": "blank"
+    },
+    {
+     "r": 237,
+     "kind": "line",
+     "block": "portfolio",
      "label": "Net margin after tax budgeted · Total",
      "key": "nm_budget_after_tax",
      "role": "total",
@@ -3445,7 +3487,7 @@
      "values": null
     },
     {
-     "r": 236,
+     "r": 238,
      "kind": "line",
      "block": "portfolio",
      "label": "NM budget % · Total",
@@ -3456,7 +3498,7 @@
      "values": null
     },
     {
-     "r": 237,
+     "r": 239,
      "kind": "line",
      "block": "portfolio",
      "label": "NM budget specific · Total",
@@ -3467,7 +3509,7 @@
      "values": null
     },
     {
-     "r": 238,
+     "r": 240,
      "kind": "line",
      "block": "portfolio",
      "label": "NM budget after tax % · Total",
@@ -3478,7 +3520,7 @@
      "values": null
     },
     {
-     "r": 239,
+     "r": 241,
      "kind": "line",
      "block": "portfolio",
      "label": "NM budget after tax specific · Total",
@@ -3489,11 +3531,11 @@
      "values": null
     },
     {
-     "r": 240,
+     "r": 242,
      "kind": "blank"
     },
     {
-     "r": 241,
+     "r": 243,
      "kind": "line",
      "block": "portfolio",
      "label": "Corporate income tax forecasted · Total",
@@ -3504,11 +3546,11 @@
      "values": null
     },
     {
-     "r": 242,
+     "r": 244,
      "kind": "blank"
     },
     {
-     "r": 243,
+     "r": 245,
      "kind": "line",
      "block": "portfolio",
      "label": "Net margin after tax forecasted · Total",
@@ -3519,7 +3561,7 @@
      "values": null
     },
     {
-     "r": 244,
+     "r": 246,
      "kind": "line",
      "block": "portfolio",
      "label": "NM forecast % · Total",
@@ -3530,7 +3572,7 @@
      "values": null
     },
     {
-     "r": 245,
+     "r": 247,
      "kind": "line",
      "block": "portfolio",
      "label": "NM forecast specific · Total",
@@ -3541,7 +3583,7 @@
      "values": null
     },
     {
-     "r": 246,
+     "r": 248,
      "kind": "line",
      "block": "portfolio",
      "label": "NM forecast after tax % · Total",
@@ -3552,7 +3594,7 @@
      "values": null
     },
     {
-     "r": 247,
+     "r": 249,
      "kind": "line",
      "block": "portfolio",
      "label": "NM forecast after tax specific · Total",
@@ -3563,11 +3605,11 @@
      "values": null
     },
     {
-     "r": 248,
+     "r": 250,
      "kind": "blank"
     },
     {
-     "r": 249,
+     "r": 251,
      "kind": "line",
      "block": "portfolio",
      "label": "Check legs budget",
@@ -3578,7 +3620,7 @@
      "values": null
     },
     {
-     "r": 250,
+     "r": 252,
      "kind": "line",
      "block": "portfolio",
      "label": "Check legs forecast",
@@ -3589,7 +3631,7 @@
      "values": null
     },
     {
-     "r": 251,
+     "r": 253,
      "kind": "line",
      "block": "portfolio",
      "label": "Check sections NM budget",
@@ -3600,7 +3642,7 @@
      "values": null
     },
     {
-     "r": 252,
+     "r": 254,
      "kind": "line",
      "block": "portfolio",
      "label": "Check sections NM forecast",
@@ -3611,17 +3653,17 @@
      "values": null
     },
     {
-     "r": 253,
+     "r": 255,
      "kind": "blank"
     },
     {
-     "r": 254,
+     "r": 256,
      "kind": "section",
      "text": "OT1",
      "block": "section"
     },
     {
-     "r": 255,
+     "r": 257,
      "kind": "header",
      "text": "OT1",
      "block": "section",
@@ -3642,7 +3684,7 @@
      }
     },
     {
-     "r": 256,
+     "r": 258,
      "kind": "line",
      "block": "section",
      "label": "Notified volume · Retail",
@@ -3653,7 +3695,7 @@
      "values": null
     },
     {
-     "r": 257,
+     "r": 259,
      "kind": "line",
      "block": "section",
      "label": "Notified volume (avg MW) · Retail",
@@ -3664,7 +3706,7 @@
      "values": null
     },
     {
-     "r": 258,
+     "r": 260,
      "kind": "line",
      "block": "section",
      "label": "Metered volume · Retail",
@@ -3675,7 +3717,7 @@
      "values": null
     },
     {
-     "r": 259,
+     "r": 261,
      "kind": "line",
      "block": "section",
      "label": "Metered volume (avg MW) · Retail",
@@ -3686,7 +3728,7 @@
      "values": null
     },
     {
-     "r": 260,
+     "r": 262,
      "kind": "line",
      "block": "section",
      "label": "Net imbalance volume · Retail",
@@ -3697,37 +3739,15 @@
      "values": null
     },
     {
-     "r": 261,
-     "kind": "blank"
-    },
-    {
-     "r": 262,
-     "kind": "line",
-     "block": "section",
-     "label": "PV buy notified · Retail",
-     "key": "pv_buy_notified",
-     "role": "data",
-     "unit_template": "MWh",
-     "unit": "MWh",
-     "values": null
-    },
-    {
      "r": 263,
-     "kind": "line",
-     "block": "section",
-     "label": "PV buy notified MW · Retail",
-     "key": "pv_buy_notified_mw",
-     "role": "data",
-     "unit_template": "MW",
-     "unit": "MW",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 264,
      "kind": "line",
      "block": "section",
-     "label": "Baseload buy notified · Retail",
-     "key": "bl_buy_notified",
+     "label": "PV buy notified · Retail",
+     "key": "pv_buy_notified",
      "role": "data",
      "unit_template": "MWh",
      "unit": "MWh",
@@ -3737,8 +3757,8 @@
      "r": 265,
      "kind": "line",
      "block": "section",
-     "label": "Baseload buy notified MW · Retail",
-     "key": "bl_buy_notified_mw",
+     "label": "PV buy notified MW · Retail",
+     "key": "pv_buy_notified_mw",
      "role": "data",
      "unit_template": "MW",
      "unit": "MW",
@@ -3748,6 +3768,28 @@
      "r": 266,
      "kind": "line",
      "block": "section",
+     "label": "Baseload buy notified · Retail",
+     "key": "bl_buy_notified",
+     "role": "data",
+     "unit_template": "MWh",
+     "unit": "MWh",
+     "values": null
+    },
+    {
+     "r": 267,
+     "kind": "line",
+     "block": "section",
+     "label": "Baseload buy notified MW · Retail",
+     "key": "bl_buy_notified_mw",
+     "role": "data",
+     "unit_template": "MW",
+     "unit": "MW",
+     "values": null
+    },
+    {
+     "r": 268,
+     "kind": "line",
+     "block": "section",
      "label": "Spot buy notified · Retail",
      "key": "spot_buy_notified",
      "role": "subtotal",
@@ -3756,7 +3798,7 @@
      "values": null
     },
     {
-     "r": 267,
+     "r": 269,
      "kind": "line",
      "block": "section",
      "label": "Spot buy notified MW · Retail",
@@ -3767,7 +3809,7 @@
      "values": null
     },
     {
-     "r": 268,
+     "r": 270,
      "kind": "line",
      "block": "section",
      "label": "Buy notified · Retail",
@@ -3778,7 +3820,7 @@
      "values": null
     },
     {
-     "r": 269,
+     "r": 271,
      "kind": "line",
      "block": "section",
      "label": "Buy notified MW · Retail",
@@ -3789,33 +3831,11 @@
      "values": null
     },
     {
-     "r": 270,
+     "r": 272,
      "kind": "line",
      "block": "section",
      "label": "PV buy metered · Retail",
      "key": "pv_buy_metered",
-     "role": "subtotal",
-     "unit_template": "MWh",
-     "unit": "MWh",
-     "values": null
-    },
-    {
-     "r": 271,
-     "kind": "line",
-     "block": "section",
-     "label": "PV buy metered MW · Retail",
-     "key": "pv_buy_metered_mw",
-     "role": "subtotal",
-     "unit_template": "MW",
-     "unit": "MW",
-     "values": null
-    },
-    {
-     "r": 272,
-     "kind": "line",
-     "block": "section",
-     "label": "Baseload buy metered · Retail",
-     "key": "bl_buy_metered",
      "role": "subtotal",
      "unit_template": "MWh",
      "unit": "MWh",
@@ -3825,8 +3845,8 @@
      "r": 273,
      "kind": "line",
      "block": "section",
-     "label": "Baseload buy metered MW · Retail",
-     "key": "bl_buy_metered_mw",
+     "label": "PV buy metered MW · Retail",
+     "key": "pv_buy_metered_mw",
      "role": "subtotal",
      "unit_template": "MW",
      "unit": "MW",
@@ -3836,6 +3856,28 @@
      "r": 274,
      "kind": "line",
      "block": "section",
+     "label": "Baseload buy metered · Retail",
+     "key": "bl_buy_metered",
+     "role": "subtotal",
+     "unit_template": "MWh",
+     "unit": "MWh",
+     "values": null
+    },
+    {
+     "r": 275,
+     "kind": "line",
+     "block": "section",
+     "label": "Baseload buy metered MW · Retail",
+     "key": "bl_buy_metered_mw",
+     "role": "subtotal",
+     "unit_template": "MW",
+     "unit": "MW",
+     "values": null
+    },
+    {
+     "r": 276,
+     "kind": "line",
+     "block": "section",
      "label": "Spot settlement · Retail",
      "key": "spot_settlement",
      "role": "data",
@@ -3844,7 +3886,7 @@
      "values": null
     },
     {
-     "r": 275,
+     "r": 277,
      "kind": "line",
      "block": "section",
      "label": "Spot settlement MW · Retail",
@@ -3855,7 +3897,7 @@
      "values": null
     },
     {
-     "r": 276,
+     "r": 278,
      "kind": "line",
      "block": "section",
      "label": "Buy metered · Retail",
@@ -3866,7 +3908,7 @@
      "values": null
     },
     {
-     "r": 277,
+     "r": 279,
      "kind": "line",
      "block": "section",
      "label": "Buy metered MW · Retail",
@@ -3877,11 +3919,11 @@
      "values": null
     },
     {
-     "r": 278,
+     "r": 280,
      "kind": "blank"
     },
     {
-     "r": 279,
+     "r": 281,
      "kind": "line",
      "block": "section",
      "label": "Share PV · Retail",
@@ -3892,7 +3934,7 @@
      "values": null
     },
     {
-     "r": 280,
+     "r": 282,
      "kind": "line",
      "block": "section",
      "label": "Share Baseload · Retail",
@@ -3903,7 +3945,7 @@
      "values": null
     },
     {
-     "r": 281,
+     "r": 283,
      "kind": "line",
      "block": "section",
      "label": "Share spot · Retail",
@@ -3914,37 +3956,15 @@
      "values": null
     },
     {
-     "r": 282,
-     "kind": "blank"
-    },
-    {
-     "r": 283,
-     "kind": "line",
-     "block": "section",
-     "label": "PV cost budgeted · Retail",
-     "key": "cost_pv_budget",
-     "role": "data",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
      "r": 284,
-     "kind": "line",
-     "block": "section",
-     "label": "Baseload cost budgeted · Retail",
-     "key": "cost_bl_budget",
-     "role": "data",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 285,
      "kind": "line",
      "block": "section",
-     "label": "Spot cost · Retail",
-     "key": "cost_spot",
+     "label": "PV cost budgeted · Retail",
+     "key": "cost_pv_budget",
      "role": "data",
      "unit_template": "€",
      "unit": "EUR",
@@ -3954,6 +3974,28 @@
      "r": 286,
      "kind": "line",
      "block": "section",
+     "label": "Baseload cost budgeted · Retail",
+     "key": "cost_bl_budget",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 287,
+     "kind": "line",
+     "block": "section",
+     "label": "Spot cost · Retail",
+     "key": "cost_spot",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 288,
+     "kind": "line",
+     "block": "section",
      "label": "Sourcing cost budgeted · Retail",
      "key": "cost_budget",
      "role": "total",
@@ -3962,37 +4004,15 @@
      "values": null
     },
     {
-     "r": 287,
-     "kind": "blank"
-    },
-    {
-     "r": 288,
-     "kind": "line",
-     "block": "section",
-     "label": "Price PV budget · Retail",
-     "key": "price_pv_budget",
-     "role": "subtotal",
-     "unit_template": "€/MWh",
-     "unit": "EUR/MWh",
-     "values": null
-    },
-    {
      "r": 289,
-     "kind": "line",
-     "block": "section",
-     "label": "Price Baseload budget · Retail",
-     "key": "price_bl_budget",
-     "role": "subtotal",
-     "unit_template": "€/MWh",
-     "unit": "EUR/MWh",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 290,
      "kind": "line",
      "block": "section",
-     "label": "Price spot · Retail",
-     "key": "price_spot",
+     "label": "Price PV budget · Retail",
+     "key": "price_pv_budget",
      "role": "subtotal",
      "unit_template": "€/MWh",
      "unit": "EUR/MWh",
@@ -4002,6 +4022,28 @@
      "r": 291,
      "kind": "line",
      "block": "section",
+     "label": "Price Baseload budget · Retail",
+     "key": "price_bl_budget",
+     "role": "subtotal",
+     "unit_template": "€/MWh",
+     "unit": "EUR/MWh",
+     "values": null
+    },
+    {
+     "r": 292,
+     "kind": "line",
+     "block": "section",
+     "label": "Price spot · Retail",
+     "key": "price_spot",
+     "role": "subtotal",
+     "unit_template": "€/MWh",
+     "unit": "EUR/MWh",
+     "values": null
+    },
+    {
+     "r": 293,
+     "kind": "line",
+     "block": "section",
      "label": "Price total budget · Retail",
      "key": "price_total_budget",
      "role": "total",
@@ -4010,37 +4052,15 @@
      "values": null
     },
     {
-     "r": 292,
-     "kind": "blank"
-    },
-    {
-     "r": 293,
-     "kind": "line",
-     "block": "section",
-     "label": "PV cost forecasted · Retail",
-     "key": "cost_pv_forecast",
-     "role": "data",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
      "r": 294,
-     "kind": "line",
-     "block": "section",
-     "label": "Baseload cost forecasted · Retail",
-     "key": "cost_bl_forecast",
-     "role": "data",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 295,
      "kind": "line",
      "block": "section",
-     "label": "Cost spot forecast · Retail",
-     "key": "cost_spot_f",
+     "label": "PV cost forecasted · Retail",
+     "key": "cost_pv_forecast",
      "role": "data",
      "unit_template": "€",
      "unit": "EUR",
@@ -4050,6 +4070,28 @@
      "r": 296,
      "kind": "line",
      "block": "section",
+     "label": "Baseload cost forecasted · Retail",
+     "key": "cost_bl_forecast",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 297,
+     "kind": "line",
+     "block": "section",
+     "label": "Cost spot forecast · Retail",
+     "key": "cost_spot_f",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 298,
+     "kind": "line",
+     "block": "section",
      "label": "Sourcing cost forecasted · Retail",
      "key": "cost_forecast",
      "role": "total",
@@ -4058,37 +4100,15 @@
      "values": null
     },
     {
-     "r": 297,
-     "kind": "blank"
-    },
-    {
-     "r": 298,
-     "kind": "line",
-     "block": "section",
-     "label": "Price PV forecast · Retail",
-     "key": "price_pv_forecast",
-     "role": "subtotal",
-     "unit_template": "€/MWh",
-     "unit": "EUR/MWh",
-     "values": null
-    },
-    {
      "r": 299,
-     "kind": "line",
-     "block": "section",
-     "label": "Price Baseload forecast · Retail",
-     "key": "price_bl_forecast",
-     "role": "subtotal",
-     "unit_template": "€/MWh",
-     "unit": "EUR/MWh",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 300,
      "kind": "line",
      "block": "section",
-     "label": "Price spot forecast · Retail",
-     "key": "price_spot_f",
+     "label": "Price PV forecast · Retail",
+     "key": "price_pv_forecast",
      "role": "subtotal",
      "unit_template": "€/MWh",
      "unit": "EUR/MWh",
@@ -4098,6 +4118,28 @@
      "r": 301,
      "kind": "line",
      "block": "section",
+     "label": "Price Baseload forecast · Retail",
+     "key": "price_bl_forecast",
+     "role": "subtotal",
+     "unit_template": "€/MWh",
+     "unit": "EUR/MWh",
+     "values": null
+    },
+    {
+     "r": 302,
+     "kind": "line",
+     "block": "section",
+     "label": "Price spot forecast · Retail",
+     "key": "price_spot_f",
+     "role": "subtotal",
+     "unit_template": "€/MWh",
+     "unit": "EUR/MWh",
+     "values": null
+    },
+    {
+     "r": 303,
+     "kind": "line",
+     "block": "section",
      "label": "Price total forecast · Retail",
      "key": "price_total_forecast",
      "role": "total",
@@ -4106,11 +4148,11 @@
      "values": null
     },
     {
-     "r": 302,
+     "r": 304,
      "kind": "blank"
     },
     {
-     "r": 303,
+     "r": 305,
      "kind": "line",
      "block": "section",
      "label": "Budget minus forecast cost · Retail",
@@ -4121,7 +4163,7 @@
      "values": null
     },
     {
-     "r": 304,
+     "r": 306,
      "kind": "line",
      "block": "section",
      "label": "Budget minus forecast price · Retail",
@@ -4132,11 +4174,11 @@
      "values": null
     },
     {
-     "r": 305,
+     "r": 307,
      "kind": "blank"
     },
     {
-     "r": 306,
+     "r": 308,
      "kind": "line",
      "block": "section",
      "label": "Risk premium accrued · Retail",
@@ -4147,33 +4189,11 @@
      "values": null
     },
     {
-     "r": 307,
+     "r": 309,
      "kind": "line",
      "block": "section",
      "label": "Risk premium cumulative · Retail",
      "key": "premium_cumulative",
-     "role": "data",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
-     "r": 308,
-     "kind": "line",
-     "block": "section",
-     "label": "Premium settlement · Retail",
-     "key": "premium_settlement",
-     "role": "subtotal",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
-     "r": 309,
-     "kind": "line",
-     "block": "section",
-     "label": "Premium settlement cumulative · Retail",
-     "key": "premium_settlement_cumulative",
      "role": "data",
      "unit_template": "€",
      "unit": "EUR",
@@ -4183,6 +4203,28 @@
      "r": 310,
      "kind": "line",
      "block": "section",
+     "label": "Premium settlement · Retail",
+     "key": "premium_settlement",
+     "role": "subtotal",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 311,
+     "kind": "line",
+     "block": "section",
+     "label": "Premium settlement cumulative · Retail",
+     "key": "premium_settlement_cumulative",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 312,
+     "kind": "line",
+     "block": "section",
      "label": "Premium deviation · Retail",
      "key": "premium_deviation",
      "role": "subtotal",
@@ -4191,11 +4233,11 @@
      "values": null
     },
     {
-     "r": 311,
+     "r": 313,
      "kind": "blank"
     },
     {
-     "r": 312,
+     "r": 314,
      "kind": "line",
      "block": "section",
      "label": "Premium budget input · Retail",
@@ -4206,7 +4248,7 @@
      "values": null
     },
     {
-     "r": 313,
+     "r": 315,
      "kind": "line",
      "block": "section",
      "label": "Premium forecast input · Retail",
@@ -4217,7 +4259,7 @@
      "values": null
     },
     {
-     "r": 314,
+     "r": 316,
      "kind": "line",
      "block": "section",
      "label": "Premium forecast derived · Retail",
@@ -4228,11 +4270,11 @@
      "values": null
     },
     {
-     "r": 315,
+     "r": 317,
      "kind": "blank"
     },
     {
-     "r": 316,
+     "r": 318,
      "kind": "line",
      "block": "section",
      "label": "Reserve release budgeted · Retail",
@@ -4243,7 +4285,7 @@
      "values": null
     },
     {
-     "r": 317,
+     "r": 319,
      "kind": "line",
      "block": "section",
      "label": "Reserve release forecasted · Retail",
@@ -4254,11 +4296,11 @@
      "values": null
     },
     {
-     "r": 318,
+     "r": 320,
      "kind": "blank"
     },
     {
-     "r": 319,
+     "r": 321,
      "kind": "line",
      "block": "section",
      "label": "Revenue · Retail",
@@ -4269,7 +4311,7 @@
      "values": null
     },
     {
-     "r": 320,
+     "r": 322,
      "kind": "line",
      "block": "section",
      "label": "Average sell price · Retail",
@@ -4280,11 +4322,11 @@
      "values": null
     },
     {
-     "r": 321,
+     "r": 323,
      "kind": "blank"
     },
     {
-     "r": 322,
+     "r": 324,
      "kind": "line",
      "block": "section",
      "label": "GM1 budgeted · Retail",
@@ -4295,7 +4337,7 @@
      "values": null
     },
     {
-     "r": 323,
+     "r": 325,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecasted · Retail",
@@ -4306,11 +4348,11 @@
      "values": null
     },
     {
-     "r": 324,
+     "r": 326,
      "kind": "blank"
     },
     {
-     "r": 325,
+     "r": 327,
      "kind": "line",
      "block": "section",
      "label": "Source imbalance · Retail",
@@ -4321,7 +4363,7 @@
      "values": null
     },
     {
-     "r": 326,
+     "r": 328,
      "kind": "line",
      "block": "section",
      "label": "Off-taker imbalance · Retail",
@@ -4332,11 +4374,11 @@
      "values": null
     },
     {
-     "r": 327,
+     "r": 329,
      "kind": "blank"
     },
     {
-     "r": 328,
+     "r": 330,
      "kind": "line",
      "block": "section",
      "label": "GM2 budgeted · Retail",
@@ -4347,7 +4389,7 @@
      "values": null
     },
     {
-     "r": 329,
+     "r": 331,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecasted · Retail",
@@ -4358,11 +4400,11 @@
      "values": null
     },
     {
-     "r": 330,
+     "r": 332,
      "kind": "blank"
     },
     {
-     "r": 331,
+     "r": 333,
      "kind": "line",
      "block": "section",
      "label": "GM1 budget % · Retail",
@@ -4373,7 +4415,7 @@
      "values": null
     },
     {
-     "r": 332,
+     "r": 334,
      "kind": "line",
      "block": "section",
      "label": "GM1 budget specific · Retail",
@@ -4384,11 +4426,11 @@
      "values": null
     },
     {
-     "r": 333,
+     "r": 335,
      "kind": "blank"
     },
     {
-     "r": 334,
+     "r": 336,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecast % · Retail",
@@ -4399,7 +4441,7 @@
      "values": null
     },
     {
-     "r": 335,
+     "r": 337,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecast specific · Retail",
@@ -4410,11 +4452,11 @@
      "values": null
     },
     {
-     "r": 336,
+     "r": 338,
      "kind": "blank"
     },
     {
-     "r": 337,
+     "r": 339,
      "kind": "line",
      "block": "section",
      "label": "GM2 budget % · Retail",
@@ -4425,7 +4467,7 @@
      "values": null
     },
     {
-     "r": 338,
+     "r": 340,
      "kind": "line",
      "block": "section",
      "label": "GM2 budget specific · Retail",
@@ -4436,11 +4478,11 @@
      "values": null
     },
     {
-     "r": 339,
+     "r": 341,
      "kind": "blank"
     },
     {
-     "r": 340,
+     "r": 342,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecast % · Retail",
@@ -4451,7 +4493,7 @@
      "values": null
     },
     {
-     "r": 341,
+     "r": 343,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecast specific · Retail",
@@ -4462,37 +4504,15 @@
      "values": null
     },
     {
-     "r": 342,
-     "kind": "blank"
-    },
-    {
-     "r": 343,
-     "kind": "line",
-     "block": "section",
-     "label": "Green certificates · Retail",
-     "key": "gc_count",
-     "role": "subtotal",
-     "unit_template": "GC",
-     "unit": "GC",
-     "values": null
-    },
-    {
      "r": 344,
-     "kind": "line",
-     "block": "section",
-     "label": "GC spot · Retail",
-     "key": "gc_spot",
-     "role": "subtotal",
-     "unit_template": "GC",
-     "unit": "GC",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 345,
      "kind": "line",
      "block": "section",
-     "label": "GC bilateral · Retail",
-     "key": "gc_bilateral",
+     "label": "Green certificates · Retail",
+     "key": "gc_count",
      "role": "subtotal",
      "unit_template": "GC",
      "unit": "GC",
@@ -4502,6 +4522,28 @@
      "r": 346,
      "kind": "line",
      "block": "section",
+     "label": "GC spot · Retail",
+     "key": "gc_spot",
+     "role": "subtotal",
+     "unit_template": "GC",
+     "unit": "GC",
+     "values": null
+    },
+    {
+     "r": 347,
+     "kind": "line",
+     "block": "section",
+     "label": "GC bilateral · Retail",
+     "key": "gc_bilateral",
+     "role": "subtotal",
+     "unit_template": "GC",
+     "unit": "GC",
+     "values": null
+    },
+    {
+     "r": 348,
+     "kind": "line",
+     "block": "section",
      "label": "GC value · Retail",
      "key": "gc_value",
      "role": "data",
@@ -4510,7 +4552,7 @@
      "values": null
     },
     {
-     "r": 347,
+     "r": 349,
      "kind": "line",
      "block": "section",
      "label": "GC unit cost · Retail",
@@ -4521,37 +4563,15 @@
      "values": null
     },
     {
-     "r": 348,
-     "kind": "blank"
-    },
-    {
-     "r": 349,
-     "kind": "line",
-     "block": "section",
-     "label": "PV remaining · Retail",
-     "key": "pv_remaining",
-     "role": "data",
-     "unit_template": "MWh",
-     "unit": "MWh",
-     "values": null
-    },
-    {
      "r": 350,
-     "kind": "line",
-     "block": "section",
-     "label": "PV remaining MW · Retail",
-     "key": "pv_remaining_mw",
-     "role": "data",
-     "unit_template": "MW",
-     "unit": "MW",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 351,
      "kind": "line",
      "block": "section",
-     "label": "Baseload remaining · Retail",
-     "key": "bl_remaining",
+     "label": "PV remaining · Retail",
+     "key": "pv_remaining",
      "role": "data",
      "unit_template": "MWh",
      "unit": "MWh",
@@ -4561,6 +4581,28 @@
      "r": 352,
      "kind": "line",
      "block": "section",
+     "label": "PV remaining MW · Retail",
+     "key": "pv_remaining_mw",
+     "role": "data",
+     "unit_template": "MW",
+     "unit": "MW",
+     "values": null
+    },
+    {
+     "r": 353,
+     "kind": "line",
+     "block": "section",
+     "label": "Baseload remaining · Retail",
+     "key": "bl_remaining",
+     "role": "data",
+     "unit_template": "MWh",
+     "unit": "MWh",
+     "values": null
+    },
+    {
+     "r": 354,
+     "kind": "line",
+     "block": "section",
      "label": "Baseload remaining MW · Retail",
      "key": "bl_remaining_mw",
      "role": "data",
@@ -4569,11 +4611,11 @@
      "values": null
     },
     {
-     "r": 353,
+     "r": 355,
      "kind": "blank"
     },
     {
-     "r": 354,
+     "r": 356,
      "kind": "line",
      "block": "section",
      "label": "Pass-through revenue · Retail",
@@ -4584,7 +4626,7 @@
      "values": null
     },
     {
-     "r": 355,
+     "r": 357,
      "kind": "line",
      "block": "section",
      "label": "Pass-through cost · Retail",
@@ -4595,7 +4637,7 @@
      "values": null
     },
     {
-     "r": 356,
+     "r": 358,
      "kind": "line",
      "block": "section",
      "label": "Risk reserve · Retail",
@@ -4606,7 +4648,7 @@
      "values": null
     },
     {
-     "r": 357,
+     "r": 359,
      "kind": "line",
      "block": "section",
      "label": "Portfolio OPEX · Retail",
@@ -4617,7 +4659,7 @@
      "values": null
     },
     {
-     "r": 358,
+     "r": 360,
      "kind": "line",
      "block": "section",
      "label": "Variable OPEX (sales bonus) · Retail",
@@ -4628,11 +4670,11 @@
      "values": null
     },
     {
-     "r": 359,
+     "r": 361,
      "kind": "blank"
     },
     {
-     "r": 360,
+     "r": 362,
      "kind": "line",
      "block": "section",
      "label": "Own guarantee outstanding · Retail",
@@ -4643,7 +4685,7 @@
      "values": null
     },
     {
-     "r": 361,
+     "r": 363,
      "kind": "line",
      "block": "section",
      "label": "Own BGL fee · Retail",
@@ -4654,11 +4696,11 @@
      "values": null
     },
     {
-     "r": 362,
+     "r": 364,
      "kind": "blank"
     },
     {
-     "r": 363,
+     "r": 365,
      "kind": "line",
      "block": "section",
      "label": "NM pre-tax budgeted · Retail",
@@ -4669,7 +4711,7 @@
      "values": null
     },
     {
-     "r": 364,
+     "r": 366,
      "kind": "line",
      "block": "section",
      "label": "NM pre-tax forecasted · Retail",
@@ -4680,11 +4722,11 @@
      "values": null
     },
     {
-     "r": 365,
+     "r": 367,
      "kind": "blank"
     },
     {
-     "r": 366,
+     "r": 368,
      "kind": "line",
      "block": "section",
      "label": "NM budget % · Retail",
@@ -4695,7 +4737,7 @@
      "values": null
     },
     {
-     "r": 367,
+     "r": 369,
      "kind": "line",
      "block": "section",
      "label": "NM budget specific · Retail",
@@ -4706,11 +4748,11 @@
      "values": null
     },
     {
-     "r": 368,
+     "r": 370,
      "kind": "blank"
     },
     {
-     "r": 369,
+     "r": 371,
      "kind": "line",
      "block": "section",
      "label": "NM forecast % · Retail",
@@ -4721,7 +4763,7 @@
      "values": null
     },
     {
-     "r": 370,
+     "r": 372,
      "kind": "line",
      "block": "section",
      "label": "NM forecast specific · Retail",
@@ -4732,11 +4774,11 @@
      "values": null
     },
     {
-     "r": 371,
+     "r": 373,
      "kind": "blank"
     },
     {
-     "r": 372,
+     "r": 374,
      "kind": "line",
      "block": "section",
      "label": "Memo: market BGL fee share · Retail",
@@ -4747,7 +4789,7 @@
      "values": null
     },
     {
-     "r": 373,
+     "r": 375,
      "kind": "line",
      "block": "section",
      "label": "Memo: interest share · Retail",
@@ -4758,17 +4800,17 @@
      "values": null
     },
     {
-     "r": 374,
+     "r": 376,
      "kind": "blank"
     },
     {
-     "r": 375,
+     "r": 377,
      "kind": "section",
      "text": "OT2",
      "block": "section"
     },
     {
-     "r": 376,
+     "r": 378,
      "kind": "header",
      "text": "OT2",
      "block": "section",
@@ -4789,7 +4831,7 @@
      }
     },
     {
-     "r": 377,
+     "r": 379,
      "kind": "line",
      "block": "section",
      "label": "Notified volume · Retail",
@@ -4800,7 +4842,7 @@
      "values": null
     },
     {
-     "r": 378,
+     "r": 380,
      "kind": "line",
      "block": "section",
      "label": "Notified volume (avg MW) · Retail",
@@ -4811,7 +4853,7 @@
      "values": null
     },
     {
-     "r": 379,
+     "r": 381,
      "kind": "line",
      "block": "section",
      "label": "Metered volume · Retail",
@@ -4822,7 +4864,7 @@
      "values": null
     },
     {
-     "r": 380,
+     "r": 382,
      "kind": "line",
      "block": "section",
      "label": "Metered volume (avg MW) · Retail",
@@ -4833,7 +4875,7 @@
      "values": null
     },
     {
-     "r": 381,
+     "r": 383,
      "kind": "line",
      "block": "section",
      "label": "Net imbalance volume · Retail",
@@ -4844,37 +4886,15 @@
      "values": null
     },
     {
-     "r": 382,
-     "kind": "blank"
-    },
-    {
-     "r": 383,
-     "kind": "line",
-     "block": "section",
-     "label": "PV buy notified · Retail",
-     "key": "pv_buy_notified",
-     "role": "data",
-     "unit_template": "MWh",
-     "unit": "MWh",
-     "values": null
-    },
-    {
      "r": 384,
-     "kind": "line",
-     "block": "section",
-     "label": "PV buy notified MW · Retail",
-     "key": "pv_buy_notified_mw",
-     "role": "data",
-     "unit_template": "MW",
-     "unit": "MW",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 385,
      "kind": "line",
      "block": "section",
-     "label": "Baseload buy notified · Retail",
-     "key": "bl_buy_notified",
+     "label": "PV buy notified · Retail",
+     "key": "pv_buy_notified",
      "role": "data",
      "unit_template": "MWh",
      "unit": "MWh",
@@ -4884,8 +4904,8 @@
      "r": 386,
      "kind": "line",
      "block": "section",
-     "label": "Baseload buy notified MW · Retail",
-     "key": "bl_buy_notified_mw",
+     "label": "PV buy notified MW · Retail",
+     "key": "pv_buy_notified_mw",
      "role": "data",
      "unit_template": "MW",
      "unit": "MW",
@@ -4895,6 +4915,28 @@
      "r": 387,
      "kind": "line",
      "block": "section",
+     "label": "Baseload buy notified · Retail",
+     "key": "bl_buy_notified",
+     "role": "data",
+     "unit_template": "MWh",
+     "unit": "MWh",
+     "values": null
+    },
+    {
+     "r": 388,
+     "kind": "line",
+     "block": "section",
+     "label": "Baseload buy notified MW · Retail",
+     "key": "bl_buy_notified_mw",
+     "role": "data",
+     "unit_template": "MW",
+     "unit": "MW",
+     "values": null
+    },
+    {
+     "r": 389,
+     "kind": "line",
+     "block": "section",
      "label": "Spot buy notified · Retail",
      "key": "spot_buy_notified",
      "role": "subtotal",
@@ -4903,7 +4945,7 @@
      "values": null
     },
     {
-     "r": 388,
+     "r": 390,
      "kind": "line",
      "block": "section",
      "label": "Spot buy notified MW · Retail",
@@ -4914,7 +4956,7 @@
      "values": null
     },
     {
-     "r": 389,
+     "r": 391,
      "kind": "line",
      "block": "section",
      "label": "Buy notified · Retail",
@@ -4925,7 +4967,7 @@
      "values": null
     },
     {
-     "r": 390,
+     "r": 392,
      "kind": "line",
      "block": "section",
      "label": "Buy notified MW · Retail",
@@ -4936,33 +4978,11 @@
      "values": null
     },
     {
-     "r": 391,
+     "r": 393,
      "kind": "line",
      "block": "section",
      "label": "PV buy metered · Retail",
      "key": "pv_buy_metered",
-     "role": "subtotal",
-     "unit_template": "MWh",
-     "unit": "MWh",
-     "values": null
-    },
-    {
-     "r": 392,
-     "kind": "line",
-     "block": "section",
-     "label": "PV buy metered MW · Retail",
-     "key": "pv_buy_metered_mw",
-     "role": "subtotal",
-     "unit_template": "MW",
-     "unit": "MW",
-     "values": null
-    },
-    {
-     "r": 393,
-     "kind": "line",
-     "block": "section",
-     "label": "Baseload buy metered · Retail",
-     "key": "bl_buy_metered",
      "role": "subtotal",
      "unit_template": "MWh",
      "unit": "MWh",
@@ -4972,8 +4992,8 @@
      "r": 394,
      "kind": "line",
      "block": "section",
-     "label": "Baseload buy metered MW · Retail",
-     "key": "bl_buy_metered_mw",
+     "label": "PV buy metered MW · Retail",
+     "key": "pv_buy_metered_mw",
      "role": "subtotal",
      "unit_template": "MW",
      "unit": "MW",
@@ -4983,6 +5003,28 @@
      "r": 395,
      "kind": "line",
      "block": "section",
+     "label": "Baseload buy metered · Retail",
+     "key": "bl_buy_metered",
+     "role": "subtotal",
+     "unit_template": "MWh",
+     "unit": "MWh",
+     "values": null
+    },
+    {
+     "r": 396,
+     "kind": "line",
+     "block": "section",
+     "label": "Baseload buy metered MW · Retail",
+     "key": "bl_buy_metered_mw",
+     "role": "subtotal",
+     "unit_template": "MW",
+     "unit": "MW",
+     "values": null
+    },
+    {
+     "r": 397,
+     "kind": "line",
+     "block": "section",
      "label": "Spot settlement · Retail",
      "key": "spot_settlement",
      "role": "data",
@@ -4991,7 +5033,7 @@
      "values": null
     },
     {
-     "r": 396,
+     "r": 398,
      "kind": "line",
      "block": "section",
      "label": "Spot settlement MW · Retail",
@@ -5002,7 +5044,7 @@
      "values": null
     },
     {
-     "r": 397,
+     "r": 399,
      "kind": "line",
      "block": "section",
      "label": "Buy metered · Retail",
@@ -5013,7 +5055,7 @@
      "values": null
     },
     {
-     "r": 398,
+     "r": 400,
      "kind": "line",
      "block": "section",
      "label": "Buy metered MW · Retail",
@@ -5024,11 +5066,11 @@
      "values": null
     },
     {
-     "r": 399,
+     "r": 401,
      "kind": "blank"
     },
     {
-     "r": 400,
+     "r": 402,
      "kind": "line",
      "block": "section",
      "label": "Share PV · Retail",
@@ -5039,7 +5081,7 @@
      "values": null
     },
     {
-     "r": 401,
+     "r": 403,
      "kind": "line",
      "block": "section",
      "label": "Share Baseload · Retail",
@@ -5050,7 +5092,7 @@
      "values": null
     },
     {
-     "r": 402,
+     "r": 404,
      "kind": "line",
      "block": "section",
      "label": "Share spot · Retail",
@@ -5061,37 +5103,15 @@
      "values": null
     },
     {
-     "r": 403,
-     "kind": "blank"
-    },
-    {
-     "r": 404,
-     "kind": "line",
-     "block": "section",
-     "label": "PV cost budgeted · Retail",
-     "key": "cost_pv_budget",
-     "role": "data",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
      "r": 405,
-     "kind": "line",
-     "block": "section",
-     "label": "Baseload cost budgeted · Retail",
-     "key": "cost_bl_budget",
-     "role": "data",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 406,
      "kind": "line",
      "block": "section",
-     "label": "Spot cost · Retail",
-     "key": "cost_spot",
+     "label": "PV cost budgeted · Retail",
+     "key": "cost_pv_budget",
      "role": "data",
      "unit_template": "€",
      "unit": "EUR",
@@ -5101,6 +5121,28 @@
      "r": 407,
      "kind": "line",
      "block": "section",
+     "label": "Baseload cost budgeted · Retail",
+     "key": "cost_bl_budget",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 408,
+     "kind": "line",
+     "block": "section",
+     "label": "Spot cost · Retail",
+     "key": "cost_spot",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 409,
+     "kind": "line",
+     "block": "section",
      "label": "Sourcing cost budgeted · Retail",
      "key": "cost_budget",
      "role": "total",
@@ -5109,37 +5151,15 @@
      "values": null
     },
     {
-     "r": 408,
-     "kind": "blank"
-    },
-    {
-     "r": 409,
-     "kind": "line",
-     "block": "section",
-     "label": "Price PV budget · Retail",
-     "key": "price_pv_budget",
-     "role": "subtotal",
-     "unit_template": "€/MWh",
-     "unit": "EUR/MWh",
-     "values": null
-    },
-    {
      "r": 410,
-     "kind": "line",
-     "block": "section",
-     "label": "Price Baseload budget · Retail",
-     "key": "price_bl_budget",
-     "role": "subtotal",
-     "unit_template": "€/MWh",
-     "unit": "EUR/MWh",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 411,
      "kind": "line",
      "block": "section",
-     "label": "Price spot · Retail",
-     "key": "price_spot",
+     "label": "Price PV budget · Retail",
+     "key": "price_pv_budget",
      "role": "subtotal",
      "unit_template": "€/MWh",
      "unit": "EUR/MWh",
@@ -5149,6 +5169,28 @@
      "r": 412,
      "kind": "line",
      "block": "section",
+     "label": "Price Baseload budget · Retail",
+     "key": "price_bl_budget",
+     "role": "subtotal",
+     "unit_template": "€/MWh",
+     "unit": "EUR/MWh",
+     "values": null
+    },
+    {
+     "r": 413,
+     "kind": "line",
+     "block": "section",
+     "label": "Price spot · Retail",
+     "key": "price_spot",
+     "role": "subtotal",
+     "unit_template": "€/MWh",
+     "unit": "EUR/MWh",
+     "values": null
+    },
+    {
+     "r": 414,
+     "kind": "line",
+     "block": "section",
      "label": "Price total budget · Retail",
      "key": "price_total_budget",
      "role": "total",
@@ -5157,37 +5199,15 @@
      "values": null
     },
     {
-     "r": 413,
-     "kind": "blank"
-    },
-    {
-     "r": 414,
-     "kind": "line",
-     "block": "section",
-     "label": "PV cost forecasted · Retail",
-     "key": "cost_pv_forecast",
-     "role": "data",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
      "r": 415,
-     "kind": "line",
-     "block": "section",
-     "label": "Baseload cost forecasted · Retail",
-     "key": "cost_bl_forecast",
-     "role": "data",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 416,
      "kind": "line",
      "block": "section",
-     "label": "Cost spot forecast · Retail",
-     "key": "cost_spot_f",
+     "label": "PV cost forecasted · Retail",
+     "key": "cost_pv_forecast",
      "role": "data",
      "unit_template": "€",
      "unit": "EUR",
@@ -5197,6 +5217,28 @@
      "r": 417,
      "kind": "line",
      "block": "section",
+     "label": "Baseload cost forecasted · Retail",
+     "key": "cost_bl_forecast",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 418,
+     "kind": "line",
+     "block": "section",
+     "label": "Cost spot forecast · Retail",
+     "key": "cost_spot_f",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 419,
+     "kind": "line",
+     "block": "section",
      "label": "Sourcing cost forecasted · Retail",
      "key": "cost_forecast",
      "role": "total",
@@ -5205,37 +5247,15 @@
      "values": null
     },
     {
-     "r": 418,
-     "kind": "blank"
-    },
-    {
-     "r": 419,
-     "kind": "line",
-     "block": "section",
-     "label": "Price PV forecast · Retail",
-     "key": "price_pv_forecast",
-     "role": "subtotal",
-     "unit_template": "€/MWh",
-     "unit": "EUR/MWh",
-     "values": null
-    },
-    {
      "r": 420,
-     "kind": "line",
-     "block": "section",
-     "label": "Price Baseload forecast · Retail",
-     "key": "price_bl_forecast",
-     "role": "subtotal",
-     "unit_template": "€/MWh",
-     "unit": "EUR/MWh",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 421,
      "kind": "line",
      "block": "section",
-     "label": "Price spot forecast · Retail",
-     "key": "price_spot_f",
+     "label": "Price PV forecast · Retail",
+     "key": "price_pv_forecast",
      "role": "subtotal",
      "unit_template": "€/MWh",
      "unit": "EUR/MWh",
@@ -5245,6 +5265,28 @@
      "r": 422,
      "kind": "line",
      "block": "section",
+     "label": "Price Baseload forecast · Retail",
+     "key": "price_bl_forecast",
+     "role": "subtotal",
+     "unit_template": "€/MWh",
+     "unit": "EUR/MWh",
+     "values": null
+    },
+    {
+     "r": 423,
+     "kind": "line",
+     "block": "section",
+     "label": "Price spot forecast · Retail",
+     "key": "price_spot_f",
+     "role": "subtotal",
+     "unit_template": "€/MWh",
+     "unit": "EUR/MWh",
+     "values": null
+    },
+    {
+     "r": 424,
+     "kind": "line",
+     "block": "section",
      "label": "Price total forecast · Retail",
      "key": "price_total_forecast",
      "role": "total",
@@ -5253,11 +5295,11 @@
      "values": null
     },
     {
-     "r": 423,
+     "r": 425,
      "kind": "blank"
     },
     {
-     "r": 424,
+     "r": 426,
      "kind": "line",
      "block": "section",
      "label": "Budget minus forecast cost · Retail",
@@ -5268,7 +5310,7 @@
      "values": null
     },
     {
-     "r": 425,
+     "r": 427,
      "kind": "line",
      "block": "section",
      "label": "Budget minus forecast price · Retail",
@@ -5279,11 +5321,11 @@
      "values": null
     },
     {
-     "r": 426,
+     "r": 428,
      "kind": "blank"
     },
     {
-     "r": 427,
+     "r": 429,
      "kind": "line",
      "block": "section",
      "label": "Risk premium accrued · Retail",
@@ -5294,33 +5336,11 @@
      "values": null
     },
     {
-     "r": 428,
+     "r": 430,
      "kind": "line",
      "block": "section",
      "label": "Risk premium cumulative · Retail",
      "key": "premium_cumulative",
-     "role": "data",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
-     "r": 429,
-     "kind": "line",
-     "block": "section",
-     "label": "Premium settlement · Retail",
-     "key": "premium_settlement",
-     "role": "subtotal",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
-     "r": 430,
-     "kind": "line",
-     "block": "section",
-     "label": "Premium settlement cumulative · Retail",
-     "key": "premium_settlement_cumulative",
      "role": "data",
      "unit_template": "€",
      "unit": "EUR",
@@ -5330,6 +5350,28 @@
      "r": 431,
      "kind": "line",
      "block": "section",
+     "label": "Premium settlement · Retail",
+     "key": "premium_settlement",
+     "role": "subtotal",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 432,
+     "kind": "line",
+     "block": "section",
+     "label": "Premium settlement cumulative · Retail",
+     "key": "premium_settlement_cumulative",
+     "role": "data",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 433,
+     "kind": "line",
+     "block": "section",
      "label": "Premium deviation · Retail",
      "key": "premium_deviation",
      "role": "subtotal",
@@ -5338,11 +5380,11 @@
      "values": null
     },
     {
-     "r": 432,
+     "r": 434,
      "kind": "blank"
     },
     {
-     "r": 433,
+     "r": 435,
      "kind": "line",
      "block": "section",
      "label": "Premium budget input · Retail",
@@ -5353,7 +5395,7 @@
      "values": null
     },
     {
-     "r": 434,
+     "r": 436,
      "kind": "line",
      "block": "section",
      "label": "Premium forecast input · Retail",
@@ -5364,7 +5406,7 @@
      "values": null
     },
     {
-     "r": 435,
+     "r": 437,
      "kind": "line",
      "block": "section",
      "label": "Premium forecast derived · Retail",
@@ -5375,11 +5417,11 @@
      "values": null
     },
     {
-     "r": 436,
+     "r": 438,
      "kind": "blank"
     },
     {
-     "r": 437,
+     "r": 439,
      "kind": "line",
      "block": "section",
      "label": "Reserve release budgeted · Retail",
@@ -5390,7 +5432,7 @@
      "values": null
     },
     {
-     "r": 438,
+     "r": 440,
      "kind": "line",
      "block": "section",
      "label": "Reserve release forecasted · Retail",
@@ -5401,11 +5443,11 @@
      "values": null
     },
     {
-     "r": 439,
+     "r": 441,
      "kind": "blank"
     },
     {
-     "r": 440,
+     "r": 442,
      "kind": "line",
      "block": "section",
      "label": "Revenue · Retail",
@@ -5416,7 +5458,7 @@
      "values": null
     },
     {
-     "r": 441,
+     "r": 443,
      "kind": "line",
      "block": "section",
      "label": "Average sell price · Retail",
@@ -5427,11 +5469,11 @@
      "values": null
     },
     {
-     "r": 442,
+     "r": 444,
      "kind": "blank"
     },
     {
-     "r": 443,
+     "r": 445,
      "kind": "line",
      "block": "section",
      "label": "GM1 budgeted · Retail",
@@ -5442,7 +5484,7 @@
      "values": null
     },
     {
-     "r": 444,
+     "r": 446,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecasted · Retail",
@@ -5453,11 +5495,11 @@
      "values": null
     },
     {
-     "r": 445,
+     "r": 447,
      "kind": "blank"
     },
     {
-     "r": 446,
+     "r": 448,
      "kind": "line",
      "block": "section",
      "label": "Source imbalance · Retail",
@@ -5468,7 +5510,7 @@
      "values": null
     },
     {
-     "r": 447,
+     "r": 449,
      "kind": "line",
      "block": "section",
      "label": "Off-taker imbalance · Retail",
@@ -5479,11 +5521,11 @@
      "values": null
     },
     {
-     "r": 448,
+     "r": 450,
      "kind": "blank"
     },
     {
-     "r": 449,
+     "r": 451,
      "kind": "line",
      "block": "section",
      "label": "GM2 budgeted · Retail",
@@ -5494,7 +5536,7 @@
      "values": null
     },
     {
-     "r": 450,
+     "r": 452,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecasted · Retail",
@@ -5505,11 +5547,11 @@
      "values": null
     },
     {
-     "r": 451,
+     "r": 453,
      "kind": "blank"
     },
     {
-     "r": 452,
+     "r": 454,
      "kind": "line",
      "block": "section",
      "label": "GM1 budget % · Retail",
@@ -5520,7 +5562,7 @@
      "values": null
     },
     {
-     "r": 453,
+     "r": 455,
      "kind": "line",
      "block": "section",
      "label": "GM1 budget specific · Retail",
@@ -5531,11 +5573,11 @@
      "values": null
     },
     {
-     "r": 454,
+     "r": 456,
      "kind": "blank"
     },
     {
-     "r": 455,
+     "r": 457,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecast % · Retail",
@@ -5546,7 +5588,7 @@
      "values": null
     },
     {
-     "r": 456,
+     "r": 458,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecast specific · Retail",
@@ -5557,11 +5599,11 @@
      "values": null
     },
     {
-     "r": 457,
+     "r": 459,
      "kind": "blank"
     },
     {
-     "r": 458,
+     "r": 460,
      "kind": "line",
      "block": "section",
      "label": "GM2 budget % · Retail",
@@ -5572,7 +5614,7 @@
      "values": null
     },
     {
-     "r": 459,
+     "r": 461,
      "kind": "line",
      "block": "section",
      "label": "GM2 budget specific · Retail",
@@ -5583,11 +5625,11 @@
      "values": null
     },
     {
-     "r": 460,
+     "r": 462,
      "kind": "blank"
     },
     {
-     "r": 461,
+     "r": 463,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecast % · Retail",
@@ -5598,7 +5640,7 @@
      "values": null
     },
     {
-     "r": 462,
+     "r": 464,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecast specific · Retail",
@@ -5609,37 +5651,15 @@
      "values": null
     },
     {
-     "r": 463,
-     "kind": "blank"
-    },
-    {
-     "r": 464,
-     "kind": "line",
-     "block": "section",
-     "label": "Green certificates · Retail",
-     "key": "gc_count",
-     "role": "subtotal",
-     "unit_template": "GC",
-     "unit": "GC",
-     "values": null
-    },
-    {
      "r": 465,
-     "kind": "line",
-     "block": "section",
-     "label": "GC spot · Retail",
-     "key": "gc_spot",
-     "role": "subtotal",
-     "unit_template": "GC",
-     "unit": "GC",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 466,
      "kind": "line",
      "block": "section",
-     "label": "GC bilateral · Retail",
-     "key": "gc_bilateral",
+     "label": "Green certificates · Retail",
+     "key": "gc_count",
      "role": "subtotal",
      "unit_template": "GC",
      "unit": "GC",
@@ -5649,6 +5669,28 @@
      "r": 467,
      "kind": "line",
      "block": "section",
+     "label": "GC spot · Retail",
+     "key": "gc_spot",
+     "role": "subtotal",
+     "unit_template": "GC",
+     "unit": "GC",
+     "values": null
+    },
+    {
+     "r": 468,
+     "kind": "line",
+     "block": "section",
+     "label": "GC bilateral · Retail",
+     "key": "gc_bilateral",
+     "role": "subtotal",
+     "unit_template": "GC",
+     "unit": "GC",
+     "values": null
+    },
+    {
+     "r": 469,
+     "kind": "line",
+     "block": "section",
      "label": "GC value · Retail",
      "key": "gc_value",
      "role": "data",
@@ -5657,7 +5699,7 @@
      "values": null
     },
     {
-     "r": 468,
+     "r": 470,
      "kind": "line",
      "block": "section",
      "label": "GC unit cost · Retail",
@@ -5668,37 +5710,15 @@
      "values": null
     },
     {
-     "r": 469,
-     "kind": "blank"
-    },
-    {
-     "r": 470,
-     "kind": "line",
-     "block": "section",
-     "label": "PV remaining · Retail",
-     "key": "pv_remaining",
-     "role": "data",
-     "unit_template": "MWh",
-     "unit": "MWh",
-     "values": null
-    },
-    {
      "r": 471,
-     "kind": "line",
-     "block": "section",
-     "label": "PV remaining MW · Retail",
-     "key": "pv_remaining_mw",
-     "role": "data",
-     "unit_template": "MW",
-     "unit": "MW",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 472,
      "kind": "line",
      "block": "section",
-     "label": "Baseload remaining · Retail",
-     "key": "bl_remaining",
+     "label": "PV remaining · Retail",
+     "key": "pv_remaining",
      "role": "data",
      "unit_template": "MWh",
      "unit": "MWh",
@@ -5708,6 +5728,28 @@
      "r": 473,
      "kind": "line",
      "block": "section",
+     "label": "PV remaining MW · Retail",
+     "key": "pv_remaining_mw",
+     "role": "data",
+     "unit_template": "MW",
+     "unit": "MW",
+     "values": null
+    },
+    {
+     "r": 474,
+     "kind": "line",
+     "block": "section",
+     "label": "Baseload remaining · Retail",
+     "key": "bl_remaining",
+     "role": "data",
+     "unit_template": "MWh",
+     "unit": "MWh",
+     "values": null
+    },
+    {
+     "r": 475,
+     "kind": "line",
+     "block": "section",
      "label": "Baseload remaining MW · Retail",
      "key": "bl_remaining_mw",
      "role": "data",
@@ -5716,11 +5758,11 @@
      "values": null
     },
     {
-     "r": 474,
+     "r": 476,
      "kind": "blank"
     },
     {
-     "r": 475,
+     "r": 477,
      "kind": "line",
      "block": "section",
      "label": "Pass-through revenue · Retail",
@@ -5731,7 +5773,7 @@
      "values": null
     },
     {
-     "r": 476,
+     "r": 478,
      "kind": "line",
      "block": "section",
      "label": "Pass-through cost · Retail",
@@ -5742,7 +5784,7 @@
      "values": null
     },
     {
-     "r": 477,
+     "r": 479,
      "kind": "line",
      "block": "section",
      "label": "Risk reserve · Retail",
@@ -5753,7 +5795,7 @@
      "values": null
     },
     {
-     "r": 478,
+     "r": 480,
      "kind": "line",
      "block": "section",
      "label": "Portfolio OPEX · Retail",
@@ -5764,7 +5806,7 @@
      "values": null
     },
     {
-     "r": 479,
+     "r": 481,
      "kind": "line",
      "block": "section",
      "label": "Variable OPEX (sales bonus) · Retail",
@@ -5775,11 +5817,11 @@
      "values": null
     },
     {
-     "r": 480,
+     "r": 482,
      "kind": "blank"
     },
     {
-     "r": 481,
+     "r": 483,
      "kind": "line",
      "block": "section",
      "label": "Own guarantee outstanding · Retail",
@@ -5790,7 +5832,7 @@
      "values": null
     },
     {
-     "r": 482,
+     "r": 484,
      "kind": "line",
      "block": "section",
      "label": "Own BGL fee · Retail",
@@ -5801,11 +5843,11 @@
      "values": null
     },
     {
-     "r": 483,
+     "r": 485,
      "kind": "blank"
     },
     {
-     "r": 484,
+     "r": 486,
      "kind": "line",
      "block": "section",
      "label": "NM pre-tax budgeted · Retail",
@@ -5816,7 +5858,7 @@
      "values": null
     },
     {
-     "r": 485,
+     "r": 487,
      "kind": "line",
      "block": "section",
      "label": "NM pre-tax forecasted · Retail",
@@ -5827,11 +5869,11 @@
      "values": null
     },
     {
-     "r": 486,
+     "r": 488,
      "kind": "blank"
     },
     {
-     "r": 487,
+     "r": 489,
      "kind": "line",
      "block": "section",
      "label": "NM budget % · Retail",
@@ -5842,7 +5884,7 @@
      "values": null
     },
     {
-     "r": 488,
+     "r": 490,
      "kind": "line",
      "block": "section",
      "label": "NM budget specific · Retail",
@@ -5853,11 +5895,11 @@
      "values": null
     },
     {
-     "r": 489,
+     "r": 491,
      "kind": "blank"
     },
     {
-     "r": 490,
+     "r": 492,
      "kind": "line",
      "block": "section",
      "label": "NM forecast % · Retail",
@@ -5868,7 +5910,7 @@
      "values": null
     },
     {
-     "r": 491,
+     "r": 493,
      "kind": "line",
      "block": "section",
      "label": "NM forecast specific · Retail",
@@ -5879,11 +5921,11 @@
      "values": null
     },
     {
-     "r": 492,
+     "r": 494,
      "kind": "blank"
     },
     {
-     "r": 493,
+     "r": 495,
      "kind": "line",
      "block": "section",
      "label": "Memo: market BGL fee share · Retail",
@@ -5894,7 +5936,7 @@
      "values": null
     },
     {
-     "r": 494,
+     "r": 496,
      "kind": "line",
      "block": "section",
      "label": "Memo: interest share · Retail",
@@ -5905,17 +5947,17 @@
      "values": null
     },
     {
-     "r": 495,
+     "r": 497,
      "kind": "blank"
     },
     {
-     "r": 496,
+     "r": 498,
      "kind": "section",
      "text": "OT3",
      "block": "section"
     },
     {
-     "r": 497,
+     "r": 499,
      "kind": "header",
      "text": "OT3",
      "block": "section",
@@ -5936,7 +5978,7 @@
      }
     },
     {
-     "r": 498,
+     "r": 500,
      "kind": "line",
      "block": "section",
      "label": "Notified volume · Retail",
@@ -5947,7 +5989,7 @@
      "values": null
     },
     {
-     "r": 499,
+     "r": 501,
      "kind": "line",
      "block": "section",
      "label": "Notified volume (avg MW) · Retail",
@@ -5958,7 +6000,7 @@
      "values": null
     },
     {
-     "r": 500,
+     "r": 502,
      "kind": "line",
      "block": "section",
      "label": "Metered volume · Retail",
@@ -5969,7 +6011,7 @@
      "values": null
     },
     {
-     "r": 501,
+     "r": 503,
      "kind": "line",
      "block": "section",
      "label": "Metered volume (avg MW) · Retail",
@@ -5980,7 +6022,7 @@
      "values": null
     },
     {
-     "r": 502,
+     "r": 504,
      "kind": "line",
      "block": "section",
      "label": "Net imbalance volume · Retail",
@@ -5991,37 +6033,15 @@
      "values": null
     },
     {
-     "r": 503,
-     "kind": "blank"
-    },
-    {
-     "r": 504,
-     "kind": "line",
-     "block": "section",
-     "label": "PV buy notified · Retail",
-     "key": "pv_buy_notified",
-     "role": "data",
-     "unit_template": "MWh",
-     "unit": "MWh",
-     "values": null
-    },
-    {
      "r": 505,
-     "kind": "line",
-     "block": "section",
-     "label": "PV buy notified MW · Retail",
-     "key": "pv_buy_notified_mw",
-     "role": "data",
-     "unit_template": "MW",
-     "unit": "MW",
-     "values": null
+     "kind": "blank"
     },
     {
      "r": 506,
      "kind": "line",
      "block": "section",
-     "label": "Baseload buy notified · Retail",
-     "key": "bl_buy_notified",
+     "label": "PV buy notified · Retail",
+     "key": "pv_buy_notified",
      "role": "data",
      "unit_template": "MWh",
      "unit": "MWh",
@@ -6031,6 +6051,28 @@
      "r": 507,
      "kind": "line",
      "block": "section",
+     "label": "PV buy notified MW · Retail",
+     "key": "pv_buy_notified_mw",
+     "role": "data",
+     "unit_template": "MW",
+     "unit": "MW",
+     "values": null
+    },
+    {
+     "r": 508,
+     "kind": "line",
+     "block": "section",
+     "label": "Baseload buy notified · Retail",
+     "key": "bl_buy_notified",
+     "role": "data",
+     "unit_template": "MWh",
+     "unit": "MWh",
+     "values": null
+    },
+    {
+     "r": 509,
+     "kind": "line",
+     "block": "section",
      "label": "Baseload buy notified MW · Retail",
      "key": "bl_buy_notified_mw",
      "role": "data",
@@ -6039,7 +6081,7 @@
      "values": null
     },
     {
-     "r": 508,
+     "r": 510,
      "kind": "line",
      "block": "section",
      "label": "Spot buy notified · Retail",
@@ -6050,7 +6092,7 @@
      "values": null
     },
     {
-     "r": 509,
+     "r": 511,
      "kind": "line",
      "block": "section",
      "label": "Spot buy notified MW · Retail",
@@ -6061,7 +6103,7 @@
      "values": null
     },
     {
-     "r": 510,
+     "r": 512,
      "kind": "line",
      "block": "section",
      "label": "Buy notified · Retail",
@@ -6072,7 +6114,7 @@
      "values": null
     },
     {
-     "r": 511,
+     "r": 513,
      "kind": "line",
      "block": "section",
      "label": "Buy notified MW · Retail",
@@ -6083,7 +6125,7 @@
      "values": null
     },
     {
-     "r": 512,
+     "r": 514,
      "kind": "line",
      "block": "section",
      "label": "PV buy metered · Retail",
@@ -6094,7 +6136,7 @@
      "values": null
     },
     {
-     "r": 513,
+     "r": 515,
      "kind": "line",
      "block": "section",
      "label": "PV buy metered MW · Retail",
@@ -6105,7 +6147,7 @@
      "values": null
     },
     {
-     "r": 514,
+     "r": 516,
      "kind": "line",
      "block": "section",
      "label": "Baseload buy metered · Retail",
@@ -6116,7 +6158,7 @@
      "values": null
     },
     {
-     "r": 515,
+     "r": 517,
      "kind": "line",
      "block": "section",
      "label": "Baseload buy metered MW · Retail",
@@ -6127,7 +6169,7 @@
      "values": null
     },
     {
-     "r": 516,
+     "r": 518,
      "kind": "line",
      "block": "section",
      "label": "Spot settlement · Retail",
@@ -6138,7 +6180,7 @@
      "values": null
     },
     {
-     "r": 517,
+     "r": 519,
      "kind": "line",
      "block": "section",
      "label": "Spot settlement MW · Retail",
@@ -6149,7 +6191,7 @@
      "values": null
     },
     {
-     "r": 518,
+     "r": 520,
      "kind": "line",
      "block": "section",
      "label": "Buy metered · Retail",
@@ -6160,7 +6202,7 @@
      "values": null
     },
     {
-     "r": 519,
+     "r": 521,
      "kind": "line",
      "block": "section",
      "label": "Buy metered MW · Retail",
@@ -6171,11 +6213,11 @@
      "values": null
     },
     {
-     "r": 520,
+     "r": 522,
      "kind": "blank"
     },
     {
-     "r": 521,
+     "r": 523,
      "kind": "line",
      "block": "section",
      "label": "Share PV · Retail",
@@ -6186,7 +6228,7 @@
      "values": null
     },
     {
-     "r": 522,
+     "r": 524,
      "kind": "line",
      "block": "section",
      "label": "Share Baseload · Retail",
@@ -6197,7 +6239,7 @@
      "values": null
     },
     {
-     "r": 523,
+     "r": 525,
      "kind": "line",
      "block": "section",
      "label": "Share spot · Retail",
@@ -6208,11 +6250,11 @@
      "values": null
     },
     {
-     "r": 524,
+     "r": 526,
      "kind": "blank"
     },
     {
-     "r": 525,
+     "r": 527,
      "kind": "line",
      "block": "section",
      "label": "PV cost budgeted · Retail",
@@ -6223,7 +6265,7 @@
      "values": null
     },
     {
-     "r": 526,
+     "r": 528,
      "kind": "line",
      "block": "section",
      "label": "Baseload cost budgeted · Retail",
@@ -6234,7 +6276,7 @@
      "values": null
     },
     {
-     "r": 527,
+     "r": 529,
      "kind": "line",
      "block": "section",
      "label": "Spot cost · Retail",
@@ -6245,7 +6287,7 @@
      "values": null
     },
     {
-     "r": 528,
+     "r": 530,
      "kind": "line",
      "block": "section",
      "label": "Sourcing cost budgeted · Retail",
@@ -6256,11 +6298,11 @@
      "values": null
     },
     {
-     "r": 529,
+     "r": 531,
      "kind": "blank"
     },
     {
-     "r": 530,
+     "r": 532,
      "kind": "line",
      "block": "section",
      "label": "Price PV budget · Retail",
@@ -6271,7 +6313,7 @@
      "values": null
     },
     {
-     "r": 531,
+     "r": 533,
      "kind": "line",
      "block": "section",
      "label": "Price Baseload budget · Retail",
@@ -6282,7 +6324,7 @@
      "values": null
     },
     {
-     "r": 532,
+     "r": 534,
      "kind": "line",
      "block": "section",
      "label": "Price spot · Retail",
@@ -6293,7 +6335,7 @@
      "values": null
     },
     {
-     "r": 533,
+     "r": 535,
      "kind": "line",
      "block": "section",
      "label": "Price total budget · Retail",
@@ -6304,11 +6346,11 @@
      "values": null
     },
     {
-     "r": 534,
+     "r": 536,
      "kind": "blank"
     },
     {
-     "r": 535,
+     "r": 537,
      "kind": "line",
      "block": "section",
      "label": "PV cost forecasted · Retail",
@@ -6319,7 +6361,7 @@
      "values": null
     },
     {
-     "r": 536,
+     "r": 538,
      "kind": "line",
      "block": "section",
      "label": "Baseload cost forecasted · Retail",
@@ -6330,7 +6372,7 @@
      "values": null
     },
     {
-     "r": 537,
+     "r": 539,
      "kind": "line",
      "block": "section",
      "label": "Cost spot forecast · Retail",
@@ -6341,7 +6383,7 @@
      "values": null
     },
     {
-     "r": 538,
+     "r": 540,
      "kind": "line",
      "block": "section",
      "label": "Sourcing cost forecasted · Retail",
@@ -6352,11 +6394,11 @@
      "values": null
     },
     {
-     "r": 539,
+     "r": 541,
      "kind": "blank"
     },
     {
-     "r": 540,
+     "r": 542,
      "kind": "line",
      "block": "section",
      "label": "Price PV forecast · Retail",
@@ -6367,7 +6409,7 @@
      "values": null
     },
     {
-     "r": 541,
+     "r": 543,
      "kind": "line",
      "block": "section",
      "label": "Price Baseload forecast · Retail",
@@ -6378,7 +6420,7 @@
      "values": null
     },
     {
-     "r": 542,
+     "r": 544,
      "kind": "line",
      "block": "section",
      "label": "Price spot forecast · Retail",
@@ -6389,7 +6431,7 @@
      "values": null
     },
     {
-     "r": 543,
+     "r": 545,
      "kind": "line",
      "block": "section",
      "label": "Price total forecast · Retail",
@@ -6400,11 +6442,11 @@
      "values": null
     },
     {
-     "r": 544,
+     "r": 546,
      "kind": "blank"
     },
     {
-     "r": 545,
+     "r": 547,
      "kind": "line",
      "block": "section",
      "label": "Budget minus forecast cost · Retail",
@@ -6415,7 +6457,7 @@
      "values": null
     },
     {
-     "r": 546,
+     "r": 548,
      "kind": "line",
      "block": "section",
      "label": "Budget minus forecast price · Retail",
@@ -6426,11 +6468,11 @@
      "values": null
     },
     {
-     "r": 547,
+     "r": 549,
      "kind": "blank"
     },
     {
-     "r": 548,
+     "r": 550,
      "kind": "line",
      "block": "section",
      "label": "Risk premium accrued · Retail",
@@ -6441,7 +6483,7 @@
      "values": null
     },
     {
-     "r": 549,
+     "r": 551,
      "kind": "line",
      "block": "section",
      "label": "Risk premium cumulative · Retail",
@@ -6452,7 +6494,7 @@
      "values": null
     },
     {
-     "r": 550,
+     "r": 552,
      "kind": "line",
      "block": "section",
      "label": "Premium settlement · Retail",
@@ -6463,7 +6505,7 @@
      "values": null
     },
     {
-     "r": 551,
+     "r": 553,
      "kind": "line",
      "block": "section",
      "label": "Premium settlement cumulative · Retail",
@@ -6474,7 +6516,7 @@
      "values": null
     },
     {
-     "r": 552,
+     "r": 554,
      "kind": "line",
      "block": "section",
      "label": "Premium deviation · Retail",
@@ -6485,11 +6527,11 @@
      "values": null
     },
     {
-     "r": 553,
+     "r": 555,
      "kind": "blank"
     },
     {
-     "r": 554,
+     "r": 556,
      "kind": "line",
      "block": "section",
      "label": "Premium budget input · Retail",
@@ -6500,7 +6542,7 @@
      "values": null
     },
     {
-     "r": 555,
+     "r": 557,
      "kind": "line",
      "block": "section",
      "label": "Premium forecast input · Retail",
@@ -6511,7 +6553,7 @@
      "values": null
     },
     {
-     "r": 556,
+     "r": 558,
      "kind": "line",
      "block": "section",
      "label": "Premium forecast derived · Retail",
@@ -6522,11 +6564,11 @@
      "values": null
     },
     {
-     "r": 557,
+     "r": 559,
      "kind": "blank"
     },
     {
-     "r": 558,
+     "r": 560,
      "kind": "line",
      "block": "section",
      "label": "Reserve release budgeted · Retail",
@@ -6537,7 +6579,7 @@
      "values": null
     },
     {
-     "r": 559,
+     "r": 561,
      "kind": "line",
      "block": "section",
      "label": "Reserve release forecasted · Retail",
@@ -6548,11 +6590,11 @@
      "values": null
     },
     {
-     "r": 560,
+     "r": 562,
      "kind": "blank"
     },
     {
-     "r": 561,
+     "r": 563,
      "kind": "line",
      "block": "section",
      "label": "Revenue · Retail",
@@ -6563,7 +6605,7 @@
      "values": null
     },
     {
-     "r": 562,
+     "r": 564,
      "kind": "line",
      "block": "section",
      "label": "Average sell price · Retail",
@@ -6574,11 +6616,11 @@
      "values": null
     },
     {
-     "r": 563,
+     "r": 565,
      "kind": "blank"
     },
     {
-     "r": 564,
+     "r": 566,
      "kind": "line",
      "block": "section",
      "label": "GM1 budgeted · Retail",
@@ -6589,7 +6631,7 @@
      "values": null
     },
     {
-     "r": 565,
+     "r": 567,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecasted · Retail",
@@ -6600,11 +6642,11 @@
      "values": null
     },
     {
-     "r": 566,
+     "r": 568,
      "kind": "blank"
     },
     {
-     "r": 567,
+     "r": 569,
      "kind": "line",
      "block": "section",
      "label": "Source imbalance · Retail",
@@ -6615,7 +6657,7 @@
      "values": null
     },
     {
-     "r": 568,
+     "r": 570,
      "kind": "line",
      "block": "section",
      "label": "Off-taker imbalance · Retail",
@@ -6626,11 +6668,11 @@
      "values": null
     },
     {
-     "r": 569,
+     "r": 571,
      "kind": "blank"
     },
     {
-     "r": 570,
+     "r": 572,
      "kind": "line",
      "block": "section",
      "label": "GM2 budgeted · Retail",
@@ -6641,7 +6683,7 @@
      "values": null
     },
     {
-     "r": 571,
+     "r": 573,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecasted · Retail",
@@ -6652,11 +6694,11 @@
      "values": null
     },
     {
-     "r": 572,
+     "r": 574,
      "kind": "blank"
     },
     {
-     "r": 573,
+     "r": 575,
      "kind": "line",
      "block": "section",
      "label": "GM1 budget % · Retail",
@@ -6667,7 +6709,7 @@
      "values": null
     },
     {
-     "r": 574,
+     "r": 576,
      "kind": "line",
      "block": "section",
      "label": "GM1 budget specific · Retail",
@@ -6678,11 +6720,11 @@
      "values": null
     },
     {
-     "r": 575,
+     "r": 577,
      "kind": "blank"
     },
     {
-     "r": 576,
+     "r": 578,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecast % · Retail",
@@ -6693,7 +6735,7 @@
      "values": null
     },
     {
-     "r": 577,
+     "r": 579,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecast specific · Retail",
@@ -6704,11 +6746,11 @@
      "values": null
     },
     {
-     "r": 578,
+     "r": 580,
      "kind": "blank"
     },
     {
-     "r": 579,
+     "r": 581,
      "kind": "line",
      "block": "section",
      "label": "GM2 budget % · Retail",
@@ -6719,7 +6761,7 @@
      "values": null
     },
     {
-     "r": 580,
+     "r": 582,
      "kind": "line",
      "block": "section",
      "label": "GM2 budget specific · Retail",
@@ -6730,11 +6772,11 @@
      "values": null
     },
     {
-     "r": 581,
+     "r": 583,
      "kind": "blank"
     },
     {
-     "r": 582,
+     "r": 584,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecast % · Retail",
@@ -6745,7 +6787,7 @@
      "values": null
     },
     {
-     "r": 583,
+     "r": 585,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecast specific · Retail",
@@ -6756,11 +6798,11 @@
      "values": null
     },
     {
-     "r": 584,
+     "r": 586,
      "kind": "blank"
     },
     {
-     "r": 585,
+     "r": 587,
      "kind": "line",
      "block": "section",
      "label": "Green certificates · Retail",
@@ -6771,7 +6813,7 @@
      "values": null
     },
     {
-     "r": 586,
+     "r": 588,
      "kind": "line",
      "block": "section",
      "label": "GC spot · Retail",
@@ -6782,7 +6824,7 @@
      "values": null
     },
     {
-     "r": 587,
+     "r": 589,
      "kind": "line",
      "block": "section",
      "label": "GC bilateral · Retail",
@@ -6793,7 +6835,7 @@
      "values": null
     },
     {
-     "r": 588,
+     "r": 590,
      "kind": "line",
      "block": "section",
      "label": "GC value · Retail",
@@ -6804,7 +6846,7 @@
      "values": null
     },
     {
-     "r": 589,
+     "r": 591,
      "kind": "line",
      "block": "section",
      "label": "GC unit cost · Retail",
@@ -6815,11 +6857,11 @@
      "values": null
     },
     {
-     "r": 590,
+     "r": 592,
      "kind": "blank"
     },
     {
-     "r": 591,
+     "r": 593,
      "kind": "line",
      "block": "section",
      "label": "PV remaining · Retail",
@@ -6830,7 +6872,7 @@
      "values": null
     },
     {
-     "r": 592,
+     "r": 594,
      "kind": "line",
      "block": "section",
      "label": "PV remaining MW · Retail",
@@ -6841,7 +6883,7 @@
      "values": null
     },
     {
-     "r": 593,
+     "r": 595,
      "kind": "line",
      "block": "section",
      "label": "Baseload remaining · Retail",
@@ -6852,7 +6894,7 @@
      "values": null
     },
     {
-     "r": 594,
+     "r": 596,
      "kind": "line",
      "block": "section",
      "label": "Baseload remaining MW · Retail",
@@ -6863,11 +6905,11 @@
      "values": null
     },
     {
-     "r": 595,
+     "r": 597,
      "kind": "blank"
     },
     {
-     "r": 596,
+     "r": 598,
      "kind": "line",
      "block": "section",
      "label": "Pass-through revenue · Retail",
@@ -6878,7 +6920,7 @@
      "values": null
     },
     {
-     "r": 597,
+     "r": 599,
      "kind": "line",
      "block": "section",
      "label": "Pass-through cost · Retail",
@@ -6889,7 +6931,7 @@
      "values": null
     },
     {
-     "r": 598,
+     "r": 600,
      "kind": "line",
      "block": "section",
      "label": "Risk reserve · Retail",
@@ -6900,7 +6942,7 @@
      "values": null
     },
     {
-     "r": 599,
+     "r": 601,
      "kind": "line",
      "block": "section",
      "label": "Portfolio OPEX · Retail",
@@ -6911,7 +6953,7 @@
      "values": null
     },
     {
-     "r": 600,
+     "r": 602,
      "kind": "line",
      "block": "section",
      "label": "Variable OPEX (sales bonus) · Retail",
@@ -6922,11 +6964,11 @@
      "values": null
     },
     {
-     "r": 601,
+     "r": 603,
      "kind": "blank"
     },
     {
-     "r": 602,
+     "r": 604,
      "kind": "line",
      "block": "section",
      "label": "Own guarantee outstanding · Retail",
@@ -6937,7 +6979,7 @@
      "values": null
     },
     {
-     "r": 603,
+     "r": 605,
      "kind": "line",
      "block": "section",
      "label": "Own BGL fee · Retail",
@@ -6948,11 +6990,11 @@
      "values": null
     },
     {
-     "r": 604,
+     "r": 606,
      "kind": "blank"
     },
     {
-     "r": 605,
+     "r": 607,
      "kind": "line",
      "block": "section",
      "label": "NM pre-tax budgeted · Retail",
@@ -6963,7 +7005,7 @@
      "values": null
     },
     {
-     "r": 606,
+     "r": 608,
      "kind": "line",
      "block": "section",
      "label": "NM pre-tax forecasted · Retail",
@@ -6974,11 +7016,11 @@
      "values": null
     },
     {
-     "r": 607,
+     "r": 609,
      "kind": "blank"
     },
     {
-     "r": 608,
+     "r": 610,
      "kind": "line",
      "block": "section",
      "label": "NM budget % · Retail",
@@ -6989,7 +7031,7 @@
      "values": null
     },
     {
-     "r": 609,
+     "r": 611,
      "kind": "line",
      "block": "section",
      "label": "NM budget specific · Retail",
@@ -7000,11 +7042,11 @@
      "values": null
     },
     {
-     "r": 610,
+     "r": 612,
      "kind": "blank"
     },
     {
-     "r": 611,
+     "r": 613,
      "kind": "line",
      "block": "section",
      "label": "NM forecast % · Retail",
@@ -7015,7 +7057,7 @@
      "values": null
     },
     {
-     "r": 612,
+     "r": 614,
      "kind": "line",
      "block": "section",
      "label": "NM forecast specific · Retail",
@@ -7026,11 +7068,11 @@
      "values": null
     },
     {
-     "r": 613,
+     "r": 615,
      "kind": "blank"
     },
     {
-     "r": 614,
+     "r": 616,
      "kind": "line",
      "block": "section",
      "label": "Memo: market BGL fee share · Retail",
@@ -7041,7 +7083,7 @@
      "values": null
     },
     {
-     "r": 615,
+     "r": 617,
      "kind": "line",
      "block": "section",
      "label": "Memo: interest share · Retail",
@@ -7052,17 +7094,17 @@
      "values": null
     },
     {
-     "r": 616,
+     "r": 618,
      "kind": "blank"
     },
     {
-     "r": 617,
+     "r": 619,
      "kind": "section",
      "text": "OT4",
      "block": "section"
     },
     {
-     "r": 618,
+     "r": 620,
      "kind": "header",
      "text": "OT4",
      "block": "section",
@@ -7083,7 +7125,7 @@
      }
     },
     {
-     "r": 619,
+     "r": 621,
      "kind": "line",
      "block": "section",
      "label": "Notified volume · Retail",
@@ -7094,7 +7136,7 @@
      "values": null
     },
     {
-     "r": 620,
+     "r": 622,
      "kind": "line",
      "block": "section",
      "label": "Notified volume (avg MW) · Retail",
@@ -7105,7 +7147,7 @@
      "values": null
     },
     {
-     "r": 621,
+     "r": 623,
      "kind": "line",
      "block": "section",
      "label": "Metered volume · Retail",
@@ -7116,7 +7158,7 @@
      "values": null
     },
     {
-     "r": 622,
+     "r": 624,
      "kind": "line",
      "block": "section",
      "label": "Metered volume (avg MW) · Retail",
@@ -7127,7 +7169,7 @@
      "values": null
     },
     {
-     "r": 623,
+     "r": 625,
      "kind": "line",
      "block": "section",
      "label": "Net imbalance volume · Retail",
@@ -7138,11 +7180,11 @@
      "values": null
     },
     {
-     "r": 624,
+     "r": 626,
      "kind": "blank"
     },
     {
-     "r": 625,
+     "r": 627,
      "kind": "line",
      "block": "section",
      "label": "PV buy notified · Retail",
@@ -7153,7 +7195,7 @@
      "values": null
     },
     {
-     "r": 626,
+     "r": 628,
      "kind": "line",
      "block": "section",
      "label": "PV buy notified MW · Retail",
@@ -7164,7 +7206,7 @@
      "values": null
     },
     {
-     "r": 627,
+     "r": 629,
      "kind": "line",
      "block": "section",
      "label": "Baseload buy notified · Retail",
@@ -7175,7 +7217,7 @@
      "values": null
     },
     {
-     "r": 628,
+     "r": 630,
      "kind": "line",
      "block": "section",
      "label": "Baseload buy notified MW · Retail",
@@ -7186,7 +7228,7 @@
      "values": null
     },
     {
-     "r": 629,
+     "r": 631,
      "kind": "line",
      "block": "section",
      "label": "Spot buy notified · Retail",
@@ -7197,7 +7239,7 @@
      "values": null
     },
     {
-     "r": 630,
+     "r": 632,
      "kind": "line",
      "block": "section",
      "label": "Spot buy notified MW · Retail",
@@ -7208,7 +7250,7 @@
      "values": null
     },
     {
-     "r": 631,
+     "r": 633,
      "kind": "line",
      "block": "section",
      "label": "Buy notified · Retail",
@@ -7219,7 +7261,7 @@
      "values": null
     },
     {
-     "r": 632,
+     "r": 634,
      "kind": "line",
      "block": "section",
      "label": "Buy notified MW · Retail",
@@ -7230,7 +7272,7 @@
      "values": null
     },
     {
-     "r": 633,
+     "r": 635,
      "kind": "line",
      "block": "section",
      "label": "PV buy metered · Retail",
@@ -7241,7 +7283,7 @@
      "values": null
     },
     {
-     "r": 634,
+     "r": 636,
      "kind": "line",
      "block": "section",
      "label": "PV buy metered MW · Retail",
@@ -7252,7 +7294,7 @@
      "values": null
     },
     {
-     "r": 635,
+     "r": 637,
      "kind": "line",
      "block": "section",
      "label": "Baseload buy metered · Retail",
@@ -7263,7 +7305,7 @@
      "values": null
     },
     {
-     "r": 636,
+     "r": 638,
      "kind": "line",
      "block": "section",
      "label": "Baseload buy metered MW · Retail",
@@ -7274,7 +7316,7 @@
      "values": null
     },
     {
-     "r": 637,
+     "r": 639,
      "kind": "line",
      "block": "section",
      "label": "Spot settlement · Retail",
@@ -7285,7 +7327,7 @@
      "values": null
     },
     {
-     "r": 638,
+     "r": 640,
      "kind": "line",
      "block": "section",
      "label": "Spot settlement MW · Retail",
@@ -7296,7 +7338,7 @@
      "values": null
     },
     {
-     "r": 639,
+     "r": 641,
      "kind": "line",
      "block": "section",
      "label": "Buy metered · Retail",
@@ -7307,7 +7349,7 @@
      "values": null
     },
     {
-     "r": 640,
+     "r": 642,
      "kind": "line",
      "block": "section",
      "label": "Buy metered MW · Retail",
@@ -7318,11 +7360,11 @@
      "values": null
     },
     {
-     "r": 641,
+     "r": 643,
      "kind": "blank"
     },
     {
-     "r": 642,
+     "r": 644,
      "kind": "line",
      "block": "section",
      "label": "Share PV · Retail",
@@ -7333,7 +7375,7 @@
      "values": null
     },
     {
-     "r": 643,
+     "r": 645,
      "kind": "line",
      "block": "section",
      "label": "Share Baseload · Retail",
@@ -7344,7 +7386,7 @@
      "values": null
     },
     {
-     "r": 644,
+     "r": 646,
      "kind": "line",
      "block": "section",
      "label": "Share spot · Retail",
@@ -7355,11 +7397,11 @@
      "values": null
     },
     {
-     "r": 645,
+     "r": 647,
      "kind": "blank"
     },
     {
-     "r": 646,
+     "r": 648,
      "kind": "line",
      "block": "section",
      "label": "PV cost budgeted · Retail",
@@ -7370,7 +7412,7 @@
      "values": null
     },
     {
-     "r": 647,
+     "r": 649,
      "kind": "line",
      "block": "section",
      "label": "Baseload cost budgeted · Retail",
@@ -7381,7 +7423,7 @@
      "values": null
     },
     {
-     "r": 648,
+     "r": 650,
      "kind": "line",
      "block": "section",
      "label": "Spot cost · Retail",
@@ -7392,7 +7434,7 @@
      "values": null
     },
     {
-     "r": 649,
+     "r": 651,
      "kind": "line",
      "block": "section",
      "label": "Sourcing cost budgeted · Retail",
@@ -7403,11 +7445,11 @@
      "values": null
     },
     {
-     "r": 650,
+     "r": 652,
      "kind": "blank"
     },
     {
-     "r": 651,
+     "r": 653,
      "kind": "line",
      "block": "section",
      "label": "Price PV budget · Retail",
@@ -7418,7 +7460,7 @@
      "values": null
     },
     {
-     "r": 652,
+     "r": 654,
      "kind": "line",
      "block": "section",
      "label": "Price Baseload budget · Retail",
@@ -7429,7 +7471,7 @@
      "values": null
     },
     {
-     "r": 653,
+     "r": 655,
      "kind": "line",
      "block": "section",
      "label": "Price spot · Retail",
@@ -7440,7 +7482,7 @@
      "values": null
     },
     {
-     "r": 654,
+     "r": 656,
      "kind": "line",
      "block": "section",
      "label": "Price total budget · Retail",
@@ -7451,11 +7493,11 @@
      "values": null
     },
     {
-     "r": 655,
+     "r": 657,
      "kind": "blank"
     },
     {
-     "r": 656,
+     "r": 658,
      "kind": "line",
      "block": "section",
      "label": "PV cost forecasted · Retail",
@@ -7466,7 +7508,7 @@
      "values": null
     },
     {
-     "r": 657,
+     "r": 659,
      "kind": "line",
      "block": "section",
      "label": "Baseload cost forecasted · Retail",
@@ -7477,7 +7519,7 @@
      "values": null
     },
     {
-     "r": 658,
+     "r": 660,
      "kind": "line",
      "block": "section",
      "label": "Cost spot forecast · Retail",
@@ -7488,7 +7530,7 @@
      "values": null
     },
     {
-     "r": 659,
+     "r": 661,
      "kind": "line",
      "block": "section",
      "label": "Sourcing cost forecasted · Retail",
@@ -7499,11 +7541,11 @@
      "values": null
     },
     {
-     "r": 660,
+     "r": 662,
      "kind": "blank"
     },
     {
-     "r": 661,
+     "r": 663,
      "kind": "line",
      "block": "section",
      "label": "Price PV forecast · Retail",
@@ -7514,7 +7556,7 @@
      "values": null
     },
     {
-     "r": 662,
+     "r": 664,
      "kind": "line",
      "block": "section",
      "label": "Price Baseload forecast · Retail",
@@ -7525,7 +7567,7 @@
      "values": null
     },
     {
-     "r": 663,
+     "r": 665,
      "kind": "line",
      "block": "section",
      "label": "Price spot forecast · Retail",
@@ -7536,7 +7578,7 @@
      "values": null
     },
     {
-     "r": 664,
+     "r": 666,
      "kind": "line",
      "block": "section",
      "label": "Price total forecast · Retail",
@@ -7547,11 +7589,11 @@
      "values": null
     },
     {
-     "r": 665,
+     "r": 667,
      "kind": "blank"
     },
     {
-     "r": 666,
+     "r": 668,
      "kind": "line",
      "block": "section",
      "label": "Budget minus forecast cost · Retail",
@@ -7562,7 +7604,7 @@
      "values": null
     },
     {
-     "r": 667,
+     "r": 669,
      "kind": "line",
      "block": "section",
      "label": "Budget minus forecast price · Retail",
@@ -7573,11 +7615,11 @@
      "values": null
     },
     {
-     "r": 668,
+     "r": 670,
      "kind": "blank"
     },
     {
-     "r": 669,
+     "r": 671,
      "kind": "line",
      "block": "section",
      "label": "Risk premium accrued · Retail",
@@ -7588,7 +7630,7 @@
      "values": null
     },
     {
-     "r": 670,
+     "r": 672,
      "kind": "line",
      "block": "section",
      "label": "Risk premium cumulative · Retail",
@@ -7599,7 +7641,7 @@
      "values": null
     },
     {
-     "r": 671,
+     "r": 673,
      "kind": "line",
      "block": "section",
      "label": "Premium settlement · Retail",
@@ -7610,7 +7652,7 @@
      "values": null
     },
     {
-     "r": 672,
+     "r": 674,
      "kind": "line",
      "block": "section",
      "label": "Premium settlement cumulative · Retail",
@@ -7621,7 +7663,7 @@
      "values": null
     },
     {
-     "r": 673,
+     "r": 675,
      "kind": "line",
      "block": "section",
      "label": "Premium deviation · Retail",
@@ -7632,11 +7674,11 @@
      "values": null
     },
     {
-     "r": 674,
+     "r": 676,
      "kind": "blank"
     },
     {
-     "r": 675,
+     "r": 677,
      "kind": "line",
      "block": "section",
      "label": "Premium budget input · Retail",
@@ -7647,7 +7689,7 @@
      "values": null
     },
     {
-     "r": 676,
+     "r": 678,
      "kind": "line",
      "block": "section",
      "label": "Premium forecast input · Retail",
@@ -7658,7 +7700,7 @@
      "values": null
     },
     {
-     "r": 677,
+     "r": 679,
      "kind": "line",
      "block": "section",
      "label": "Premium forecast derived · Retail",
@@ -7669,11 +7711,11 @@
      "values": null
     },
     {
-     "r": 678,
+     "r": 680,
      "kind": "blank"
     },
     {
-     "r": 679,
+     "r": 681,
      "kind": "line",
      "block": "section",
      "label": "Reserve release budgeted · Retail",
@@ -7684,7 +7726,7 @@
      "values": null
     },
     {
-     "r": 680,
+     "r": 682,
      "kind": "line",
      "block": "section",
      "label": "Reserve release forecasted · Retail",
@@ -7695,11 +7737,11 @@
      "values": null
     },
     {
-     "r": 681,
+     "r": 683,
      "kind": "blank"
     },
     {
-     "r": 682,
+     "r": 684,
      "kind": "line",
      "block": "section",
      "label": "Revenue · Retail",
@@ -7710,7 +7752,7 @@
      "values": null
     },
     {
-     "r": 683,
+     "r": 685,
      "kind": "line",
      "block": "section",
      "label": "Average sell price · Retail",
@@ -7721,11 +7763,11 @@
      "values": null
     },
     {
-     "r": 684,
+     "r": 686,
      "kind": "blank"
     },
     {
-     "r": 685,
+     "r": 687,
      "kind": "line",
      "block": "section",
      "label": "GM1 budgeted · Retail",
@@ -7736,7 +7778,7 @@
      "values": null
     },
     {
-     "r": 686,
+     "r": 688,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecasted · Retail",
@@ -7747,11 +7789,11 @@
      "values": null
     },
     {
-     "r": 687,
+     "r": 689,
      "kind": "blank"
     },
     {
-     "r": 688,
+     "r": 690,
      "kind": "line",
      "block": "section",
      "label": "Source imbalance · Retail",
@@ -7762,7 +7804,7 @@
      "values": null
     },
     {
-     "r": 689,
+     "r": 691,
      "kind": "line",
      "block": "section",
      "label": "Off-taker imbalance · Retail",
@@ -7773,11 +7815,11 @@
      "values": null
     },
     {
-     "r": 690,
+     "r": 692,
      "kind": "blank"
     },
     {
-     "r": 691,
+     "r": 693,
      "kind": "line",
      "block": "section",
      "label": "GM2 budgeted · Retail",
@@ -7788,7 +7830,7 @@
      "values": null
     },
     {
-     "r": 692,
+     "r": 694,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecasted · Retail",
@@ -7799,11 +7841,11 @@
      "values": null
     },
     {
-     "r": 693,
+     "r": 695,
      "kind": "blank"
     },
     {
-     "r": 694,
+     "r": 696,
      "kind": "line",
      "block": "section",
      "label": "GM1 budget % · Retail",
@@ -7814,7 +7856,7 @@
      "values": null
     },
     {
-     "r": 695,
+     "r": 697,
      "kind": "line",
      "block": "section",
      "label": "GM1 budget specific · Retail",
@@ -7825,11 +7867,11 @@
      "values": null
     },
     {
-     "r": 696,
+     "r": 698,
      "kind": "blank"
     },
     {
-     "r": 697,
+     "r": 699,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecast % · Retail",
@@ -7840,7 +7882,7 @@
      "values": null
     },
     {
-     "r": 698,
+     "r": 700,
      "kind": "line",
      "block": "section",
      "label": "GM1 forecast specific · Retail",
@@ -7851,11 +7893,11 @@
      "values": null
     },
     {
-     "r": 699,
+     "r": 701,
      "kind": "blank"
     },
     {
-     "r": 700,
+     "r": 702,
      "kind": "line",
      "block": "section",
      "label": "GM2 budget % · Retail",
@@ -7866,7 +7908,7 @@
      "values": null
     },
     {
-     "r": 701,
+     "r": 703,
      "kind": "line",
      "block": "section",
      "label": "GM2 budget specific · Retail",
@@ -7877,11 +7919,11 @@
      "values": null
     },
     {
-     "r": 702,
+     "r": 704,
      "kind": "blank"
     },
     {
-     "r": 703,
+     "r": 705,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecast % · Retail",
@@ -7892,7 +7934,7 @@
      "values": null
     },
     {
-     "r": 704,
+     "r": 706,
      "kind": "line",
      "block": "section",
      "label": "GM2 forecast specific · Retail",
@@ -7903,11 +7945,11 @@
      "values": null
     },
     {
-     "r": 705,
+     "r": 707,
      "kind": "blank"
     },
     {
-     "r": 706,
+     "r": 708,
      "kind": "line",
      "block": "section",
      "label": "Green certificates · Retail",
@@ -7918,7 +7960,7 @@
      "values": null
     },
     {
-     "r": 707,
+     "r": 709,
      "kind": "line",
      "block": "section",
      "label": "GC spot · Retail",
@@ -7929,7 +7971,7 @@
      "values": null
     },
     {
-     "r": 708,
+     "r": 710,
      "kind": "line",
      "block": "section",
      "label": "GC bilateral · Retail",
@@ -7940,7 +7982,7 @@
      "values": null
     },
     {
-     "r": 709,
+     "r": 711,
      "kind": "line",
      "block": "section",
      "label": "GC value · Retail",
@@ -7951,7 +7993,7 @@
      "values": null
     },
     {
-     "r": 710,
+     "r": 712,
      "kind": "line",
      "block": "section",
      "label": "GC unit cost · Retail",
@@ -7962,11 +8004,11 @@
      "values": null
     },
     {
-     "r": 711,
+     "r": 713,
      "kind": "blank"
     },
     {
-     "r": 712,
+     "r": 714,
      "kind": "line",
      "block": "section",
      "label": "PV remaining · Retail",
@@ -7977,7 +8019,7 @@
      "values": null
     },
     {
-     "r": 713,
+     "r": 715,
      "kind": "line",
      "block": "section",
      "label": "PV remaining MW · Retail",
@@ -7988,7 +8030,7 @@
      "values": null
     },
     {
-     "r": 714,
+     "r": 716,
      "kind": "line",
      "block": "section",
      "label": "Baseload remaining · Retail",
@@ -7999,7 +8041,7 @@
      "values": null
     },
     {
-     "r": 715,
+     "r": 717,
      "kind": "line",
      "block": "section",
      "label": "Baseload remaining MW · Retail",
@@ -8010,11 +8052,11 @@
      "values": null
     },
     {
-     "r": 716,
+     "r": 718,
      "kind": "blank"
     },
     {
-     "r": 717,
+     "r": 719,
      "kind": "line",
      "block": "section",
      "label": "Pass-through revenue · Retail",
@@ -8025,7 +8067,7 @@
      "values": null
     },
     {
-     "r": 718,
+     "r": 720,
      "kind": "line",
      "block": "section",
      "label": "Pass-through cost · Retail",
@@ -8036,7 +8078,7 @@
      "values": null
     },
     {
-     "r": 719,
+     "r": 721,
      "kind": "line",
      "block": "section",
      "label": "Risk reserve · Retail",
@@ -8047,7 +8089,7 @@
      "values": null
     },
     {
-     "r": 720,
+     "r": 722,
      "kind": "line",
      "block": "section",
      "label": "Portfolio OPEX · Retail",
@@ -8058,7 +8100,7 @@
      "values": null
     },
     {
-     "r": 721,
+     "r": 723,
      "kind": "line",
      "block": "section",
      "label": "Variable OPEX (sales bonus) · Retail",
@@ -8069,11 +8111,11 @@
      "values": null
     },
     {
-     "r": 722,
+     "r": 724,
      "kind": "blank"
     },
     {
-     "r": 723,
+     "r": 725,
      "kind": "line",
      "block": "section",
      "label": "Own guarantee outstanding · Retail",
@@ -8084,7 +8126,7 @@
      "values": null
     },
     {
-     "r": 724,
+     "r": 726,
      "kind": "line",
      "block": "section",
      "label": "Own BGL fee · Retail",
@@ -8095,11 +8137,11 @@
      "values": null
     },
     {
-     "r": 725,
+     "r": 727,
      "kind": "blank"
     },
     {
-     "r": 726,
+     "r": 728,
      "kind": "line",
      "block": "section",
      "label": "NM pre-tax budgeted · Retail",
@@ -8110,7 +8152,7 @@
      "values": null
     },
     {
-     "r": 727,
+     "r": 729,
      "kind": "line",
      "block": "section",
      "label": "NM pre-tax forecasted · Retail",
@@ -8121,11 +8163,11 @@
      "values": null
     },
     {
-     "r": 728,
+     "r": 730,
      "kind": "blank"
     },
     {
-     "r": 729,
+     "r": 731,
      "kind": "line",
      "block": "section",
      "label": "NM budget % · Retail",
@@ -8136,7 +8178,7 @@
      "values": null
     },
     {
-     "r": 730,
+     "r": 732,
      "kind": "line",
      "block": "section",
      "label": "NM budget specific · Retail",
@@ -8147,11 +8189,11 @@
      "values": null
     },
     {
-     "r": 731,
+     "r": 733,
      "kind": "blank"
     },
     {
-     "r": 732,
+     "r": 734,
      "kind": "line",
      "block": "section",
      "label": "NM forecast % · Retail",
@@ -8162,7 +8204,7 @@
      "values": null
     },
     {
-     "r": 733,
+     "r": 735,
      "kind": "line",
      "block": "section",
      "label": "NM forecast specific · Retail",
@@ -8173,11 +8215,11 @@
      "values": null
     },
     {
-     "r": 734,
+     "r": 736,
      "kind": "blank"
     },
     {
-     "r": 735,
+     "r": 737,
      "kind": "line",
      "block": "section",
      "label": "Memo: market BGL fee share · Retail",
@@ -8188,7 +8230,7 @@
      "values": null
     },
     {
-     "r": 736,
+     "r": 738,
      "kind": "line",
      "block": "section",
      "label": "Memo: interest share · Retail",
@@ -8199,11 +8241,11 @@
      "values": null
     },
     {
-     "r": 737,
+     "r": 739,
      "kind": "blank"
     },
     {
-     "r": 738,
+     "r": 740,
      "kind": "blank"
     }
    ],
@@ -8240,10 +8282,10 @@
    },
    "freeze": "C7",
    "row_heights": {
-    "254": 24.0,
-    "375": 24.0,
-    "496": 24.0,
-    "617": 24.0
+    "256": 24.0,
+    "377": 24.0,
+    "498": 24.0,
+    "619": 24.0
    }
   },
   "CF_Mth": {
@@ -8472,6 +8514,17 @@
      "r": 26,
      "kind": "line",
      "block": "cashflow",
+     "label": "PRE service accrued, net of gain · Total",
+     "key": "acc_pre_service",
+     "role": "subtotal",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 27,
+     "kind": "line",
+     "block": "cashflow",
      "label": "Accrual reserve · Total",
      "key": "acc_reserve",
      "role": "subtotal",
@@ -8480,7 +8533,7 @@
      "values": null
     },
     {
-     "r": 27,
+     "r": 28,
      "kind": "line",
      "block": "cashflow",
      "label": "Accrual guarantees · Total",
@@ -8491,11 +8544,11 @@
      "values": null
     },
     {
-     "r": 28,
+     "r": 29,
      "kind": "blank"
     },
     {
-     "r": 29,
+     "r": 30,
      "kind": "line",
      "block": "cashflow",
      "label": "OT1 receipts energy · Retail",
@@ -8506,7 +8559,7 @@
      "values": null
     },
     {
-     "r": 30,
+     "r": 31,
      "kind": "line",
      "block": "cashflow",
      "label": "OT1 receipts passthrough · Retail",
@@ -8517,7 +8570,7 @@
      "values": null
     },
     {
-     "r": 31,
+     "r": 32,
      "kind": "line",
      "block": "cashflow",
      "label": "OT2 receipts energy · Retail",
@@ -8528,7 +8581,7 @@
      "values": null
     },
     {
-     "r": 32,
+     "r": 33,
      "kind": "line",
      "block": "cashflow",
      "label": "OT2 receipts passthrough · Retail",
@@ -8539,7 +8592,7 @@
      "values": null
     },
     {
-     "r": 33,
+     "r": 34,
      "kind": "line",
      "block": "cashflow",
      "label": "OT3 receipts energy · Retail",
@@ -8550,7 +8603,7 @@
      "values": null
     },
     {
-     "r": 34,
+     "r": 35,
      "kind": "line",
      "block": "cashflow",
      "label": "OT3 receipts passthrough · Retail",
@@ -8561,7 +8614,7 @@
      "values": null
     },
     {
-     "r": 35,
+     "r": 36,
      "kind": "line",
      "block": "cashflow",
      "label": "OT4 receipts energy · Retail",
@@ -8572,7 +8625,7 @@
      "values": null
     },
     {
-     "r": 36,
+     "r": 37,
      "kind": "line",
      "block": "cashflow",
      "label": "OT4 receipts passthrough · Retail",
@@ -8583,7 +8636,7 @@
      "values": null
     },
     {
-     "r": 37,
+     "r": 38,
      "kind": "line",
      "block": "cashflow",
      "label": "Receipts resell · Wholesale spot resell",
@@ -8594,7 +8647,7 @@
      "values": null
     },
     {
-     "r": 38,
+     "r": 39,
      "kind": "line",
      "block": "cashflow",
      "label": "Receipts imbalance · Total",
@@ -8605,11 +8658,11 @@
      "values": null
     },
     {
-     "r": 39,
+     "r": 40,
      "kind": "blank"
     },
     {
-     "r": 40,
+     "r": 41,
      "kind": "line",
      "block": "cashflow",
      "label": "Receipts total · Total",
@@ -8620,11 +8673,11 @@
      "values": null
     },
     {
-     "r": 41,
+     "r": 42,
      "kind": "blank"
     },
     {
-     "r": 42,
+     "r": 43,
      "kind": "line",
      "block": "cashflow",
      "label": "Payments PV · Total",
@@ -8635,7 +8688,7 @@
      "values": null
     },
     {
-     "r": 43,
+     "r": 44,
      "kind": "line",
      "block": "cashflow",
      "label": "Payments Baseload · Total",
@@ -8646,7 +8699,7 @@
      "values": null
     },
     {
-     "r": 44,
+     "r": 45,
      "kind": "line",
      "block": "cashflow",
      "label": "Payments spot · Total",
@@ -8657,7 +8710,7 @@
      "values": null
     },
     {
-     "r": 45,
+     "r": 46,
      "kind": "line",
      "block": "cashflow",
      "label": "Payments grid · Total",
@@ -8668,7 +8721,7 @@
      "values": null
     },
     {
-     "r": 46,
+     "r": 47,
      "kind": "line",
      "block": "cashflow",
      "label": "Payments OPEX · Total",
@@ -8679,7 +8732,7 @@
      "values": null
     },
     {
-     "r": 47,
+     "r": 48,
      "kind": "line",
      "block": "cashflow",
      "label": "Payments variable OPEX · Total",
@@ -8690,7 +8743,7 @@
      "values": null
     },
     {
-     "r": 48,
+     "r": 49,
      "kind": "line",
      "block": "cashflow",
      "label": "Payments BGL · Total",
@@ -8701,27 +8754,23 @@
      "values": null
     },
     {
-     "r": 49,
+     "r": 50,
      "kind": "line",
      "block": "cashflow",
-     "label": "CIT paid · Total",
-     "key": "out_cit",
+     "label": "PRE service paid · Total",
+     "key": "out_pre_service",
      "role": "data",
      "unit_template": "€",
      "unit": "EUR",
      "values": null
     },
     {
-     "r": 50,
-     "kind": "blank"
-    },
-    {
      "r": 51,
      "kind": "line",
      "block": "cashflow",
-     "label": "Payments total · Total",
-     "key": "out_total",
-     "role": "total",
+     "label": "CIT paid · Total",
+     "key": "out_cit",
+     "role": "data",
      "unit_template": "€",
      "unit": "EUR",
      "values": null
@@ -8734,6 +8783,21 @@
      "r": 53,
      "kind": "line",
      "block": "cashflow",
+     "label": "Payments total · Total",
+     "key": "out_total",
+     "role": "total",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 54,
+     "kind": "blank"
+    },
+    {
+     "r": 55,
+     "kind": "line",
+     "block": "cashflow",
      "label": "VAT output · Retail",
      "key": "vat_output",
      "role": "data",
@@ -8742,7 +8806,7 @@
      "values": null
     },
     {
-     "r": 54,
+     "r": 56,
      "kind": "line",
      "block": "cashflow",
      "label": "VAT input · Retail",
@@ -8753,7 +8817,7 @@
      "values": null
     },
     {
-     "r": 55,
+     "r": 57,
      "kind": "line",
      "block": "cashflow",
      "label": "VAT net position · Retail",
@@ -8764,7 +8828,7 @@
      "values": null
     },
     {
-     "r": 56,
+     "r": 58,
      "kind": "line",
      "block": "cashflow",
      "label": "VAT paid · Retail",
@@ -8775,7 +8839,7 @@
      "values": null
     },
     {
-     "r": 57,
+     "r": 59,
      "kind": "line",
      "block": "cashflow",
      "label": "VAT credit carried · Retail",
@@ -8786,27 +8850,12 @@
      "values": null
     },
     {
-     "r": 58,
+     "r": 60,
      "kind": "line",
      "block": "cashflow",
      "label": "VAT cash · Retail",
      "key": "vat_cash",
      "role": "subtotal",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
-     "r": 59,
-     "kind": "blank"
-    },
-    {
-     "r": 60,
-     "kind": "line",
-     "block": "cashflow",
-     "label": "Net cash flow before tax · Total",
-     "key": "net_cf_before_tax",
-     "role": "total",
      "unit_template": "€",
      "unit": "EUR",
      "values": null
@@ -8819,6 +8868,21 @@
      "r": 62,
      "kind": "line",
      "block": "cashflow",
+     "label": "Net cash flow before tax · Total",
+     "key": "net_cf_before_tax",
+     "role": "total",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 63,
+     "kind": "blank"
+    },
+    {
+     "r": 64,
+     "kind": "line",
+     "block": "cashflow",
      "label": "Opening cash · Total",
      "key": "opening",
      "role": "subtotal",
@@ -8827,7 +8891,7 @@
      "values": null
     },
     {
-     "r": 63,
+     "r": 65,
      "kind": "line",
      "block": "cashflow",
      "label": "Restricted: reserve · Total",
@@ -8838,7 +8902,7 @@
      "values": null
     },
     {
-     "r": 64,
+     "r": 66,
      "kind": "line",
      "block": "cashflow",
      "label": "Restricted: collateral · Total",
@@ -8849,7 +8913,7 @@
      "values": null
     },
     {
-     "r": 65,
+     "r": 67,
      "kind": "line",
      "block": "cashflow",
      "label": "Shareholder loan injection · Total",
@@ -8860,7 +8924,7 @@
      "values": null
     },
     {
-     "r": 66,
+     "r": 68,
      "kind": "line",
      "block": "cashflow",
      "label": "Closing cash · Total",
@@ -8871,7 +8935,7 @@
      "values": null
     },
     {
-     "r": 67,
+     "r": 69,
      "kind": "line",
      "block": "cashflow",
      "label": "Free cash · Total",
@@ -8882,11 +8946,11 @@
      "values": null
     },
     {
-     "r": 68,
+     "r": 70,
      "kind": "blank"
     },
     {
-     "r": 69,
+     "r": 71,
      "kind": "line",
      "block": "cashflow",
      "label": "Loan outstanding · Total",
@@ -8897,7 +8961,7 @@
      "values": null
     },
     {
-     "r": 70,
+     "r": 72,
      "kind": "line",
      "block": "cashflow",
      "label": "Financing interest · Total",
@@ -8908,27 +8972,12 @@
      "values": null
     },
     {
-     "r": 71,
+     "r": 73,
      "kind": "line",
      "block": "cashflow",
      "label": "Interest cumulative · Total",
      "key": "interest_cumulative",
      "role": "subtotal",
-     "unit_template": "€",
-     "unit": "EUR",
-     "values": null
-    },
-    {
-     "r": 72,
-     "kind": "blank"
-    },
-    {
-     "r": 73,
-     "kind": "line",
-     "block": "cashflow",
-     "label": "Peak funding",
-     "key": "peak_funding",
-     "role": "total",
      "unit_template": "€",
      "unit": "EUR",
      "values": null
@@ -8941,6 +8990,21 @@
      "r": 75,
      "kind": "line",
      "block": "cashflow",
+     "label": "Peak funding",
+     "key": "peak_funding",
+     "role": "total",
+     "unit_template": "€",
+     "unit": "EUR",
+     "values": null
+    },
+    {
+     "r": 76,
+     "kind": "blank"
+    },
+    {
+     "r": 77,
+     "kind": "line",
+     "block": "cashflow",
      "label": "Accrual CIT · Total",
      "key": "acc_cit",
      "role": "subtotal",
@@ -8949,7 +9013,7 @@
      "values": null
     },
     {
-     "r": 76,
+     "r": 78,
      "kind": "line",
      "block": "cashflow",
      "label": "Tax paid cumulative · Total",
@@ -8960,7 +9024,7 @@
      "values": null
     },
     {
-     "r": 77,
+     "r": 79,
      "kind": "line",
      "block": "cashflow",
      "label": "Free cash after tax · Total",
@@ -8971,11 +9035,11 @@
      "values": null
     },
     {
-     "r": 78,
+     "r": 80,
      "kind": "blank"
     },
     {
-     "r": 79,
+     "r": 81,
      "kind": "line",
      "block": "cashflow",
      "label": "Check revenue",
@@ -8986,7 +9050,7 @@
      "values": null
     },
     {
-     "r": 80,
+     "r": 82,
      "kind": "line",
      "block": "cashflow",
      "label": "Check purchases",
@@ -8997,7 +9061,7 @@
      "values": null
     },
     {
-     "r": 81,
+     "r": 83,
      "kind": "line",
      "block": "cashflow",
      "label": "Check closing",
@@ -9008,11 +9072,11 @@
      "values": null
     },
     {
-     "r": 82,
+     "r": 84,
      "kind": "blank"
     },
     {
-     "r": 83,
+     "r": 85,
      "kind": "blank"
     }
    ],
@@ -9151,90 +9215,96 @@
     },
     {
      "col": "P",
+     "label": "PRE service paid · Total",
+     "key": "pre_service",
+     "unit": "EUR"
+    },
+    {
+     "col": "Q",
      "label": "VAT paid · Retail",
      "key": "vat_paid",
      "unit": "EUR"
     },
     {
-     "col": "Q",
+     "col": "R",
      "label": "CIT paid · Total",
      "key": "cit_paid",
      "unit": "EUR"
     },
     {
-     "col": "R",
+     "col": "S",
      "label": "VAT collected · Retail",
      "key": "vat_collected",
      "unit": "EUR"
     },
     {
-     "col": "S",
+     "col": "T",
      "label": "VAT input · Retail",
      "key": "vat_input",
      "unit": "EUR"
     },
     {
-     "col": "T",
+     "col": "U",
      "label": "Net cash flow · Total",
      "key": "net_cf",
      "unit": "EUR"
     },
     {
-     "col": "U",
+     "col": "V",
      "label": "Cum cash flow · Total",
      "key": "cum_cf",
      "unit": "EUR"
     },
     {
-     "col": "V",
+     "col": "W",
      "label": "Floor · Total",
      "key": "floor",
      "unit": "EUR"
     },
     {
-     "col": "W",
+     "col": "X",
      "label": "Shareholder loan injection · Total",
      "key": "injection",
      "unit": "EUR"
     },
     {
-     "col": "X",
+     "col": "Y",
      "label": "Loan · Total",
      "key": "loan",
      "unit": "EUR"
     },
     {
-     "col": "Y",
+     "col": "Z",
      "label": "Funded balance · Total",
      "key": "funded_balance",
      "unit": "EUR"
     },
     {
-     "col": "Z",
+     "col": "AA",
      "label": "Free cash · Total",
      "key": "free_cash",
      "unit": "EUR"
     },
     {
-     "col": "AA",
+     "col": "AB",
      "label": "Cum tax · Total",
      "key": "cum_tax",
      "unit": "EUR"
     },
     {
-     "col": "AB",
+     "col": "AC",
      "label": "Free cash after tax · Total",
      "key": "free_cash_after_tax",
      "unit": "EUR"
     },
     {
-     "col": "AC",
+     "col": "AD",
      "label": "Financing interest · Total",
      "key": "interest",
      "unit": "EUR"
     },
     {
-     "col": "AD",
+     "col": "AE",
      "label": "Spot buy MWh · Retail",
      "key": "spot_buy_mwh",
      "unit": "MWh"

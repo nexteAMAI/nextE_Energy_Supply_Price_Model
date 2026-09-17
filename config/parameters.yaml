@@ -232,14 +232,15 @@ counterparties:                             # Input section D (columns C:H)
 
 market_guarantees:                          # Input section E - regulatory formulas
   spot:
-    buffer_days: 4                          # C111
+    buffer_days: 4                          # C111 - house proxy; OPCOM sizes on uncollected obligations + pending buy offers incl. VAT (PO garantii PZU & PI rev. 0, 30.09.2025, pct. 6.8)
+    vat_inclusive: false                    # D121: workbook formula excludes VAT (parity); bid scenarios include it
     # peak daily notified spot buy (C112) and peak DAM price (C113) are derived by the engine
   brp:
     method: rate_per_mw                     # rate_per_mw = the workbook rule (parity); pre_delegated = D119 (balancing responsibility delegated to a PRE)
     rate_ron_per_mw: 9000.0                 # C116 - "Transelectrica BRP rule"; source_status: contradicted (BRP-GF) - no such rule; kept for parity
     generation_mw_in_brp: 160.0             # C117
-    pre_initial_ron: 100000.0               # D119: initial guarantee of the PRE service contract (art. 9.8 of the CINTA template contract, 100.000 lei)
-    pre_months_of_imbalance: 2.0            # D119: 1..3 average monthly imbalance values (CINTA PRE procedure pct. 5.2.5); 2 = house assumption
+    pre_initial_ron: 50000.0                # D121: CINTA's indication for the supply activity (CEO 17.09.2026): minimum 50.000 lei, additional to the RtM guarantee; the asset contract art. 9.8 carries 100.000 lei
+    pre_months_of_imbalance: 1.0            # D121: sized on the actual month-end settlement, adjustable upward by CINTA (procedure pct. 5.2.5 band 1..3)
     pre_vat_inclusive: true                 # D119: the imbalance value basis carries VAT (assumption - the procedure does not say)
     pre_fee_fixed_ron_per_month: 2500.0     # D120: fixed monthly PRE service fee, excl. VAT (contract nr. 570/21.01.2026, Anexa 2 A2.1, Tf)
     pre_fee_gain_share_pct: 0.05            # D120: variable fee = 5 % of |standalone imbalance cost - in-PRE cost| (Anexa 2 A2.1, Tv)

@@ -319,13 +319,15 @@ def render() -> None:
         B.note("Regulatory sizing formulas, verified 17.09.2026 (docs/PARAMETERS.md section 3): Vtm = 2 per Transelectrica PO TEL 01.13 pct. 8.2.1; "
                "Vdm = 1 plus the overdue add-on per ANRE Ordinul nr. 129/2015 art. 8. BRP / imbalance guarantee (D119): the workbook rule "
                "(rate per MW - no counterpart in any procedure, kept for the Reference Case parity) or the delegated-PRE rule - the balancing "
-               "responsibility transferred to a PRE service provider: initial guarantee of the service contract (100.000 RON in the CINTA "
-               "template, art. 9.8), then 1 to 3 average monthly imbalance values (CINTA PRE procedure pct. 5.2.5), sized on the engine's own "
-               "imbalance ledger. Bid scenarios use the delegated-PRE rule.")
+               "responsibility transferred to a PRE service provider: a floor (CINTA's indication for the supply activity: minimum 50.000 RON, "
+               "additional to the RtM guarantee - D121; the asset contract art. 9.8 carries 100.000), then months of actual month-end settlement "
+               "(1 by CINTA's indication, band 1 to 3 per the PRE procedure pct. 5.2.5), sized on the engine's own imbalance ledger. Bid "
+               "scenarios use the delegated-PRE rule; the spot collateral proxy is VAT-inclusive there (OPCOM PO garantii pct. 6.8).")
         with st.form("form_mg"):
             c1, c2, c3, c4 = st.columns(4)
             with c1:
-                buf = B.num_input("Spot buffer days", value=float(mg["spot"]["buffer_days"]), help="Input!C111", decimals=0)
+                buf = B.num_input("Spot buffer days", value=float(mg["spot"]["buffer_days"]), help="Input!C111 - house proxy (OPCOM sizes on obligations + pending offers incl. VAT, D121)", decimals=0)
+                spot_vat = st.checkbox("Spot proxy VAT-inclusive", value=bool(mg["spot"].get("vat_inclusive", False)), help="OPCOM PO garantii PZU & PI pct. 6.8 counts VAT; off in the Reference Case (parity)")
             with c2:
                 methods = ["rate_per_mw", "pre_delegated"]
                 cur = str(mg["brp"].get("method", "rate_per_mw"))
@@ -334,8 +336,8 @@ def render() -> None:
                                       help="D119; the Reference Case keeps the workbook rule for parity")
                 rate = B.num_input("BRP rate (RON per MW)", value=float(mg["brp"]["rate_ron_per_mw"]), help="Input!C116 - contradicted (BRP-GF), workbook rule only", decimals=2)
                 gen = B.num_input("Generation MW in the BRP", value=float(mg["brp"]["generation_mw_in_brp"]), help="Input!C117 - workbook rule only", decimals=2)
-                pre_init = B.num_input("PRE initial guarantee (RON)", value=float(mg["brp"].get("pre_initial_ron", 100000.0)), help="service contract art. 9.8 (CINTA template: 100.000 lei)", decimals=0)
-                pre_m = B.num_input("PRE months of imbalance (1 to 3)", value=float(mg["brp"].get("pre_months_of_imbalance", 2.0)), help="CINTA PRE procedure pct. 5.2.5 - 1 to 3 average monthly imbalance values by payment record", decimals=2)
+                pre_init = B.num_input("PRE guarantee floor (RON)", value=float(mg["brp"].get("pre_initial_ron", 50000.0)), help="CINTA indication for supply: minimum 50.000 lei (D121); asset contract art. 9.8: 100.000 lei", decimals=0)
+                pre_m = B.num_input("PRE months of settlement (1 to 3)", value=float(mg["brp"].get("pre_months_of_imbalance", 1.0)), help="CINTA sizes on the actual month-end settlement and can increase (procedure pct. 5.2.5 band 1 to 3) - D121", decimals=2)
                 pre_vat = st.checkbox("PRE basis VAT-inclusive", value=bool(mg["brp"].get("pre_vat_inclusive", True)), help="assumption - the procedure does not state the basis")
                 pre_fee = B.num_input("PRE fixed fee (RON per month, excl. VAT)", value=float(mg["brp"].get("pre_fee_fixed_ron_per_month", 2500.0)), help="contract nr. 570/2026 Anexa 2 A2.1, Tf = 2.500 lei", decimals=0)
                 pre_share = B.num_input("PRE variable fee (share of the gain, 0,05 = 5 %)", value=float(mg["brp"].get("pre_fee_gain_share_pct", 0.05)), help="Anexa 2 A2.1, Tv = 5 % of |standalone - in-PRE| imbalance cost", decimals=4)
@@ -346,7 +348,7 @@ def render() -> None:
                 vdm = B.num_input("DSO multiplier Vdm", value=float(mg["dso"]["vdm_multiplier"]), help="Input!C125 - unverified", decimals=2)
                 addon = B.num_input("DSO overdue add-on (EUR)", value=float(mg["dso"]["overdue_addon_eur"]), help="Input!C126", decimals=2)
             if st.form_submit_button("Apply changes", type="primary"):
-                mg["spot"]["buffer_days"] = float(buf)
+                mg["spot"]["buffer_days"], mg["spot"]["vat_inclusive"] = float(buf), bool(spot_vat)
                 mg["brp"]["rate_ron_per_mw"], mg["brp"]["generation_mw_in_brp"] = float(rate), float(gen)
                 mg["brp"]["method"], mg["brp"]["pre_initial_ron"] = str(method), float(pre_init)
                 mg["brp"]["pre_months_of_imbalance"], mg["brp"]["pre_vat_inclusive"] = float(pre_m), bool(pre_vat)

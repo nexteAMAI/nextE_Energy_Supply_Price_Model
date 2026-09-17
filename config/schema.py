@@ -387,6 +387,9 @@ class Parameters:
         if str(self.market_guarantees["brp"].get("method", "rate_per_mw")) != "pre_delegated":
             self.market_guarantees["brp"]["method"] = "pre_delegated"
             done.append("BRP guarantee by the delegated-PRE rule")
+        if not bool(self.market_guarantees["spot"].get("vat_inclusive", False)):
+            self.market_guarantees["spot"]["vat_inclusive"] = True
+            done.append("spot collateral proxy VAT-inclusive (OPCOM PO garantii PZU & PI pct. 6.8)")
         shipped = load_grid_tariffs()["tariffs"]
         key = lambda rows: [(r["owner"], r["component"], float(r["ron_per_mwh"])) for r in rows]  # noqa: E731
         if key(self.grid_tariffs) != key(shipped):

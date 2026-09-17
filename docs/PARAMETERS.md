@@ -48,20 +48,21 @@ from the workbook, not covered by the pass), `to_verify`, `not_published`, `assu
 | VAT rate | 21 % | Codul fiscal art. 291 alin. (1), as amended by Legea nr. 141/2025 (M. Of. nr. 699/25.07.2025), from 01.08.2025 | open | verified |
 | CIT rate | 16 % | Codul fiscal art. 17 (the workbook cites art. 41 - the declaration and payment article) | open | verified, citation corrected |
 | Reverse charge on electricity purchases | applied | Codul fiscal art. 331 alin. (2) lit. e) and alin. (1); sunset art. 331 alin. (6) - 31.12.2026 inclusive (Directive (EU) 2022/890) | until 31.12.2026 | verified - **RC-2027**: the spine year 2027 lies outside |
-| Tax payment day | 25 | art. 41 alin. (1) for CIT (checked); VAT art. 326 not checked | open | to_verify |
+| Tax payment day | 25 | art. 41 alin. (1) for CIT; art. 326 alin. (1) with art. 323 alin. (1) for VAT | open | verified |
 | GC quota | 0,499387 GC/MWh | ANRE Ordinul nr. 81/16.12.2025 art. 1 (M. Of. nr. 1176/18.12.2025); final 2025 quota 0,49983 (Ordinul nr. 3/2026) | 2026 (estimate) | verified - GC-2027 |
 | GC reference price | 148,2201 RON/GC | minimum trading value 2026, Legea nr. 220/2008 art. 11 (29,4 EUR at BNR 2025 average 5,0415; maximum 176,4525), OPCOM notice 08.01.2026 | 2026 | verified - GC-2027 |
 | BRP guarantee rate | 9.000 RON/MW | no such rule: Transelectrica PO cod TEL 00.45 ed. I rev. 3 (28.11.2025) applies to a PRE facing the TSO - nextE delegates to a PRE service provider (D119); the delegated rule: initial 100.000 RON (CINTA template contract art. 9.8), then 1-3 average monthly imbalance values (CINTA PRE procedure pct. 5.2.5) | contract term | contradicted for the workbook rule (Reference Case parity); `pre_delegated` for bid scenarios |
 | TSO guarantee multiplier Vtm | 2 | Transelectrica PO TEL 01.13 ed. I rev. 0 (TEL nr. 52004/25.11.2021, aviz ANRE nr. 22/2021) pct. 8.2.1: GF = 2 x Vtm (6-month average monthly transmission + system services value) | in force | verified |
 | DSO guarantee multiplier Vdm | 1 (+ overdue add-on) | ANRE Ordinul nr. 129/2015 (M. Of. nr. 628/18.08.2015) art. 8: GF = 1 x Vdm + max(V1, V2) | in force | verified |
 | PRE service fee | 2.500 RON/month + 5 % of the aggregation gain | contract nr. 570/21.01.2026 (CINTA template), Anexa 2 A2.1; paid within 4 working days of receipt (art. 9.3) | contract term | verified (D120) |
-| Spot collateral buffer | 4 days | OPCOM practice - not covered | - | unverified |
+| PRE guarantee (supply) | floor 50.000 RON, 1 month of actual settlement | CINTA's indication reported by the CEO 17.09.2026 (additional to the RtM guarantee; adjustable upward); asset contract art. 9.8: 100.000 | until the supply contract is signed | to_verify (D121) |
+| Spot collateral buffer | 4 days | house proxy; OPCOM PO garantii PZU & PI rev. 0 (30.09.2025) pct. 6.8: uncollected obligations + pending buy offers incl. VAT, no N-day rule; `spot.vat_inclusive` for bid scenarios | procedure in force | assumption (D121) |
 | TG (injection) | 3,63 RON/MWh | ANRE Ordinul nr. 74/2025 (M. Of. nr. 1173/18.12.2025) | 2026 | verified |
 | TL (extraction) | 36,54 RON/MWh | ANRE Ordinul nr. 74/2025: **36,45** | 2026 | contradicted (Reference Case parity); the shipped grid table carries 36,45 (TAR-2026 (a)) |
 | SS | 14,70 RON/MWh | ANRE Ordinul nr. 73/2025 (Ordinele nr. 12/2026 and 53/2026 not read) | 2026 | verified |
 | T_HV / T_MV (DEER MV set) | 39,37 / 122,80 RON/MWh, summed | the applied 2026 tariffs of Distributie Oltenia (Ordinul nr. 75/2025), not DEER's; DEER at MV = 31,96 + 83,36 = 115,32 (Ordinul nr. 77/2025); the cascade double-counts HV | 2026 | **contradicted - TAR-2026** |
 | Grid tariff table (`config/tariffs_ro.yaml`) | ANRE 2026 specific tariffs | ANRE Ordinele nr. 73-78/2025 (M. Of. nr. 1173/18.12.2025); Retele Electrice rows from secondary copies. The v1.1 table (applied tariffs under shifted operator names, TL 36,54, Delgaz MT 125,17) is superseded | 2026 | verified (RER rows verified_secondary) - TAR-2026 (a) |
-| Cogeneration, CfD, excise | 13,60 / 0,14 / 3,84 RON/MWh | not covered by the pass | 2026 | unverified |
+| Cogeneration, CfD, excise | 13,60 / 0,14 / 3,84 RON/MWh | cogeneration 13,60 to 30.06.2026 (Ord. nr. 66/2025), **14,50 from 01.07.2026 (Ord. nr. 49/2026)**; CfD 0,144 (Ord. nr. 69/2025); excise 3,84 (anexa nr. 1 titlul VIII nr. crt. 18.1, art. 342; RES exempt art. 399 alin. (1) lit. m)) | 2026 | cogeneration and CfD contradicted (parity kept; grid table updated); excise verified (D121) |
 | Public holidays | Codul muncii art. 139 alin. (1) | list matches the consolidated text; 6-7 January by Legea nr. 52/2023 (M. Of. nr. 186/06.03.2023) - secondary copies | in force | verified_secondary |
 | FX RON/EUR | 5,5 | workbook D54, Forecast Q3 2026 | - | assumption |
 | 2027 values | - | GC quota 2027, GC bounds 2027, network tariffs 2027: not published as of 17.09.2026 | - | not_published |

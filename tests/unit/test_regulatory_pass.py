@@ -49,6 +49,7 @@ def test_verified_2026_table_sums_to_the_applied_tariffs():
         hv, mv, lv = rows[(dso, "T_HV")], rows[(dso, "T_MV")], rows[(dso, "T_LV")]
         assert hv == pytest.approx(it) and hv + mv == pytest.approx(mt) and hv + mv + lv == pytest.approx(jt), dso
     assert rows[("TSO", "TL")] == 36.45 and rows[("TSO", "TG")] == 3.63 and rows[("TSO", "SS")] == 14.70
+    assert rows[("ANRE", "cogeneration")] == 14.50 and rows[("ANRE", "cfd")] == 0.144 and rows[("ANAF", "excise")] == 3.84  # D121
 
 
 def test_tar_2026_finding_deer_mv():
@@ -84,7 +85,8 @@ def test_d119_bid_defaults_and_delegated_pre_guarantee():
     assert any(w.startswith("RC-2027") for w in p.regulatory_warnings()) and any(w.startswith("BRP-GF") for w in p.regulatory_warnings())
     q = copy.deepcopy(p)
     done = q.apply_bid_defaults()
-    assert len(done) == 2 and not q.general.reverse_charge_vat_on_sources and q.market_guarantees["brp"]["method"] == "pre_delegated"
+    assert len(done) == 3 and not q.general.reverse_charge_vat_on_sources and q.market_guarantees["brp"]["method"] == "pre_delegated"
+    assert q.market_guarantees["spot"]["vat_inclusive"] is True
     assert q.apply_bid_defaults() == [] and q.regulatory_warnings() == []
     assert p.general.reverse_charge_vat_on_sources  # the source register is untouched
     inp = gr.RegulatoryInputs(peak_daily_spot_buy_mwh=0.0, peak_dam_price=0.0, peak_retail_buy_mw=40.0, metered_year_by_offtaker={},
@@ -92,10 +94,12 @@ def test_d119_bid_defaults_and_delegated_pre_guarantee():
     fx, vat = p.general.fx_ron_per_eur, p.general.vat_rate
     assert gr.brp_required(p, inp) == pytest.approx(9000.0 * (160.0 + 40.0) / fx)
     avg = 60000.0 / 12
-    assert gr.brp_required(q, inp) == pytest.approx(max(100000.0 / fx, 2.0 * avg * (1 + vat)))
-    q.market_guarantees["brp"]["pre_months_of_imbalance"] = 1.0
+    assert gr.brp_required(q, inp) == pytest.approx(max(50000.0 / fx, 1.0 * avg * (1 + vat)))  # D121: 50.000 floor, 1 month
+    q.market_guarantees["brp"]["pre_months_of_imbalance"] = 3.0
+    assert gr.brp_required(q, inp) == pytest.approx(3.0 * avg * (1 + vat))
     q.market_guarantees["brp"]["pre_vat_inclusive"] = False
-    assert gr.brp_required(q, inp) == pytest.approx(100000.0 / fx)  # the initial amount floors it
+    q.market_guarantees["brp"]["pre_months_of_imbalance"] = 1.0
+    assert gr.brp_required(q, inp) == pytest.approx(50000.0 / fx)  # the floor holds
 
 
 def test_d120_pre_service_fee_and_gain():

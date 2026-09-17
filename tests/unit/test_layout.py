@@ -100,7 +100,7 @@ def _key_of(text: str) -> str | None:
 
 def test_roles_and_decimals(book):
     ws = book["Cons_P&L"]
-    by_label = {ws.cell(r, 1).value: r for r in range(7, 254)}
+    by_label = {ws.cell(r, 1).value: r for r in range(7, 256)}
     r = by_label["Check demand"]
     assert ws.cell(r, 2).value == "check" and ws.cell(r, 4).number_format == "0.000000" and not ws.cell(r, 4).font.b
     r = by_label["Revenue · Total"]
@@ -115,7 +115,7 @@ def test_offtaker_blocks_replicated(book, result):
     ws = book["Cons_P&L"]
     sections = [(r, ws.cell(r, 1).value) for r in range(7, ws.max_row + 1) if ws.cell(r, 1).fill.fill_type == "solid" and ws.cell(r, 1).fill.fgColor.rgb == "001F3E66"]
     assert [t.split(" · ")[0] for _, t in sections] == list(result.pnl.sections)
-    assert sections[0][0] == 254 and ws.cell(255, 1).value.startswith(sections[0][1].split(" · ")[0])  # section 254, header 255 as in the template
+    assert sections[0][0] == 256 and ws.cell(257, 1).value.startswith(sections[0][1].split(" · ")[0])  # section 256, header 257 as in the template (254 before O-21)
     starts = [r for r, _ in sections]
     assert len({b - a for a, b in zip(starts, starts[1:], strict=False)}) == 1  # equal block length
 
@@ -125,7 +125,7 @@ def test_value_parity_monthly(book, result):
     ws = book["Cons_P&L"]
     pf = result.pnl.portfolio
     checked = 0
-    for r in range(7, 254):
+    for r in range(7, 256):
         key = _key_of(ws.cell(r, 1).value or "")
         if key and key in pf:
             v = pf[key]
@@ -138,7 +138,7 @@ def test_value_parity_monthly(book, result):
             checked += 1
     assert checked > 150
     T = result.pnl.sections[list(result.pnl.sections)[1]]
-    sec = [r for r in range(254, ws.max_row + 1) if ws.cell(r, 1).fill.fill_type == "solid" and ws.cell(r, 1).fill.fgColor.rgb == "001F3E66"][1]
+    sec = [r for r in range(256, ws.max_row + 1) if ws.cell(r, 1).fill.fill_type == "solid" and ws.cell(r, 1).fill.fgColor.rgb == "001F3E66"][1]
     lab = {ws.cell(r, 1).value: r for r in range(sec + 2, sec + 120)}
     r = lab["Revenue · Retail"]
     assert ws.cell(r, 4).value == pytest.approx(T["revenue"][12])
@@ -156,12 +156,8 @@ def test_value_parity_overview_cashflow_ledger(book, result):
             assert got is None if x != x else got == pytest.approx(x), (key, name)
     ws = book["CF_Mth"]
     labels = {ws.cell(r, 1).value: r for r in range(7, ws.max_row + 1) if ws.cell(r, 1).value}
-    engine_only = {"acc_pre_service", "out_pre_service"}  # D120 rows: no line in the CEO's template yet (O-21)
     for key, row in result.cashflow.rows.items():
-        if key in engine_only:
-            assert label(key, fallback=TOTAL) not in labels
-            continue
-        r = labels[label(key, fallback=TOTAL)]
+        r = labels[label(key, fallback=TOTAL)]  # since 0.7.5 every CF row has its template line (O-21, D121)
         for col, x in ((4, row[13]), (18, row[12])):
             got = ws.cell(r, col).value
             assert got is None if x != x else got == pytest.approx(x), key
@@ -234,7 +230,7 @@ def test_overview_nm_row_is_the_total_and_the_qh_label_is_neutral():
     corrected template (D-D) says 'NM · Total' and the extractor prefers the Total leg for an untagged measure.
     W-1: the QH check label names the off-taker generically (F-035)."""
     rows = {r["r"]: r for r in layout.spec()["sheets"]["Portf Overview"]["rows"] if r.get("kind") == "line"}
-    assert rows[81]["key"] == "nm" and rows[81]["label"] == "NM · Total"
+    assert rows[83]["key"] == "nm" and rows[83]["label"] == "NM · Total"  # row 81 before O-21 (D121)
     labels = [c.get("label", "") for c in layout.spec()["sheets"]["QH_full"]["columns"]]
     assert any(lb.endswith("_+_off-taker_attribution_within_strip)_must_be_0") for lb in labels)
     q = {c["key"]: c for c in layout.spec()["sheets"]["QH_full"]["columns"] if c.get("key")}
@@ -254,4 +250,20 @@ def test_no_counterparty_name_in_the_repository_texts():
              *root.glob("app/**/*.py"), *root.glob("config/*.yaml"), root / "README.md"]
     hits = [(f.relative_to(root).as_posix(), n) for f in files for n in names if n.lower() in f.read_text(encoding="utf-8").lower()]
     assert not hits, hits
+
+
+def test_o21_pre_service_lines_are_in_the_template_spec():
+    """D121: the D120 rows and the ledger column have their lines in the CEO's output template (inserted by streaming
+    XML edit as under D-D) and the spec carries them at the right places."""
+    sp = layout.spec()
+    ov = {r["key"]: r for r in sp["sheets"]["Portf Overview"]["rows"] if r.get("key")}
+    assert ov["pre_service_fee"]["r"] == ov["interest"]["r"] + 1 and ov["pre_aggregation_gain"]["r"] == ov["interest"]["r"] + 2
+    assert ov["nm"]["r"] == 83 and ov["unallocated"]["r"] == 92
+    pl = {r["key"]: r for r in sp["sheets"]["Cons_P&L"]["rows"] if r.get("key")}
+    assert pl["pre_service_fee"]["r"] == pl["interest"]["r"] + 1 and pl["unallocated"]["r"] == pl["interest"]["r"] + 3
+    cf = {r["key"]: r for r in sp["sheets"]["CF_Mth"]["rows"] if r.get("key")}
+    assert cf["acc_pre_service"]["r"] == cf["acc_bgl_fees"]["r"] + 1 and cf["out_pre_service"]["r"] == cf["out_bgl"]["r"] + 1
+    cols = {c["key"]: c["col"] for c in sp["sheets"]["CF_Daily_Ledger"]["columns"]}
+    assert cols["bgl"] == "O" and cols["pre_service"] == "P" and cols["vat_paid"] == "Q" and cols["spot_buy_mwh"] == "AE"
+    assert sp["source"]["md5"] == "a7893d616e385f35e674a0a28071a435"
 

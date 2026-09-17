@@ -89,7 +89,8 @@ def regulatory_amounts(params: Parameters, inp: RegulatoryInputs) -> RegulatoryA
     mg = params.market_guarantees
     cp = params.counterparties
     on = {k: (1.0 if cp[k].active else 0.0) for k in ("spot", "brp", "tso", "dso")}
-    spot = float(mg["spot"]["buffer_days"]) * inp.peak_daily_spot_buy_mwh * inp.peak_dam_price * on["spot"]
+    spot_vat = 1.0 + float(params.general.vat_rate) if bool(mg["spot"].get("vat_inclusive", False)) else 1.0  # D121
+    spot = float(mg["spot"]["buffer_days"]) * inp.peak_daily_spot_buy_mwh * inp.peak_dam_price * spot_vat * on["spot"]
     brp = brp_required(params, inp) * on["brp"]
     tso_val = 0.0
     dso_val = 0.0

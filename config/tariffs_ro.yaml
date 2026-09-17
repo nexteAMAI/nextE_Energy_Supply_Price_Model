@@ -15,7 +15,7 @@
 #   ANRE Ordinul nr. 75/2025      - Distributie Oltenia: IT 39,37 / MT 83,43 / JT 210,45
 #   ANRE Ordinul nr. 78/2025      - Retele Electrice Romania: IT 23,83 / MT 68,36 / JT 225,20 (secondary copies; the
 #                                   applied tariffs 23,83 / 92,19 / 317,39 agree across suppliers' sheets)
-# Cogeneration contribution, CfD contribution and excise: NOT covered by the pass - carried from the v1.1 table, unverified.
+# Cogeneration (Ord. nr. 49/2026, from 01.07.2026), CfD (Ord. nr. 69/2025) and excise (MF 2026 level): verified in the second pass of 17.09.2026 (D121).
 # 2027 tariffs: not approved as of 17.09.2026 (ANRE order portal up to Ordinul nr. 57/03.09.2026).
 meta:
   currency: RON
@@ -53,8 +53,8 @@ tariffs:
   - {owner: "Retele Electrice Romania", component: T_HV, ron_per_mwh: 23.83, validity: 2026, source: "ANRE Ordinul nr. 78/2025", source_status: verified_secondary}
   - {owner: "Retele Electrice Romania", component: T_MV, ron_per_mwh: 68.36, validity: 2026, source: "ANRE Ordinul nr. 78/2025", source_status: verified_secondary}
   - {owner: "Retele Electrice Romania", component: T_LV, ron_per_mwh: 225.20, validity: 2026, source: "ANRE Ordinul nr. 78/2025", source_status: verified_secondary}
-  - {owner: "ANRE", component: cogeneration, ron_per_mwh: 13.60, validity: 2026, applies: [true, true, true, true], source: "v1.1 template", source_status: unverified}
-  - {owner: "ANRE", component: cfd, ron_per_mwh: 0.14, validity: 2026, applies: [true, true, true, true], source: "v1.1 template", source_status: unverified}
-  - {owner: "ANAF", component: excise, ron_per_mwh: 3.84, validity: 2026, applies: [true, true, true, true], source: "v1.1 template", source_status: unverified}
+  - {owner: "ANRE", component: cogeneration, ron_per_mwh: 14.50, validity: 2026, applies: [true, true, true, true], source: "ANRE Ordinul nr. 49/25.06.2026 art. 1 (0,0145 lei/kWh excl. VAT, M. Of. nr. 526/26.06.2026, from 01.07.2026; 13,60 under Ordinul nr. 66/2025 from 01.11.2025 to 30.06.2026)", source_status: verified}
+  - {owner: "ANRE", component: cfd, ron_per_mwh: 0.144, validity: 2026, applies: [true, true, true, true], source: "ANRE Ordinul nr. 69/11.12.2025 art. 1 (0,000144 lei/kWh excl. VAT, M. Of. nr. 1169/17.12.2025, from 01.01.2026)", source_status: verified}
+  - {owner: "ANAF", component: excise, ron_per_mwh: 3.84, validity: 2026, applies: [true, true, true, true], source: "Codul fiscal anexa nr. 1 titlul VIII nr. crt. 18.1 indexed per art. 342 alin. (1) - MF level 2026 3,84 lei/MWh (commercial use); RES-sourced electricity exempt per art. 399 alin. (1) lit. m)", source_status: verified}
 # Applied (cumulated) distribution tariffs 2026 the sums above reproduce, lei/MWh (IT / MT / JT):
 #   DEER 31,96 / 115,32 / 355,34 · Oltenia 39,37 / 122,80 / 333,25 · Delgaz 40,46 / 125,71 / 387,91 · Retele Electrice 23,83 / 92,19 / 317,39

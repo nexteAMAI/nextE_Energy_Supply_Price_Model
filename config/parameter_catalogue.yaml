@@ -91,8 +91,9 @@ entries:
   - path: "general\\.tax_payment_day"
     unit: day of month
     standard: "25"
-    source: "Codul fiscal art. 41 alin. (1) (CIT: the 25th of the first month after the quarter, checked); the VAT deadline article (art. 326) was not checked in this pass"
-    source_status: to_verify
+    source: "Codul fiscal art. 41 alin. (1) (CIT: the 25th of the first month after the quarter); VAT: art. 326 alin. (1) with art. 323 alin. (1) (the 25th inclusive of the month following the fiscal period)"
+    source_status: verified
+    validity: "in force"
     checked: "17.09.2026"
   - {path: "general\\.fx_ron_per_eur", unit: RON/EUR, standard: "5,5", source: "workbook D54, Forecast Q3 2026", source_status: assumption}
 
@@ -126,20 +127,20 @@ entries:
     note: "BRP-GF: the workbook rule 9.000 RON/MW x MW in the BRP is kept for parity; the CEO rules whether the engine adopts the PO formula (docs/OPEN_ITEMS.md)"
   - path: "market_guarantees\\.brp\\.pre_initial_ron"
     unit: RON
-    standard: "100.000"
-    source: "PRE service contract, art. 9.8 of the CINTA template contract (initial financial guarantee, bank guarantee letter or cash, valid 3 months beyond termination; adjustable after the first settlement month by the imbalance value)"
-    source_status: verified
-    validity: "contract term"
+    standard: "50.000 (supply activity)"
+    source: "CINTA's indication for the supply activity, reported by the CEO 17.09.2026: minimum 50.000 lei, additional to the guarantee nextE holds for the RtM business, sized on the actual month-end settlement and adjustable upward by CINTA; the asset contract nr. 570/21.01.2026 art. 9.8 carries 100.000 lei"
+    source_status: to_verify
+    validity: "until the supply entity's contract is signed"
     checked: "17.09.2026"
-    note: "D119: read on the signed nextE Asset - CINTA contract of 29-30.01.2026; the supply entity's own contract may set another amount"
+    note: "D121: to be confirmed on the signed supply contract (T-5 (a))"
   - path: "market_guarantees\\.brp\\.pre_months_of_imbalance"
     unit: months
-    standard: "2 (band 1 to 3)"
-    source: "CINTA PRE procedure 'Modul de derulare a activitatii PRE' pct. 5.2.5: the guarantee varies between 1 and 3 average monthly imbalance values by payment record"
-    source_status: assumption
+    standard: "1 (band 1 to 3)"
+    source: "CINTA PRE procedure 'Modul de derulare a activitatii PRE' pct. 5.2.5: the guarantee varies between 1 and 3 average monthly imbalance values by payment record; CINTA's indication for supply (CEO 17.09.2026): the actual month-end settlement, adjustable upward"
+    source_status: to_verify
     validity: "procedure in force (2025 edition)"
     checked: "17.09.2026"
-    note: "D119: 2 is the house mid-band assumption; the VAT-inclusive basis is an assumption too (pre_vat_inclusive)"
+    note: "D121: 1 month of actual settlement per CINTA's indication; the VAT-inclusive basis is an assumption (pre_vat_inclusive)"
   - path: "market_guarantees\\.brp\\.pre_fee_fixed_ron_per_month"
     unit: RON/month
     standard: "2.500 (excl. VAT)"
@@ -177,7 +178,21 @@ entries:
     source_status: verified
     validity: "in force; not abrogated per the ANRE order portal on 17.09.2026"
     checked: "17.09.2026"
-  - {path: "market_guarantees\\.spot\\.buffer_days", unit: days, standard: "4", source: "OPCOM collateral practice per workbook - not covered by the pass of 17.09.2026", source_status: unverified}
+  - path: "market_guarantees\\.spot\\.buffer_days"
+    unit: days
+    standard: "4 (house proxy)"
+    source: "OPCOM 'Procedura privind constituirea, verificarea si utilizarea garantiilor financiare pentru participarea la PZU si PI', rev. 0 of 30.09.2025, pct. 6.8-6.12: the guarantee covers the uncollected net payment obligations incl. VAT plus the maximum cumulated value of pending buy offers incl. VAT, validated daily - no N-day multiplier exists"
+    source_status: assumption
+    validity: "procedure in force"
+    checked: "17.09.2026"
+    note: "D121: the 4-day proxy of the peak daily purchase at the peak DAM price approximates one day of open offers plus the settlement pipeline; it excludes VAT in the Reference Case (parity) - bid scenarios set spot.vat_inclusive"
+  - path: "market_guarantees\\.spot\\.vat_inclusive"
+    unit: ""
+    standard: "true for bid scenarios"
+    source: "OPCOM PO garantii PZU & PI rev. 0 (30.09.2025) pct. 6.8: obligations and offers are counted incl. VAT"
+    source_status: verified
+    validity: "procedure in force"
+    checked: "17.09.2026"
 
   # ---- regulated tariffs --------------------------------------------------------------------------------------
   - path: "tariff_components_eur_per_mwh\\.TL"
@@ -210,11 +225,29 @@ entries:
     validity: "2026"
     checked: "17.09.2026"
     note: "TAR-2026: the workbook's T_HV 39,37 and T_MV 122,80 RON/MWh are the applied (cumulated) 2026 tariffs of Distributie Oltenia (Ordinul nr. 75/2025), not DEER's, and the cascade adds them - the HV component is counted twice; kept for parity until the CEO rules"
-  - path: "tariff_components_eur_per_mwh\\.(cogeneration|cfd|excise)"
+  - path: "tariff_components_eur_per_mwh\\.cogeneration"
     unit: EUR/MWh
-    standard: ""
-    source: "workbook Input!C54:F63 - not covered by the pass of 17.09.2026"
-    source_status: unverified
+    standard: "14,50 RON/MWh from 01.07.2026 at the register FX"
+    source: "ANRE Ordinul nr. 49/25.06.2026 art. 1: 0,0145 lei/kWh excl. VAT from 01.07.2026 (M. Of. nr. 526/26.06.2026), abrogating Ordinul nr. 66/2025 (0,0136 lei/kWh, 01.11.2025-30.06.2026)"
+    source_status: contradicted
+    validity: "from 01.07.2026"
+    checked: "17.09.2026"
+    note: "D121: the workbook carries 13,60 RON/MWh (2,4727 EUR/MWh) - the H1 2026 level; kept for parity, the grid table carries 14,50"
+  - path: "tariff_components_eur_per_mwh\\.cfd"
+    unit: EUR/MWh
+    standard: "0,144 RON/MWh at the register FX"
+    source: "ANRE Ordinul nr. 69/11.12.2025 art. 1: 0,000144 lei/kWh excl. VAT from 01.01.2026 (M. Of. nr. 1169/17.12.2025)"
+    source_status: contradicted
+    validity: "2026"
+    checked: "17.09.2026"
+    note: "D121: the workbook rounds to 0,14 RON/MWh; kept for parity, the grid table carries 0,144"
+  - path: "tariff_components_eur_per_mwh\\.excise"
+    unit: EUR/MWh
+    standard: "3,84 RON/MWh at the register FX"
+    source: "Codul fiscal anexa nr. 1 titlul VIII nr. crt. 18.1 (electricitate utilizata in scop comercial), indexed per art. 342 alin. (1) - Ministry of Finance level for 2026: 3,84 lei/MWh; exemption for electricity from renewable sources art. 399 alin. (1) lit. m); chargeable on supply to final consumers art. 358 alin. (2)"
+    source_status: verified
+    validity: "2026"
+    checked: "17.09.2026"
   - path: "grid_tariffs\\[.*\\]\\.ron_per_mwh"
     unit: RON/MWh
     standard: ""
