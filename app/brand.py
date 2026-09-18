@@ -79,6 +79,10 @@ table.esb tr.section td {{ font-weight: 700; color: {NAVY}; text-transform: uppe
 .esb-scroll {{ overflow-x: auto; max-height: 560px; overflow-y: auto; border: 1px solid {LINE}; margin-bottom: 0.8rem; }}
 .esb-scroll table.esb {{ margin-bottom: 0; }}
 .esb-scroll table.esb th {{ position: sticky; top: 0; }}
+.esb-wide {{ overflow-x: auto; margin-bottom: 0.8rem; }}
+.esb-wide table.esb {{ margin-bottom: 0; }}
+.esb-wide::-webkit-scrollbar {{ height: 8px; }}
+.esb-wide::-webkit-scrollbar-thumb {{ background: {LINE}; }}
 </style>
 """
 
@@ -96,8 +100,9 @@ def num(x, decimals: int = 2, unit: str = "") -> str:
         v = float(x)
     except (TypeError, ValueError):
         return str(x)
-    neg = v < 0
-    s = f"{abs(v):,.{decimals}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    s = f"{abs(v):,.{decimals}f}"
+    neg = v < 0 and any(ch not in "0.," for ch in s)  # a value that rounds to zero is never shown as (0) (G5-1)
+    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
     s = f"({s})" if neg else s
     return f"{s} {unit}".strip()
 
@@ -106,8 +111,10 @@ def pct(x, decimals: int = 1) -> str:
     if x is None or (isinstance(x, float) and math.isnan(x)):
         return "–"
     v = float(x) * 100
-    s = f"{abs(v):,.{decimals}f}".replace(",", "X").replace(".", ",").replace("X", ".")
-    return f"({s} %)" if v < 0 else f"{s} %"
+    s = f"{abs(v):,.{decimals}f}"
+    neg = v < 0 and any(ch not in "0.," for ch in s)
+    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
+    return f"({s} %)" if neg else f"{s} %"
 
 
 def dmy(d) -> str:
@@ -176,6 +183,8 @@ def grid_input(df: pd.DataFrame, key: str, decimals: int = 2) -> pd.DataFrame:
     """
     shown = df.map(lambda v: num(v, decimals))
     cfg = {str(c): st.column_config.TextColumn(str(c), width="small") for c in shown.columns}
+    if df.index.name:
+        cfg["_index"] = st.column_config.TextColumn(str(df.index.name))  # the row-label column carries its name (G5-6)
     edited = st.data_editor(shown, key=key, width="stretch", column_config=cfg)
     out = df.copy().astype(float)
     bad = []
@@ -326,6 +335,8 @@ def table(df: pd.DataFrame, decimals: int = 2, index_label: str = "", pct_rows: 
     html = f'<table class="esb"><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table>'
     if scroll:
         html = f'<div class="esb-scroll">{html}</div>'
+    else:
+        html = f'<div class="esb-wide">{html}</div>'  # a table wider than the page scrolls sideways instead of clipping (G5-7)
     st.markdown(html, unsafe_allow_html=True)
     if max_rows is not None and len(df) > max_rows:
         caption(f"First {max_rows} of {num(len(df), 0)} rows shown; the full table is in the exports.")

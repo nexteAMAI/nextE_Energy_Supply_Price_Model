@@ -132,7 +132,7 @@ entries:
     source_status: to_verify
     validity: "until the supply entity's contract is signed"
     checked: "17.09.2026"
-    note: "D121: to be confirmed on the signed supply contract (T-5 (a))"
+    note: "D121 / D122: reading confirmed by the CEO 18.09.2026 (T-3 (a)) - the amount is CINTA's month-end settlement basis and can be raised by CINTA; kept to_verify until the signed supply contract (T-5). NOT MODELLED (D122, T-4 (c)): the pro-rata joint-and-several contribution to CINTA's own TSO guarantee (contract A1.2.3) and the adjustment of the guarantee by CINTA above the floor"
   - path: "market_guarantees\\.brp\\.pre_months_of_imbalance"
     unit: months
     standard: "1 (band 1 to 3)"
@@ -140,7 +140,7 @@ entries:
     source_status: to_verify
     validity: "procedure in force (2025 edition)"
     checked: "17.09.2026"
-    note: "D121: 1 month of actual settlement per CINTA's indication; the VAT-inclusive basis is an assumption (pre_vat_inclusive)"
+    note: "D121 / D122: 1 month of actual settlement per CINTA's indication (confirmed 18.09.2026); the VAT-inclusive basis is an assumption (pre_vat_inclusive). NOT MODELLED (D122): the VAT re-characterisation of negative-price imbalance settlements and the 4-working-day payment term of the service invoice (art. 9.3 - the engine pays on the first day of the next month)"
   - path: "market_guarantees\\.brp\\.pre_fee_fixed_ron_per_month"
     unit: RON/month
     standard: "2.500 (excl. VAT)"
@@ -148,7 +148,7 @@ entries:
     source_status: verified
     validity: "contract term 24 months from 23.01.2026, auto-renewing (art. 3)"
     checked: "17.09.2026"
-    note: "D120: the supply entity is to sign the same template - the CEO confirmed the terms 17.09.2026"
+    note: "D120 / D122: the supply entity signs the identical template (T-5 (a), 17.09.2026). NOT MODELLED (D122): the 4-working-day payment term (the engine settles the service fee on the first day of the next month); the guarantee of art. 9.8 (100.000 lei, three months post-termination) belongs to the asset contract, not to the supply register"
   - path: "market_guarantees\\.brp\\.pre_fee_gain_share_pct"
     unit: "%"
     standard: "5 %"
@@ -163,7 +163,7 @@ entries:
     source: "house assumption; the D017 measurement on the asset portfolio (Jan-Jun 2026) found a gain of 4 % to 74 % of the standalone imbalance value, month by month, and advised against a single percentage"
     source_status: assumption
     checked: "17.09.2026"
-    note: "D120: 0 keeps the imbalance cost standalone (conservative); any value entered reduces the imbalance cost and charges the 5 % fee on it"
+    note: "D120 / D122: 0 keeps the imbalance cost standalone (conservative) - the aggregation gain of the PRE is NOT MODELLED in bid scenarios (T-4 (c), 18.09.2026); any value entered reduces the imbalance cost and charges the 5 % fee on it"
   - path: "market_guarantees\\.tso\\.vtm_multiplier"
     unit: x
     standard: "2"

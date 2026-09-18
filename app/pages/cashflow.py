@@ -87,10 +87,11 @@ def render() -> None:
     d = cf.daily
     if d is not None:
         B.eyebrow("Loan outstanding and free cash by day · EUR")
-        x = [B.dmy(v) for v in d["date"]]
-        st.plotly_chart(B.lines(x, {"Loan outstanding": d["loan"].values, "Free cash after tax": d["free_cash_after_tax"].values,
-                                    "Restricted floor": d["floor"].values}, y_title="EUR", height=340),
-                        width="stretch", config={"displayModeBar": False})
+        x = pd.to_datetime(d["date"])  # a date axis: monthly ticks instead of one label per day (G5-9)
+        fig = B.lines(x, {"Loan outstanding": d["loan"].values, "Free cash after tax": d["free_cash_after_tax"].values,
+                          "Restricted floor": d["floor"].values}, y_title="EUR", height=340)
+        fig.update_xaxes(type="date", dtick="M1", tickformat="%d.%m.%Y", hoverformat="%d.%m.%Y")
+        st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
         B.caption("CF_Daily_Ledger columns X, AB, V; EUR; settlement days = month end + terms, taxes on the payment day")
         summ = pd.DataFrame({"Value": list(ds.values())}, index=[label(k, fallback=TOTAL) for k in ds])
         summ_units = [unit_of(k) for k in ds]

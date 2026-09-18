@@ -25,7 +25,7 @@ def render() -> None:
     B.page_title("Audit and Log", "What ran, on which inputs, with which decisions - the institutional record of this session and of the engine")
     p = state.params
     B.kpi_row([
-        ("Engine", f"v{__version__}", "", "nexte-esb; parity-proven against the frozen Reference Case (20.092 cells, 0 FAIL)"),
+        ("Engine", f"v{__version__}", "", "nexte-esb; parity-proven against the frozen Reference Case (20.092 of 20.245 cached cells tied, 0 FAIL; 153 layout cells not applicable)"),
         ("Scenario file", f"{state.scenario.name}", "", f"v{state.scenario.version} · md5 {state.scenario.md5[:12] or '–'}"),
         ("Series", "Reference Case fixture" if state.use_reference_fixture else "uploads only", "", f"{len(state.uploads)} upload(s) accepted this session"),
         ("Run state", "current" if (state.result is not None and not state.dirty) else ("inputs changed" if state.result else "no run"), "",

@@ -115,7 +115,7 @@ def render() -> None:
                 B.refusal(str(e))
 
     st.markdown("## Parity report")
-    B.note("The tie-out of the engine against the frozen Reference Case workbook (20.245 cached cells of the five result sheets, tolerance "
+    B.note("The tie-out of the engine against the frozen Reference Case workbook (20.245 cached cells of the five result sheets, of which 20.092 are mapped and tied and 153 are layout cells not applicable; tolerance "
            "abs(py - xl) <= 1e-6 x max(abs(xl), 1)). It runs on the Reference Case fixture with the Reference Case register regardless of the "
            "session's inputs; the committed report is in the repository's audit folder.")
     if st.button("Run the parity tie-out now"):

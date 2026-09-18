@@ -324,29 +324,36 @@ def render() -> None:
                "(1 by CINTA's indication, band 1 to 3 per the PRE procedure pct. 5.2.5), sized on the engine's own imbalance ledger. Bid "
                "scenarios use the delegated-PRE rule; the spot collateral proxy is VAT-inclusive there (OPCOM PO garantii pct. 6.8).")
         with st.form("form_mg"):
+            B.eyebrow("Spot (OPCOM) and TSO / DSO")
             c1, c2, c3, c4 = st.columns(4)
             with c1:
                 buf = B.num_input("Spot buffer days", value=float(mg["spot"]["buffer_days"]), help="Input!C111 - house proxy (OPCOM sizes on obligations + pending offers incl. VAT, D121)", decimals=0)
                 spot_vat = st.checkbox("Spot proxy VAT-inclusive", value=bool(mg["spot"].get("vat_inclusive", False)), help="OPCOM PO garantii PZU & PI pct. 6.8 counts VAT; off in the Reference Case (parity)")
             with c2:
+                vtm = B.num_input("TSO multiplier Vtm", value=float(mg["tso"]["vtm_multiplier"]), help="Input!C121 - PO TEL 01.13 pct. 8.2.1 (verified, D118)", decimals=2)
+            with c3:
+                vdm = B.num_input("DSO multiplier Vdm", value=float(mg["dso"]["vdm_multiplier"]), help="Input!C125 - ANRE Ordinul nr. 129/2015 art. 8 (verified, D118)", decimals=2)
+            with c4:
+                addon = B.num_input("DSO overdue add-on (EUR)", value=float(mg["dso"]["overdue_addon_eur"]), help="Input!C126", decimals=2)
+            B.eyebrow("BRP / imbalance guarantee and PRE service (D119, D121)")
+            c1, c2, c3, c4 = st.columns(4)
+            with c1:
                 methods = ["rate_per_mw", "pre_delegated"]
                 cur = str(mg["brp"].get("method", "rate_per_mw"))
                 method = st.selectbox("BRP guarantee method", methods, index=methods.index(cur) if cur in methods else 0,
                                       format_func=lambda m: {"rate_per_mw": "Workbook rule - rate per MW", "pre_delegated": "Delegated PRE - months of imbalance"}[m],
                                       help="D119; the Reference Case keeps the workbook rule for parity")
+                pre_vat = st.checkbox("PRE basis VAT-inclusive", value=bool(mg["brp"].get("pre_vat_inclusive", True)), help="assumption - the procedure does not state the basis")
+            with c2:
                 rate = B.num_input("BRP rate (RON per MW)", value=float(mg["brp"]["rate_ron_per_mw"]), help="Input!C116 - contradicted (BRP-GF), workbook rule only", decimals=2)
                 gen = B.num_input("Generation MW in the BRP", value=float(mg["brp"]["generation_mw_in_brp"]), help="Input!C117 - workbook rule only", decimals=2)
+            with c3:
                 pre_init = B.num_input("PRE guarantee floor (RON)", value=float(mg["brp"].get("pre_initial_ron", 50000.0)), help="CINTA indication for supply: minimum 50.000 lei (D121); asset contract art. 9.8: 100.000 lei", decimals=0)
                 pre_m = B.num_input("PRE months of settlement (1 to 3)", value=float(mg["brp"].get("pre_months_of_imbalance", 1.0)), help="CINTA sizes on the actual month-end settlement and can increase (procedure pct. 5.2.5 band 1 to 3) - D121", decimals=2)
-                pre_vat = st.checkbox("PRE basis VAT-inclusive", value=bool(mg["brp"].get("pre_vat_inclusive", True)), help="assumption - the procedure does not state the basis")
+            with c4:
                 pre_fee = B.num_input("PRE fixed fee (RON per month, excl. VAT)", value=float(mg["brp"].get("pre_fee_fixed_ron_per_month", 2500.0)), help="contract nr. 570/2026 Anexa 2 A2.1, Tf = 2.500 lei", decimals=0)
                 pre_share = B.num_input("PRE variable fee (share of the gain, 0,05 = 5 %)", value=float(mg["brp"].get("pre_fee_gain_share_pct", 0.05)), help="Anexa 2 A2.1, Tv = 5 % of |standalone - in-PRE| imbalance cost", decimals=4)
                 pre_gain = B.num_input("Assumed aggregation gain (share of |imbalance value|, 0 = not modelled)", value=float(mg["brp"].get("pre_aggregation_gain_pct_of_imbalance", 0.0)), help="house assumption; D017 measured 4 % to 74 % month by month on the asset portfolio", decimals=4)
-            with c3:
-                vtm = B.num_input("TSO multiplier Vtm", value=float(mg["tso"]["vtm_multiplier"]), help="Input!C121 - unverified", decimals=2)
-            with c4:
-                vdm = B.num_input("DSO multiplier Vdm", value=float(mg["dso"]["vdm_multiplier"]), help="Input!C125 - unverified", decimals=2)
-                addon = B.num_input("DSO overdue add-on (EUR)", value=float(mg["dso"]["overdue_addon_eur"]), help="Input!C126", decimals=2)
             if st.form_submit_button("Apply changes", type="primary"):
                 mg["spot"]["buffer_days"], mg["spot"]["vat_inclusive"] = float(buf), bool(spot_vat)
                 mg["brp"]["rate_ron_per_mw"], mg["brp"]["generation_mw_in_brp"] = float(rate), float(gen)
@@ -385,7 +392,7 @@ def render() -> None:
         B.note(f"Source: {cfg['meta'].get('source', '')} · validity {cfg['meta'].get('validity', '')} · source_status: <b>{cfg['meta'].get('source_status', '')}</b>"
                f" · checked {cfg['meta'].get('checked', '')}. Rows by regulatory charge owner and component; distribution rows are the SPECIFIC "
                "tariffs of each ANRE order and the cascade sums them to the applied tariff of the connection level (D109, D119). An off-taker "
-               "that names its DSO and voltage level takes its components from here. Cogeneration, CfD and excise rows remain unverified.")
+               "that names its DSO and voltage level takes its components from here. Cogeneration (Ordinul nr. 49/2026 from 01.07.2026), CfD (Ordinul nr. 69/2025) and excise (Codul fiscal art. 342, anexa 1 titlul VIII) were verified on 17.09.2026 (D121); the register values of the Reference Case stay for parity (COG-H2).")
         shipped = load_grid_tariffs()["tariffs"]
         if [(r["owner"], r["component"], float(r["ron_per_mwh"])) for r in p.grid_tariffs] != [(r["owner"], r["component"], float(r["ron_per_mwh"])) for r in shipped]:
             B.note("This scenario carries its own grid tariff table (saved before the table of 17.09.2026 or edited). "
@@ -397,7 +404,7 @@ def render() -> None:
         with st.form("form_grid_tariffs"):
             rows = pd.DataFrame(p.grid_tariffs)
             grid = pd.DataFrame({"RON/MWh": rows["ron_per_mwh"].astype(float).values},
-                                index=[f"{r['owner']} · {r['component']}" for r in p.grid_tariffs])
+                                index=pd.Index([f"{r['owner']} · {r['component']}" for r in p.grid_tariffs], name="Owner · component"))
             edited = B.grid_input(grid, key="grid_tariffs_editor", decimals=2)
             if st.form_submit_button("Apply grid tariff table", type="primary"):
                 for r, v in zip(p.grid_tariffs, edited["RON/MWh"].tolist(), strict=True):

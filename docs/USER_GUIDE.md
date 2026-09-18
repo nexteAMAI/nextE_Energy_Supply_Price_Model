@@ -1,6 +1,6 @@
 # USER GUIDE - nextE Energy Supply Bid Management Tool
 
-Application v0.7.5 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
+Application v0.7.6 (engine v0.4.0, unchanged since gate G4). Written for the person who prices and manages the retail
 supply portfolio, not for a developer. Every capability of the Excel model
 `Energy_Supply_Portfolio_Tracking_v03` is reachable through the twelve pages described here;
 nothing requires a command line.
@@ -38,8 +38,9 @@ value and a PASS or FAIL mark; a failing check means the figures are not to be u
 ### 2 - Data
 Where series enter. The switch "Use the Reference Case fixture" keeps the coded 2027 series as
 the base layer; uploads replace series one by one. A delivery is one workbook in the standard
-template (downloads at the bottom of the page: off-taker load, PV generation, baseload
-nomination, wholesale prices). On "Validate and load" the file passes the six checks (spine,
+template (at the bottom of the page: off-taker load, PV generation, baseload nomination,
+wholesale prices - press "Prepare the template" once, about 20 seconds, then "Download"; the
+prepared file is kept for the register it was built for). On "Validate and load" the file passes the six checks (spine,
 layout, surface, registry, energy, gaps); the result is shown check by check, and a refused
 file is not loaded. For a wholesale-prices delivery the price scenario is taken from the
 file's Std_Control or chosen in the box next to the uploader. The coverage table shows which
@@ -183,9 +184,13 @@ the verified state the page says so in a note; nothing is blocked.
   editing the positions' contents, not by dragging.
 - The Pricing_Calc tie-out covers the position-3 view only, the one the workbook caches (D94);
   the other views run the same code.
-- The regulated constants (VAT, CIT, reverse charge, GC values, BRP rate, Vtm, Vdm, tariff
-  components) are those of the frozen workbook and marked unverified; they are to be
-  confirmed against primary sources before gate G5.
+- The regulated constants were verified against their primary sources on 17.09.2026
+  (parameter catalogue, Audit page: status, validity, check date, note). Values the sources
+  contradict stay in the Reference Case for parity; bid scenarios take the verified set
+  through "Apply the bid-scenario defaults" on the Parameters page. A value that changes
+  inside the spine year is carried as one value per scenario (D122). The delegated-PRE
+  residuals (pro-rata TSO-guarantee contribution, negative-price VAT treatment, 4-working-day
+  service term, aggregation gain) are stated, not modelled.
 - Daylight-saving handling of uploads is proven on synthetic deliveries; a real local-clock
   delivery spanning the March and October changes has not yet been processed (gate G2
   conditional).

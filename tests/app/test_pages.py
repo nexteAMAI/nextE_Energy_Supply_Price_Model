@@ -188,3 +188,29 @@ def test_parameters_pv_fixed_amount_is_editable_not_derived_checkbox():
     assert not [c for c in at.checkbox if "derived" in c.label.lower()]
     fields = [t for t in at.text_input if t.key == "cp_pv_g_fixed"]
     assert fields and not fields[0].disabled
+
+
+def test_guarantees_origin_column_reads_the_catalogue_and_the_brp_method():
+    """G5-10 (D122): origin / status from the catalogue; the BRP row follows the register's method."""
+    at = AppTest.from_string(_script("guarantees"), default_timeout=240)
+    at.run()
+    assert not at.exception
+    text = " ".join(m.value for m in at.markdown)
+    assert "Workbook rule, kept for parity" in text and "[contradicted]" in text and "[verified]" in text
+    assert "unverified" not in text.replace("[unverified]", "")  # no stale free-text status
+    prelude = "st_state = S.get(); st_state.params.apply_bid_defaults(); st_state.mark_dirty()"
+    at = AppTest.from_string(_script("guarantees", prelude), default_timeout=240)
+    at.run()
+    assert not at.exception
+    text = " ".join(m.value for m in at.markdown)
+    assert "Delegated PRE (D119, D121)" in text and "months x mean |monthly imbalance value|" in text and "[to_verify]" in text
+
+
+def test_data_page_builds_a_template_on_demand_only():
+    """G5-2 (D122): the page opens without building the four templates; a Prepare button per class."""
+    at = AppTest.from_string(_script("data"), default_timeout=240)
+    at.run()
+    assert not at.exception
+    prepare = [b for b in at.button if b.label == "Prepare the template"]
+    assert len(prepare) == 4
+    assert not [b for b in at.download_button if b.label == "Download (.xlsx)"]

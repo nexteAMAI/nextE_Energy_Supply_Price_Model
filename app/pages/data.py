@@ -22,7 +22,7 @@ CLASS_HELP = {
 }
 
 
-@st.cache_data(show_spinner="Building the template in the canonical styling (about 20 seconds per file, once per register)")
+@st.cache_data(show_spinner="Building the template in the canonical styling (about 20 seconds, once per register)", persist="disk")
 def _template_bytes(input_class: str, year: int, codes: tuple[str, ...], scenarios: tuple[str, ...]) -> bytes:
     """Contract 1.1 template sized to the register (D112 / D113): off-taker codes for load and nominations, the PV plant, the
     scenario blocks for wholesale prices; the CEO's canonical styling."""
@@ -125,13 +125,23 @@ def render() -> None:
     B.note("Templates carry Instructions, Std_Control, Series_Registry (slots pre-declared and locked), the RAW_EET_QH paste surface and the "
            "Recon_Check gate. Contract: docs/DATA_CONTRACT.md (ESB-STD-QH 1.1: scenario blocks in one wholesale file, entity names for reference, "
            "an entirely blank declared column counts as not delivered). Templates are sized to the register and carry the canonical styling (D113).")
+    B.caption("A template is built when its Prepare button is pressed (about 20 seconds; kept on disk for the register it was built for), "
+              "so the page opens without waiting for the four files (G5-2).")
     year = p.spine_year
     codes = tuple(o.code for o in p.offtakers)
+    prepared: set[str] = st.session_state.setdefault("data_templates_prepared", set())
     cols = st.columns(len(INPUT_CLASSES))
     for col, cls in zip(cols, INPUT_CLASSES, strict=True):
         with col:
             st.markdown(f"**{cls}**")
             B.caption(CLASS_HELP.get(cls, ""))
-            st.download_button(f"Download TPL_{cls}_QH_{year}.xlsx", data=_template_bytes(cls, year, codes, tuple(p.scenario_names)),
-                               file_name=f"TPL_{cls}_QH_{year}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                               key=f"tpl_{cls}")
+            fname = f"TPL_{cls}_QH_{year}.xlsx"
+            B.caption(fname)
+            if cls in prepared:
+                st.download_button("Download (.xlsx)", data=_template_bytes(cls, year, codes, tuple(p.scenario_names)),
+                                   file_name=fname, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                   key=f"tpl_{cls}")
+            elif st.button("Prepare the template", key=f"tpl_prep_{cls}"):
+                _template_bytes(cls, year, codes, tuple(p.scenario_names))
+                prepared.add(cls)
+                st.rerun()

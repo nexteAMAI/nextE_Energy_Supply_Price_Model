@@ -65,15 +65,39 @@ def render() -> None:
     st.markdown("## Regulatory formulas · inputs of this run")
     mg = p.market_guarantees
     fx = p.general.fx_ron_per_eur
+    from esb.catalogue import entry_for
+
+    def origin(key: str) -> str:
+        """Source and status of the driving register entry, read from the parameter catalogue (G5-10, D-I)."""
+        e = entry_for(key)
+        return f"{e.source} [{e.source_status}]" if e.source else "–"
+
+    delegated = str(mg["brp"].get("method", "rate_per_mw")) == "pre_delegated"
+    spot_vat_txt = f" x (1 + VAT {B.pct(p.general.vat_rate, 0)})" if bool(mg["spot"].get("vat_inclusive", False)) else ""
+    if delegated:
+        vals = np.abs(np.asarray(inp.imbalance_value_monthly if inp.imbalance_value_monthly is not None else [], dtype=float))
+        avg = float(vals.mean()) if vals.size else 0.0
+        vat_txt = f" x (1 + VAT {B.pct(p.general.vat_rate, 0)})" if bool(mg["brp"].get("pre_vat_inclusive", True)) else ""
+        brp_formula = (f"max({B.num(mg['brp'].get('pre_initial_ron', 0.0), 0)} RON / {B.num(fx, 2)}; "
+                       f"{B.num(mg['brp'].get('pre_months_of_imbalance', 0.0), 2)} months x mean |monthly imbalance value| {B.num(avg, 0)} EUR{vat_txt})")
+        brp_origin = f"Delegated PRE (D119, D121): floor {origin('market_guarantees.brp.pre_initial_ron')}; months {origin('market_guarantees.brp.pre_months_of_imbalance')}"
+    else:
+        brp_formula = f"{B.num(mg['brp']['rate_ron_per_mw'], 0)} RON/MW x ({B.num(mg['brp']['generation_mw_in_brp'], 0)} + {B.num(inp.peak_retail_buy_mw, 2)}) MW / {B.num(fx, 2)}"
+        brp_origin = f"Workbook rule, kept for parity: {origin('market_guarantees.brp.rate_ron_per_mw')}"
     rows = [
-        ("Spot (OPCOM)", f"{B.num(mg['spot']['buffer_days'], 0)} days x {B.num(inp.peak_daily_spot_buy_mwh, 2)} MWh x {B.num(inp.peak_dam_price, 2)} EUR/MWh", reg.spot, "Input!C111:C114"),
-        ("BRP", f"{B.num(mg['brp']['rate_ron_per_mw'], 0)} RON/MW x ({B.num(mg['brp']['generation_mw_in_brp'], 0)} + {B.num(inp.peak_retail_buy_mw, 2)}) MW / {B.num(fx, 2)}", reg.brp, "Input!C116:C119 - unverified"),
-        ("TSO", f"Vtm {B.num(mg['tso']['vtm_multiplier'], 1)} x 4 x (TL + SS) x metered / 12 = annual value {B.num(reg.tso_annual_value, 0)} EUR", reg.tso, "Input!C121:C123 - PO 01.13 unverified"),
-        ("DSO", f"Vdm {B.num(mg['dso']['vdm_multiplier'], 1)} x 4 x (T_HV + T_MV + T_LV) x metered / 12 + add-on = annual value {B.num(reg.dso_annual_value, 0)} EUR", reg.dso, "Input!C125:C128 - ANRE Order 129/2015 unverified"),
+        ("Spot (OPCOM)", f"{B.num(mg['spot']['buffer_days'], 0)} days x {B.num(inp.peak_daily_spot_buy_mwh, 2)} MWh x {B.num(inp.peak_dam_price, 2)} EUR/MWh{spot_vat_txt}", reg.spot,
+         origin("market_guarantees.spot.buffer_days")),
+        ("BRP", brp_formula, reg.brp, brp_origin),
+        ("TSO", f"Vtm {B.num(mg['tso']['vtm_multiplier'], 1)} x 4 x (TL + SS) x metered / 12 = annual value {B.num(reg.tso_annual_value, 0)} EUR", reg.tso,
+         origin("market_guarantees.tso.vtm_multiplier")),
+        ("DSO", f"Vdm {B.num(mg['dso']['vdm_multiplier'], 1)} x 4 x (T_HV + T_MV + T_LV) x metered / 12 + add-on = annual value {B.num(reg.dso_annual_value, 0)} EUR", reg.dso,
+         origin("market_guarantees.dso.vdm_multiplier")),
     ]
     df = pd.DataFrame(rows, columns=["Counterparty", "Formula on this run", "Amount (EUR)", "Origin / status"]).set_index("Counterparty")
     B.table(df, index_label="Counterparty", decimals=0)
-    B.caption("Citations are carried as quoted in the workbook with source_status: unverified (docs/PARAMETERS.md section 3); the numbers are the engine's, the legal basis is to be confirmed")
+    B.caption("Origin and status are read from the parameter catalogue (config/parameter_catalogue.yaml, docs/PARAMETERS.md section 3): "
+              "verified = read on the primary source; contradicted = the source says otherwise, value kept for the Reference Case parity; "
+              "to_verify = source named, pending the signed supply contract; assumption = house proxy. The numbers are the engine's.")
 
     st.markdown("## Own guarantees received from off-takers")
     rows = []
